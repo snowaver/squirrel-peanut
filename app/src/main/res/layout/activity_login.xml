@@ -1,0 +1,16 @@
+<?xml  version="1.0"  encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:id="@+id/register_root_layout"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:background="@color/lightgray"  android:fitsSystemWindows="true">
+
+    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  android:title="@string/login"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
+
+    <cc.mashroom.hedgehog.widget.PromptInputbox  android:id="@+id/username"  android:layout_width="match_parent"  android:layout_height="50dp"  android:inputType="number"  android:hint="@string/username"  app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.PromptInputbox>
+
+    <cc.mashroom.hedgehog.widget.PromptInputbox  android:id="@+id/password"  android:layout_width="match_parent"  android:layout_height="50dp"  android:inputType="textPassword"  android:hint="@string/password"  app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.PromptInputbox>
+
+    <TextView  android:id="@+id/jump_to_registration_link"  android:layout_width="match_parent"  android:layout_height="50dp"  android:paddingRight="10dp"  android:text="@string/register_if_no_account"  android:textColor="@color/blue"  android:textSize="16dp"  android:gravity="center_vertical|end"/>
+
+    <View  android:layout_width="match_parent"  android:layout_height="0dp" android:layout_weight="1"></View>
+
+    <Button  android:id="@+id/login_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:text="@string/login"  android:textSize="18dp"  android:textColor="@color/white"   android:background="@color/limegreen"/>
+
+</LinearLayout>

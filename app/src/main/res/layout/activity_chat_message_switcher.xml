@@ -1,0 +1,31 @@
+<?xml  version="1.0"  encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:orientation="horizontal">
+
+    <ImageView  android:id="@+id/send_failed_warning_image"  android:layout_width="50dp"  android:layout_height="40dp"  android:paddingRight="10dp"  android:visibility="gone"  android:src="@drawable/warning_ico"  android:scaleType="fitCenter"  android:layout_gravity="right|top"/>
+
+    <cc.mashroom.hedgehog.widget.ViewSwitcher  android:id="@+id/message_content_switcher"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_gravity="left">
+
+        <TextView  android:id="@+id/message"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:minHeight="40dp"  android:gravity="center_vertical"  android:textColor="@color/darkgray"  android:textSize="14dp"/>
+
+        <RelativeLayout  android:id="@+id/media_message_layout"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:visibility="gone">
+
+            <cc.mashroom.hedgehog.widget.FlexibleSimpleDraweeView  android:id="@+id/screenshot"  android:layout_width="wrap_content"  android:layout_height="90dp"  android:maxHeight="90dp"/>
+
+            <com.github.ybq.android.spinkit.SpinKitView  android:id="@+id/upload_progress_bar"  android:layout_width="40dp"  android:layout_height="40dp"  android:padding="5dp"      android:layout_centerInParent="true"  app:SpinKit_Style="ChasingDots"  android:visibility="gone"/>
+
+            <ImageView  android:id="@+id/play_button"  android:layout_width="40dp"  android:layout_height="40dp"  android:src="@drawable/play_button"  android:layout_centerInParent="true"  android:scaleType="fitCenter"/>
+
+        </RelativeLayout>
+
+        <com.aries.ui.view.radius.RadiusRelativeLayout  android:layout_width="160dp"  android:layout_height="40dp"  android:visibility="gone"  android:paddingLeft="5dp"  android:paddingRight="0dp"  android:paddingTop="5dp"  android:paddingBottom="5dp"  app:rv_radiusHalfHeightEnable="true"  app:rv_strokeWidth="1dp"  app:rv_strokeColor="@color/gainsboro">
+
+            <ImageView  android:layout_width="30dp"  android:layout_height="30dp"  android:src="@drawable/voice_recorder"/>
+
+            <TextView  android:id="@+id/voice_duration"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_centerInParent="true"  android:textColor="@color/darkgray"  android:textSize="14dp"/>
+
+        </com.aries.ui.view.radius.RadiusRelativeLayout>
+
+    </cc.mashroom.hedgehog.widget.ViewSwitcher>
+
+
+</LinearLayout>

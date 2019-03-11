@@ -1,0 +1,39 @@
+=============================================================================
+= NOTICE file corresponding to section 4d of the Apache License Version 2.0 =
+=============================================================================
+
+* Copyright 2019 snowaver. https://mashroom.cc/
+
+This product includes/uses software(s) developed by 'The Project Lombok Authors' (https://www.projectlombok.org/) and licensed under the MIT license
+- Project Lombok
+This product includes/uses software(s) developed by 'Square, Inc.' (https://square.github.io/retrofit/) and licensed under Apache Licence 2.0
+- Retrofit2
+- Converter Jackson
+This product includes/uses software(s) developed by 'Facebook, Inc. and its affiliates' ( https://frescolib.org/) and licensed under MIT license
+- Fresco
+- ImagePipeline OkHttp 3 Integration
+This product includes/uses software(s) developed by 'SteelKiwi' (http://steelkiwi.com/) and licensed under Apache Licence 2.0
+- cropiwa
+This product includes/uses software(s) developed by 'Free Software Foundation, Inc.' (http://fsf.org/) and licensed under LGPL license
+- Toasty
+This product includes/uses software(s) developed by 'ongakuer' (http://relex.me/photo-drawee-view/) and licensed under Apache Licence 2.0
+- PhotoDraweeView
+This product includes/uses software(s) developed by 'Aries Hoo' (https://github.com/AriesHoo/UIWidget/) and licensed under Apache Licence 2.0
+- UIWidget
+This product includes/uses software(s) developed by 'Shintaro Katafuchi, Marcel Schnelle, Yoshinori Isogai' (https://github.com/permissions-dispatcher/PermissionsDispatcher/) and licensed under Apache Licence 2.0
+- PermissionsDispatcher
+This product includes/uses software(s) developed by 'andy' ( https://github.com/andyxialm/SmoothCheckBox/) and licensed under Apache Licence 2.0
+- SmoothCheckBox
+This product includes/uses software(s) developed by 'Irozon, Inc.' (https://github.com/hamadakram/) and licensed under Apache Licence 2.0
+- Sneaker
+This product includes/uses software(s) developed by 'The WebRTC project authors' (https://code.google.com/p/webrtc/) and licensed under BSD 3-clause
+- Libjingle
+- Libjingle Peerconnection
+This product includes/uses software(s) developed by 'ybq' (https://ybq.github.io/Android-SpinKit/) and licensed under MIT license
+- Android-SpinKit
+This product includes/uses software(s) developed by 'daimajia' ( https://github.com/daimajia/AndroidSwipeLayout/) and licensed under MIT license
+- Android Swipe Layout
+This product includes/uses software(s) developed by 'H2 Group' ( http://www.h2database.com/html/main.html) licensed under MPL 2.0 and EPL 1.0
+- H2
+This product includes/uses software(s) developed by 'Shimizu Yasuhiro (yshrsmz)' (https://github.com/yshrsmz/KeyboardVisibilityEvent/) and licensed under MIT license
+- KeyboardVisibilityEvent

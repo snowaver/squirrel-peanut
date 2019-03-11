@@ -1,0 +1,24 @@
+<?xml  version="1.0"  encoding="utf-8"?>
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:fresco="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"  android:layout_height="wrap_content"  android:background="@color/white"  android:paddingLeft="10dp"  android:paddingTop="5dp"  android:paddingBottom="5dp"  android:paddingRight="10dp">
+
+    <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/other_portrait"  android:layout_width="40dp"  android:layout_height="40dp"  android:layout_alignParentLeft="true"   android:layout_alignParentTop="true"  fresco:placeholderImage="@drawable/placeholder"  fresco:roundAsCircle="true"  fresco:roundedCornerRadius="20dp"/>
+
+    <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/owner_portrait"  android:layout_width="40dp"  android:layout_height="40dp"  android:layout_alignParentRight="true"  android:layout_alignParentTop="true"  fresco:placeholderImage="@drawable/placeholder"  fresco:roundAsCircle="true"  fresco:roundedCornerRadius="20dp"/>
+
+    <cc.mashroom.hedgehog.widget.ViewSwitcher  android:id="@+id/message_vest_to_switcher"  android:layout_width="match_parent"  android:layout_height="wrap_content"  android:layout_toLeftOf="@id/owner_portrait"  android:layout_marginLeft="10dp"  android:layout_toRightOf="@id/other_portrait"  android:layout_marginRight="10dp"  android:layout_centerVertical="true">
+
+        <RelativeLayout  android:id="@+id/other_message_layout"  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:layout_alignParentLeft="true">
+
+            <include  android:id="@+id/other_message_content"  layout="@layout/activity_chat_message_switcher"></include>
+
+        </RelativeLayout>
+
+        <RelativeLayout  android:id="@+id/owner_message_layout"  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:layout_alignParentRight="true"  android:visibility="gone">
+
+            <include  android:id="@+id/owner_message_content"  layout="@layout/activity_chat_message_switcher"></include>
+
+        </RelativeLayout>
+
+    </cc.mashroom.hedgehog.widget.ViewSwitcher>
+
+</RelativeLayout>

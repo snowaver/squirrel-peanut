@@ -1,0 +1,28 @@
+<?xml  version="1.0"  encoding="utf-8"?>
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:background="@color/black">
+
+    <android.opengl.GLSurfaceView  android:id="@+id/glsurface_view"  android:layout_width="match_parent"  android:layout_height="match_parent"/>
+
+    <View  android:id="@+id/status_bar_hint"  android:layout_width="match_parent"  android:layout_height="0dp"  android:background="#20000000"></View>
+
+    <cc.mashroom.hedgehog.widget.ViewSwitcher  android:id="@+id/control_switcher"  android:layout_width="match_parent" android:layout_height="160dp"  android:background="@color/transparent"  android:layout_alignParentBottom="true">
+
+        <RelativeLayout  android:layout_width="match_parent"  android:layout_height="60dp"  android:layout_centerInParent="true">
+
+            <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/cancel_button"  android:layout_width="60dp"  android:layout_height="60dp"  android:layout_centerInParent="true"  app:roundAsCircle="true"  app:roundingBorderWidth="5dp"  app:roundingBorderColor="@color/white"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout  android:id="@+id/respond_layout"  android:layout_width="match_parent"  android:layout_height="60dp"  android:layout_centerInParent="true"  android:paddingLeft="10dp"  android:paddingRight="10dp"  android:visibility="gone">
+
+            <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/reject_button"  android:layout_width="60dp"  android:layout_height="60dp"  android:layout_alignParentLeft="true"   app:actualImageResource="@drawable/cancel"  app:roundAsCircle="true"/>
+
+            <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/accept_button"  android:layout_width="60dp"  android:layout_height="60dp"  android:layout_alignParentRight="true"  app:actualImageResource="@drawable/ok"  app:roundAsCircle="true"/>
+
+        </RelativeLayout>
+
+    </cc.mashroom.hedgehog.widget.ViewSwitcher>
+
+    <cc.mashroom.hedgehog.widget.Stopwatch  android:id="@+id/chronometer"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_above="@id/control_switcher"  android:textSize="22dp"  android:textColor="@color/white"  android:format="00:00:00"  android:layout_centerHorizontal="true"  android:layout_marginTop="50dp"/>
+
+</RelativeLayout>

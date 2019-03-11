@@ -1,0 +1,36 @@
+package cc.mashroom.squirrel.module.home.activity;
+
+import  android.os.Bundle;
+import  android.widget.CompoundButton;
+import  android.widget.ListView;
+
+import  com.aries.ui.widget.alert.UIAlertDialog;
+
+import  cc.mashroom.squirrel.R;
+import  cc.mashroom.squirrel.module.home.adapters.ContactGroupAdapter;
+import  cc.mashroom.squirrel.parent.AbstractActivity;
+import  cc.mashroom.util.ObjectUtils;
+
+public  class  SwitchContactGroupActivity  extends  AbstractActivity  implements  CompoundButton.OnCheckedChangeListener
+{
+    protected  void  onCreate( Bundle  savedInstanceState )
+    {
+        super.onCreate( savedInstanceState );
+
+        super.setContentView( R.layout.activity_switch_contact_group );
+
+        ObjectUtils.cast(super.findViewById(R.id.contact_groups),ListView.class).setAdapter( new  ContactGroupAdapter(this,this) );
+
+        super.findViewById(R.id.add_to_new_group_button).setOnClickListener( (button) -> add() );
+    }
+
+    private  void  add()
+    {
+        new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)).show();
+    }
+
+    public  void  onCheckedChanged( CompoundButton  compoundButton,boolean  isChecked )
+    {
+
+    }
+}

@@ -1,0 +1,24 @@
+<?xml  version="1.0"  encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:fresco="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:background="@color/lightgray">
+
+    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  fresco:backText="@string/back"  android:title="@string/contact_profile"  android:background="@color/steelblue"  fresco:additionalText="@string/edit"></cc.mashroom.hedgehog.widget.HeaderBar>
+
+    <LinearLayout  android:id="@+id/protrait_layout"  android:layout_width="match_parent"  android:layout_height="160dp"  android:orientation="horizontal"  android:gravity="center"  android:background="@color/lightgray">
+
+        <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/details_portrait"  android:layout_width="85dp"  android:layout_height="85dp"  android:layout_centerInParent="true"  fresco:placeholderImage="@drawable/placeholder"  fresco:roundAsCircle="true"  fresco:roundedCornerRadius="40dp"  fresco:roundingBorderWidth="5dp"  fresco:roundingBorderColor="@color/white"/>
+
+    </LinearLayout>
+
+    <cc.mashroom.hedgehog.widget.PromptInputbox  android:id="@+id/username"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/username"  fresco:enableBottomBorder="true"  fresco:enableTopBorder="true"></cc.mashroom.hedgehog.widget.PromptInputbox>
+
+    <cc.mashroom.hedgehog.widget.PromptInputbox  android:id="@+id/nickname"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/nickname"  fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.PromptInputbox>
+
+    <cc.mashroom.hedgehog.widget.PromptInputbox  android:id="@+id/remark"    android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/remark"    fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.PromptInputbox>
+
+    <cc.mashroom.hedgehog.widget.PromptInputbox  android:id="@+id/group"     android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/group"     fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.PromptInputbox>
+
+    <View  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"></View>
+
+    <Button  android:id="@+id/chat_or_subscribe_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/limegreen"  android:textColor="@color/white"  android:textSize="18dp"/>
+
+</LinearLayout>

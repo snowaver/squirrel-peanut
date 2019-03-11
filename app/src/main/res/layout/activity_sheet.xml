@@ -1,0 +1,35 @@
+<?xml  version="1.0"  encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  xmlns:tools="http://schemas.android.com/tools"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:fitsSystemWindows="true">
+
+    <cc.mashroom.hedgehog.widget.SlidingSidebarLayout  android:layout_width="match_parent"  android:layout_height="match_parent"  android:background="@color/lightgray"  tools:openDrawer="start"  app:transformMode="translate">
+
+        <LinearLayout  android:tag="content"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical">
+
+            <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
+
+            <cc.mashroom.hedgehog.widget.NoTouchFlipViewPager  android:id="@+id/tab_content"  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"  android:background="@color/lightgray"></cc.mashroom.hedgehog.widget.NoTouchFlipViewPager>
+
+            <View  android:layout_width="match_parent"  android:layout_height="1px"  android:background="@color/gainsboro"></View>
+
+            <com.google.android.material.tabs.TabLayout  android:id="@+id/tab_layout"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_alignParentBottom="true"  app:tabBackground="@color/white"  app:tabIndicatorHeight="0dp"  app:tabMode="fixed"  app:tabGravity="fill"  app:tabContentStart="0dp"  app:tabPaddingStart="0dp"  app:tabPaddingEnd="0dp"  app:tabTextColor="@color/darkgray"  app:tabSelectedTextColor="@color/skyblue"></com.google.android.material.tabs.TabLayout>
+
+        </LinearLayout>
+
+        <LinearLayout  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:layout_gravity="start"  android:background="@color/white">
+
+            <RelativeLayout  android:id="@+id/portrait_layout"  android:layout_width="match_parent" android:layout_height="200dp"  android:background="@color/lightgray">
+
+                <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/portrait"  android:layout_width="85dp"  android:layout_height="85dp"  android:layout_centerInParent="true"  app:placeholderImage="@drawable/placeholder"  app:roundAsCircle="true"  app:roundingBorderWidth="5dp"  app:roundingBorderColor="@color/white"/>
+
+            </RelativeLayout>
+
+            <ListView  android:id="@+id/menu_list"  android:layout_below="@id/portrait_layout"  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"  android:divider="@color/lightgray"   android:dividerHeight="1px"></ListView>
+
+            <Button  android:id="@+id/logout_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:text="@string/logout"  android:textColor="@color/white"  android:textSize="18dp"  android:background="@color/red"/>
+
+        </LinearLayout>
+
+    </cc.mashroom.hedgehog.widget.SlidingSidebarLayout>
+
+</LinearLayout>
+

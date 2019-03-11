@@ -1,0 +1,17 @@
+<resources >
+
+    <style  name="activityAnimation"  parent="@android:style/Animation">
+
+        <item  name="android:activityOpenEnterAnimation">@anim/right_in</item><item  name="android:activityOpenExitAnimation">@anim/left_out</item><item  name="android:activityCloseEnterAnimation">@anim/left_in</item><item  name="android:activityCloseExitAnimation">@anim/right_out</item>
+
+    </style>
+
+    <style  name="DefaultTheme"  parent="Theme.AppCompat.NoActionBar"><item  name="android:windowAnimationStyle">@style/activityAnimation</item><item  name="android:activityCloseEnterAnimation">@anim/left_in</item></style>
+
+    <style  name="Widget.Design.AppBarLayout"  parent="android:Widget"><item  name="elevation">0dp</item><item  name="android:background">?attr/colorPrimary</item></style>
+
+    <style  name="ExpandedToolbarTitleAppreance"   parent="android:Theme"><item  name="android:textColor">@color/transparent</item><item  name="android:textSize">14dp</item></style>
+
+    <style  name="CollapsedToolbarTitleAppreance"  parent="android:Theme"><item  name="android:textColor">@color/white</item><item  name="android:textSize">14dp</item></style>
+
+</resources>

@@ -1,0 +1,12 @@
+<?xml  version="1.0"  encoding="utf-8"?>
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"  android:layout_width="match_parent"  android:layout_height="match_parent">
+
+    <cc.mashroom.hedgehog.widget.PinnedHeaderExpandableListViewLayout  android:id="@+id/contact_group_layout"  android:layout_width="match_parent"  android:layout_height="match_parent">
+
+        <ExpandableListView  android:id="@+id/contact_group"  android:tag="content"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:childDivider="@color/lightgray"  android:headerDividersEnabled="false"  android:dividerHeight="1px"  android:scrollbars="none"  android:groupIndicator="@null"></ExpandableListView>
+
+        <FrameLayout  android:tag="header"  android:layout_width="match_parent"  android:layout_height="35dp"></FrameLayout>
+
+    </cc.mashroom.hedgehog.widget.PinnedHeaderExpandableListViewLayout>
+
+</RelativeLayout>
