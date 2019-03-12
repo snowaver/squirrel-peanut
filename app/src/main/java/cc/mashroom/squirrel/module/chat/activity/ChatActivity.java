@@ -100,7 +100,7 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 		}
 		else
 		{
-			setSneakerView(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_warning,R.string.voice_duration_too_short,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(this,ContextUtils.getStatusBarHeight(this))+50).sneakWarning();
+			showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_warning,R.string.voice_duration_too_short,R.color.black,R.color.orange );
 		}
 	}
 

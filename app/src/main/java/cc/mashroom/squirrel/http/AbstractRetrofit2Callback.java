@@ -58,6 +58,6 @@ public  abstract  class  AbstractRetrofit2Callback<T>  implements  Callback<T>
 			waitingDailog.cancel();
 		}
 
-		ObjectUtils.cast(context,AbstractActivity.class).setSneakerView(Sneaker.with(context),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(context,ContextUtils.getStatusBarHeight(context))+50).sneakError();
+		ObjectUtils.cast(context,AbstractActivity.class).showSneakerWindow( Sneaker.with(context),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
 	}
 }

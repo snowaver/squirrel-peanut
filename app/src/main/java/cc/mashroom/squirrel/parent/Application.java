@@ -192,7 +192,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 				}
 				else
 				{
-					getMainLooperHandler().post( () -> ObjectUtils.cast(AbstractActivity.STACK.getLast(),AbstractActivity.class).setSneakerView(Sneaker.with(AbstractActivity.STACK.getLast()),com.irozon.sneaker.R.drawable.ic_error,R.string.authenticate_failed,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(this,ContextUtils.getStatusBarHeight(AbstractActivity.STACK.getLast()))+50).sneakError() );
+					getMainLooperHandler().post( () -> ObjectUtils.cast(AbstractActivity.STACK.getLast(),AbstractActivity.class).showSneakerWindow(Sneaker.with(AbstractActivity.STACK.getLast()),com.irozon.sneaker.R.drawable.ic_error,R.string.authenticate_failed,R.color.white,R.color.red) );
 				}
 
 				getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).edit().remove("ID").remove("USERNAME").remove("NAME").remove("NICKNAME").commit();
@@ -204,7 +204,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 			{
 				if(     AbstractActivity.STACK.getLast() instanceof LoadingActivity || AbstractActivity.STACK.getLast() instanceof LoginActivity )
 				{
-					getMainLooperHandler().post( () -> ObjectUtils.cast(AbstractActivity.STACK.getLast(),AbstractActivity.class).setSneakerView(Sneaker.with(AbstractActivity.STACK.getLast()),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(this,ContextUtils.getStatusBarHeight(AbstractActivity.STACK.getLast()))+50).sneakError() );
+					getMainLooperHandler().post( () -> ObjectUtils.cast(AbstractActivity.STACK.getLast(),AbstractActivity.class).showSneakerWindow(Sneaker.with(AbstractActivity.STACK.getLast()),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red) );
 				}
 			}
 		}

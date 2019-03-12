@@ -165,14 +165,14 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 
 				if( contact.getInteger(  "SUBSCRIBE_STATUS" )    == 0 )
 				{
-					setSneakerView(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_packet_sent,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(this,ContextUtils.getStatusBarHeight(this))+50).sneakSuccess();
+					showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_packet_sent,R.color.white,R.color.limegreen );
 				}
 				else
 				if( contact.getInteger(  "SUBSCRIBE_STATUS" )    == 1 )
 				{
 				    if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.remark),PromptInputbox.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group), PromptInputbox.class).getText().toString().trim()) )
                     {
-						setSneakerView(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.subscribe_form_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(this,ContextUtils.getStatusBarHeight(this))+50 ).sneakError();
+						showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.subscribe_form_error,R.color.white,R.color.red );
                     }
                     else
                     {
@@ -191,11 +191,11 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 
 										ObjectUtils.cast(findViewById(R.id.subscribe_button),Button.class).setText( R.string.chat );
 
-										setSneakerView(Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.contact_added,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(SubscribeActivity.this,ContextUtils.getStatusBarHeight(SubscribeActivity.this))+50).sneakSuccess();
+										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.contact_added,R.color.white,R.color.limegreen );
 									}
 									else
 									{
-										setSneakerView(Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(SubscribeActivity.this,ContextUtils.getStatusBarHeight(SubscribeActivity.this))+50).sneakError();
+										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
 									}
 								}
 							}
@@ -231,11 +231,11 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 
 										ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor( SubscribeActivity.super.getResources().getColor(R.color.gainsboro) );
 
-										setSneakerView(Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_packet_sent,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(SubscribeActivity.this,ContextUtils.getStatusBarHeight(SubscribeActivity.this))+50).sneakSuccess();
+										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_packet_sent,R.color.white,R.color.limegreen );
 									}
 									else
 									{
-										setSneakerView(Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(SubscribeActivity.this,ContextUtils.getStatusBarHeight(SubscribeActivity.this))+50).sneakError();
+										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
 									}
 								}
 							}
@@ -243,7 +243,7 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
                     }
                     else
 					{
-						setSneakerView(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.subscribe_form_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(this,ContextUtils.getStatusBarHeight(this))+50).sneakError();
+						showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.subscribe_form_error,R.color.white,R.color.red );
 					}
 				}
 			}
@@ -270,7 +270,7 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 			{
 				if( !contact.getString("REMARK").equals(ObjectUtils.cast(super.findViewById(R.id.remark),PromptInputbox.class).getText().toString().trim()) || !group.equals(contact.getString("GROUP_NAME")) )
 				{
-					RetrofitRegistry.get(ContactService.class).update(Long.parseLong(application().getSquirrelClient().getId()),user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),PromptInputbox.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),PromptInputbox.class).getText().toString().trim()).enqueue( new  AbstractRetrofit2Callback<Void>(this){public  void  onResponse(Call<Void>  call,Response<Void>  response){ if(response.code() == 200){setSneakerView(Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(SubscribeActivity.this,ContextUtils.getStatusBarHeight(SubscribeActivity.this))+50).sneakSuccess();  Contact.dao.update("UPDATE  "+Contact.dao.getDataSourceBind().table()+"  SET  REMARK = ?,GROUP_NAME = ?  WHERE  ID = ?",new  Object[]{ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),PromptInputbox.class).getText().toString().trim(),group,user.getLong("ID")});  Contact.dao.getContactDirect().get(user.getLong("ID")).addEntry("REMARK",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),PromptInputbox.class).getText().toString().trim()).addEntry("GROUP_NAME",group);}}} );
+					RetrofitRegistry.get(ContactService.class).update(Long.parseLong(application().getSquirrelClient().getId()),user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),PromptInputbox.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),PromptInputbox.class).getText().toString().trim()).enqueue( new  AbstractRetrofit2Callback<Void>(this){public  void  onResponse(Call<Void>  call,Response<Void>  response){ if(response.code() == 200){showSneakerWindow(Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen);  Contact.dao.update("UPDATE  "+Contact.dao.getDataSourceBind().table()+"  SET  REMARK = ?,GROUP_NAME = ?  WHERE  ID = ?",new  Object[]{ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),PromptInputbox.class).getText().toString().trim(),group,user.getLong("ID")});  Contact.dao.getContactDirect().get(user.getLong("ID")).addEntry("REMARK",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),PromptInputbox.class).getText().toString().trim()).addEntry("GROUP_NAME",group);}}} );
 				}
 			}
 		}

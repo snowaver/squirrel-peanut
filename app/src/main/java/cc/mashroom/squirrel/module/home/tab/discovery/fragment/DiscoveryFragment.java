@@ -68,11 +68,11 @@ public  class   DiscoveryFragment  extends  AbstractFragment   implements  TextV
 					{
 						public  void  onResponse( Call<List<User>>  call, Response<List<User>>  response )
 						{
-							super.onResponse( call, response );
+							super.onResponse( call , response );
 
 							if( response.code()   != 200 )
 							{
-								ObjectUtils.cast(DiscoveryFragment.this.getActivity(),AbstractActivity.class).setSneakerView(Sneaker.with(DiscoveryFragment.this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(DiscoveryFragment.this.getActivity(),ContextUtils.getStatusBarHeight(DiscoveryFragment.this.getActivity()))+50).sneakError();
+								ObjectUtils.cast(DiscoveryFragment.this.getActivity(),AbstractActivity.class).showSneakerWindow( Sneaker.with(DiscoveryFragment.this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
 							}
 							else
 							{
@@ -91,7 +91,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment   implements  TextV
 			}
 			else
 			{
-				ObjectUtils.cast(this.getActivity(),AbstractActivity.class).setSneakerView(Sneaker.with(this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,R.string.content_blank_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(DiscoveryFragment.this.getActivity(),ContextUtils.getStatusBarHeight(DiscoveryFragment.this.getActivity()))+50).sneakError();
+				ObjectUtils.cast(this.getActivity(),AbstractActivity.class).showSneakerWindow( Sneaker.with(this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,R.string.content_blank_error,R.color.white,R.color.red );
 			}
 		}
 

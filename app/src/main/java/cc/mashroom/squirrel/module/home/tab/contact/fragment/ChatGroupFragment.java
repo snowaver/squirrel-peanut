@@ -81,7 +81,7 @@ public  class  ChatGroupFragment  extends  AbstractFragment    implements  Dialo
 						}
 						else
 						{
-							ObjectUtils.cast(ChatGroupFragment.this,AbstractActivity.class).setSneakerView(Sneaker.with(ChatGroupFragment.this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,response.code() == 601 ? R.string.group_name_exist : R.string.network_or_internal_server_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(ChatGroupFragment.this.getActivity(),ContextUtils.getStatusBarHeight(ChatGroupFragment.this.getActivity()))+50).sneakError();
+							ObjectUtils.cast(ChatGroupFragment.this,AbstractActivity.class).showSneakerWindow( Sneaker.with(ChatGroupFragment.this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,response.code() == 601 ? R.string.group_name_exist : R.string.network_or_internal_server_error,R.color.white,R.color.red );
 						}
 					}
 				}

@@ -94,11 +94,11 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 
 							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(new  HashMap<String,List<Map<String,Object>>>().addEntry("CHAT_GROUPS",new  LinkedList<Map<String,Object>>()).addEntry("CHAT_GROUP_USERS",response.body())) );
 
-							setSneakerView(Sneaker.with(GroupChatDetailsActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.add_successfully,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(GroupChatDetailsActivity.this,ContextUtils.getStatusBarHeight(GroupChatDetailsActivity.this))+50).sneakSuccess();
+							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.add_successfully,R.color.white,R.color.limegreen );
 						}
 						else
 						{
-							setSneakerView(Sneaker.with(GroupChatDetailsActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(GroupChatDetailsActivity.this,ContextUtils.getStatusBarHeight(GroupChatDetailsActivity.this))+50).sneakError();
+							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
 						}
 					}
 				}

@@ -75,7 +75,7 @@ public  class  AudioTouchRecoder   implements  View.OnTouchListener
                     }
                     else
                     {
-                        ObjectUtils.cast(context,AbstractActivity.class).setSneakerView(Sneaker.with(context),com.irozon.sneaker.R.drawable.ic_error,R.string.unknown_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(context,ContextUtils.getStatusBarHeight(context))+50).sneakError();
+                        ObjectUtils.cast(context,AbstractActivity.class).showSneakerWindow( Sneaker.with(context),com.irozon.sneaker.R.drawable.ic_error,R.string.unknown_error,R.color.white,R.color.red );
                     }
 
                     Tracer.trace(e );

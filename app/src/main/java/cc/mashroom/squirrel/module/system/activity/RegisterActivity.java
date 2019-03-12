@@ -87,7 +87,7 @@ public  class  RegisterActivity  extends  AbstractActivity   implements  View.On
 
 						if( response.code() != 200 )
 						{
-							setSneakerView(Sneaker.with(RegisterActivity.this),com.irozon.sneaker.R.drawable.ic_warning,failures.containsKey(response.code()) ? failures.get(response.code()) : failures.get(0),R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(RegisterActivity.this,ContextUtils.getStatusBarHeight(RegisterActivity.this))+50).sneakWarning();
+							showSneakerWindow(Sneaker.with(RegisterActivity.this),com.irozon.sneaker.R.drawable.ic_warning,failures.containsKey(response.code()) ? failures.get(response.code()) : failures.get(0),R.color.black,R.color.orange );
 						}
 						else
 						{
@@ -102,7 +102,7 @@ public  class  RegisterActivity  extends  AbstractActivity   implements  View.On
 			/*
 			Toast.makeText(this,R.string.registration_form_error,Toast.LENGTH_LONG).show();
 			*/
-			setSneakerView(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.registration_form_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(this,ContextUtils.getStatusBarHeight(this))+50).sneakError();
+			showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.registration_form_error,R.color.white,R.color.red );
 		}
 	}
 

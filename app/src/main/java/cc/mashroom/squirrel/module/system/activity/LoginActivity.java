@@ -60,7 +60,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
     {
         if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.username),PromptInputbox.class).getText().toString(),ObjectUtils.cast(super.findViewById(R.id.password),PromptInputbox.class).getText().toString()) || !NetworkUtils.isNetworkAvailable(this) )
         {
-            application().getMainLooperHandler().post( () -> setSneakerView(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,!NetworkUtils.isNetworkAvailable(this) ? R.string.network_or_internal_server_error : R.string.connect_form_error,R.color.white).autoHide(true).setDuration(3000).setHeight(DensityUtils.dp(this,ContextUtils.getStatusBarHeight(this))+50).sneakError() );
+            application().getMainLooperHandler().post( () -> showSneakerWindow(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,!NetworkUtils.isNetworkAvailable(this) ? R.string.network_or_internal_server_error : R.string.connect_form_error,R.color.white,R.color.red) );
         }
         else
         {
