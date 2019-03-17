@@ -122,11 +122,11 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 				throw  new  IllegalStateException( "SQUIRREL-CLIENT:  ** CALL  ACTIVITY **  calling  state  error." );
 			}
 
-			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,30,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(67,(int)  (((double)  ContextUtils.getStatusBarHeight(this)/super.getResources().getDisplayMetrics().heightPixels)*100)+1,33,30),"opus",1,Application.ICE_SERVERS) ).demand();
+			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75,(int)  (((double)  ContextUtils.getStatusBarHeight(this)/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) ).demand();
 		}
 		else
 		{
-			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,30,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(67,(int)  (((double)  ContextUtils.getStatusBarHeight(this)/super.getResources().getDisplayMetrics().heightPixels)*100)+1,33,30),"opus",1,Application.ICE_SERVERS) );
+			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75,(int)  (((double)  ContextUtils.getStatusBarHeight(this)/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) );
 
 			ObjectUtils.cast(super.findViewById(R.id.control_switcher),    ViewSwitcher.class).setDisplayedChild( 1 );
 

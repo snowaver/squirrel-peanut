@@ -12,14 +12,12 @@ import  androidx.core.app.ActivityOptionsCompat;
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.facebook.drawee.backends.pipeline.Fresco;
 import  com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
-import  com.facebook.imagepipeline.core.ImagePipelineConfig;
 import  com.google.common.collect.Lists;
 import  com.irozon.sneaker.Sneaker;
 
 import  org.joda.time.DateTime;
 import  org.webrtc.PeerConnection;
 
-import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.router.BalancerStateListener;
@@ -74,7 +72,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 {
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList( new  PeerConnection.IceServer("stun:118.24.16.67:3478"),new  PeerConnection.IceServer("stun:118.24.19.163:3478"),new  PeerConnection.IceServer("stun:118.25.216.217:3478"),new  PeerConnection.IceServer("stun:23.21.150.121"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302") );
 
-	public  static  String  BALANCING_PROXY_URL     = "http://192.168.1.114:8011/system/balancingproxy?action=1&keyword=0";
+	public  static  String  BALANCING_PROXY_URL      = "http://118.24.16.67:8011/system/balancingproxy?action=1&keyword=0";
 
 	public  static  List<String>  BALANCING_PROXY_BACKUP_ADDRESSES       = Lists.newArrayList( "118.24.16.67", "118.24.19.163","118.25.216.217" );
 
