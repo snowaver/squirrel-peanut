@@ -70,9 +70,9 @@ import  okhttp3.OkHttpClient;
 
 public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  BalancerStateListener, LifecycleListener, PacketListener
 {
-	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList( new  PeerConnection.IceServer("stun:118.24.16.67:3478"),new  PeerConnection.IceServer("stun:118.24.19.163:3478"),new  PeerConnection.IceServer("stun:118.25.216.217:3478"),new  PeerConnection.IceServer("stun:23.21.150.121"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302") );
+	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList( new  PeerConnection.IceServer("turn:118.24.16.67:3478?transport=tcp") );
 
-	public  static  String  BALANCING_PROXY_URL      = "http://118.24.16.67:8011/system/balancingproxy?action=1&keyword=0";
+	public  static  String  BALANCING_PROXY_URL     = "https://118.24.16.67:8011/system/balancingproxy?action=1&keyword=0";
 
 	public  static  List<String>  BALANCING_PROXY_BACKUP_ADDRESSES       = Lists.newArrayList( "118.24.16.67", "118.24.19.163","118.25.216.217" );
 

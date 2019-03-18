@@ -77,8 +77,6 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		ObjectUtils.cast(findViewById(R.id.cancel_button) , SimpleDraweeView.class).setImageURI( ImageUtils.toUri(this, cc.mashroom.hedgehog.R.drawable.red_placeholder) );
 
 		super.findViewById(R.id.status_bar_hint).setLayoutParams( statusBarlayoutParams );
-
-
 	}
 
     @Accessors( chain= true )
