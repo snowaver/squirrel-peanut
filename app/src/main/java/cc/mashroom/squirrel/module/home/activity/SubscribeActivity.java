@@ -41,10 +41,11 @@ import  cc.mashroom.squirrel.module.chat.activity.ChatActivity;
 import  cc.mashroom.squirrel.module.common.services.ContactService;
 import  cc.mashroom.squirrel.module.common.services.UserService;
 import  cc.mashroom.squirrel.module.home.adapters.ContactGroupAdapter;
+import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.subscribes.SubscribeAckPacket;
 import  cc.mashroom.squirrel.paip.message.subscribes.SubscribePacket;
-import  cc.mashroom.squirrel.parent.AbstractActivity;
+import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -58,7 +59,7 @@ import  lombok.experimental.Accessors;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
-public  class  SubscribeActivity  extends  AbstractActivity  implements  View.OnClickListener,CompoundButton.OnCheckedChangeListener,DialogInterface.OnClickListener,KeyboardVisibilityEventListener
+public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  implements  View.OnClickListener , CompoundButton.OnCheckedChangeListener , DialogInterface.OnClickListener , KeyboardVisibilityEventListener
 {
 	protected  void  onCreate(   Bundle  savedInstanceState )
 	{
@@ -74,7 +75,7 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 
 		super.findViewById(R.id.group).findViewById(R.id.edit_inputor ).setOnClickListener( (groupInputor) -> bottomSheet.show() );
 
-		ObjectUtils.cast(super.findViewById(R.id.details_portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/" +user.getLong("ID") +"/portrait").build().toString()) );
+		ObjectUtils.cast(super.findViewById(R.id.details_portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+user.getLong("ID")+"/portrait").build().toString()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.username),PromptInputbox.class).setText( user.getString("USERNAME") );
 
@@ -91,7 +92,7 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 		//  swiping  down  event  on  bottom  sheet  dialog  is  conflict  with  sliding  down  event  on  listview,   so  set  bottom  sheet  dialog's  behavior  non-hideable.
 		BottomSheetBehavior.from( this.getBottomSheet().findViewById(R.id.design_bottom_sheet) ).setHideable(  false );
 
-		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setAdapter( new  ContactGroupAdapter(this , this) );
+		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setAdapter( new  ContactGroupAdapter(this, this) );
 
 		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setOnItemClickListener( ( parent, view, position, id ) -> ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked(true) );
 
@@ -107,7 +108,7 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 
 		if( contact   != null )
 		{
-			ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setText(  prompts.get(contact.getInteger("SUBSCRIBE_STATUS")) );
+			ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setText( prompts.get(contact.getInteger("SUBSCRIBE_STATUS")) );
 
 			if( contact.getInteger("SUBSCRIBE_STATUS") == 0 )
 			{
@@ -130,6 +131,14 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
     @Getter
 	private  User  user;
 
+    public  void  received( Packet  packet )throws  Exception
+    {
+        if(            packet instanceof SubscribeAckPacket )
+        {
+            ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor( super.getResources().getColor( R.color.limegreen ) );  ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setText( super.getResources().getText(R.string.chat) );
+        }
+    }
+
 	private  void    addGroup()
 	{
 		new  UIAlertDialog.DividerIOSBuilder(SubscribeActivity.this).setBackgroundRadius(15).setTitle(R.string.add_to_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButton(R.string.cancel,(dialog,which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (SubscribeActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)).show();
@@ -139,9 +148,9 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 	{
 		String  name=ObjectUtils.cast(ObjectUtils.cast(dialog,UIAlertDialog.class).getContentView().findViewById(R.id.edit_inputor),EditText.class).getText().toString().trim();
 
-		if( StringUtils.isNotBlank(name) && !ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).groups().contains( name ) )
+		if( StringUtils.isNotBlank(name) && !ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).groups().contains(name) )
 		{
-			ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).addNewGroup(name,true).notifyDataSetChanged();
+			ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups), ListView.class).getAdapter(), ContactGroupAdapter.class).addNewGroup(name, true).notifyDataSetChanged();
 
 			this.onCheckedChanged( null,true );
 		}
@@ -165,7 +174,7 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 
 				if( contact.getInteger(  "SUBSCRIBE_STATUS" )    == 0 )
 				{
-					showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_packet_sent,R.color.white,R.color.limegreen );
+					showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_success, R.string.subscribe_packet_sent, R.color.white, R.color.limegreen );
 				}
 				else
 				if( contact.getInteger(  "SUBSCRIBE_STATUS" )    == 1 )
@@ -195,7 +204,7 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 									}
 									else
 									{
-										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
+										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error, R.string.network_or_internal_server_error, R.color.white, R.color.red );
 									}
 								}
 							}
@@ -229,13 +238,13 @@ public  class  SubscribeActivity  extends  AbstractActivity  implements  View.On
 									{
 										PacketEventDispatcher.sent(new  SubscribePacket(user.getLong("ID"),new  HashMap<String,Object>().addEntry("REMARK",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),PromptInputbox.class).getText().toString().trim()).addEntry("USERNAME",user.getString("USERNAME")).addEntry("NICKNAME",user.getString("NICKNAME")).addEntry("GROUP",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.group),PromptInputbox.class).getText().toString().trim())),TransportState.SENT );
 
-										ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor( SubscribeActivity.super.getResources().getColor(R.color.gainsboro) );
+										ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor(SubscribeActivity.super.getResources().getColor(R.color.gainsboro));
 
 										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_packet_sent,R.color.white,R.color.limegreen );
 									}
 									else
 									{
-										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
+										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error, R.string.network_or_internal_server_error, R.color.white, R.color.red );
 									}
 								}
 							}
