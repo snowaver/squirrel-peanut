@@ -94,7 +94,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setAdapter( new  ContactGroupAdapter(this, this) );
 
-		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setOnItemClickListener( ( parent, view, position, id ) -> ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked(true) );
+		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setOnItemClickListener( ( parent, view, position, id ) -> ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( true) );
 
 		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.add_to_new_group_button),TextView.class).setOnClickListener( (addGroupButton) -> addGroup() );
 
@@ -104,7 +104,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 		ObjectUtils.cast(super.findViewById(R.id.group),PromptInputbox.class).setText( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.my_buddies) );
 
-		ObjectUtils.cast(super.findViewById(R.id.title),TextView.class).setText( contact != null && (contact.getInteger("SUBSCRIBE_STATUS") == 6 || contact.getInteger("SUBSCRIBE_STATUS") == 7 ) ? R.string.contact_profile : R.string.add_contact );
+		ObjectUtils.cast(super.findViewById(R.id.title),TextView.class).setText(  contact != null && (contact.getInteger("SUBSCRIBE_STATUS") == 6 || contact.getInteger("SUBSCRIBE_STATUS") == 7 ) ? R.string.contact_profile : R.string.add_contact );
 
 		if( contact   != null )
 		{
@@ -196,7 +196,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 									if( response.code()==200 )
 									{
-										PacketEventDispatcher.sent( new  SubscribeAckPacket(user.getLong("ID"),SubscribeAckPacket.ACCEPT,new  HashMap<String,Object>().addEntry("GROUP",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.group),PromptInputbox.class).getText().toString().trim()).addEntry("USERNAME",user.get("USERNAME")).addEntry("NICKNAME",user.getString("NICKNAME"))),TransportState.SENT );
+										PacketEventDispatcher.sent( new  SubscribeAckPacket(user.getLong("ID"),SubscribeAckPacket.ACK_ACCEPT,new  HashMap<String,Object>().addEntry("GROUP",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.group),PromptInputbox.class).getText().toString().trim()).addEntry("USERNAME",user.get("USERNAME")).addEntry("NICKNAME",user.getString("NICKNAME"))),TransportState.SENT );
 
 										ObjectUtils.cast(findViewById(R.id.subscribe_button),Button.class).setText( R.string.chat );
 

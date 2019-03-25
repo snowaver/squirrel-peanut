@@ -115,12 +115,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		*/
 		if( ! getIntent().getBooleanExtra("CALLED", true) )
 		{
-			if( application().getSquirrelClient().newCall( DateTime.now(DateTimeZone.UTC).getMillis(),contactId,callContentType ) == null )
-			{
-				throw  new  IllegalStateException( "SQUIRREL-CLIENT:  ** CALL  ACTIVITY **  calling  state  error." );
-			}
-
-			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75,(int)  (((double)  ContextUtils.getStatusBarHeight(this)/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) ).demand();
+            application().getSquirrelClient().newCall(-1,this.contactId,callContentType );
 		}
 		else
 		{
@@ -134,22 +129,27 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		}
 	}
 
-	public  void  onStart(  long  callId, long  contactId )
+	public  void  onStart(  long  roomId, long  contactId )
 	{
 		this.application().getMainLooperHandler().post( () -> ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).start("HH:mm:ss") );
 	}
 
-	public  void  onReceivedSdp( long  callId,long  contactId,SDP  sdp )
+    public  void  onRoomCreated(   long  roomId )
+    {
+        this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75,(int)  (((double)  ContextUtils.getStatusBarHeight(this)/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) ).demand();
+    }
+
+	public  void  onReceivedSdp( long  roomId,long  contactId,SDP  sdp )
 	{
 
 	}
 
-	public  void  onWaitingResponse( long  callId,long  contactId )
+	public  void  onWaitingResponse( long  roomId,long  contactId )
 	{
 
 	}
 
-	public  void  onError( long  callId,long  contactId,final  CallError  error )
+	public  void  onError( long  roomId,long  contactId,final  CallError  error )
 	{
 		application().getMainLooperHandler().post( () -> Toasty.error(this,super.getString(errors.containsKey(error) ? errors.get(error) : R.string.network_or_internal_server_error),Toast.LENGTH_LONG,false).show() );
 
@@ -163,18 +163,18 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		CallEventDispatcher.removeListener(this);
 	}
 
-	public  void  onReceivedCandidate( long  callID,long  contactID,Candidate  candidate )
+	public  void  onReceivedCandidate( long  roomId,long  contactId,Candidate  candidate )
 	{
 
 	}
 
-	public  void  onResponded(   long  callId,long  contactId,int  responseCode )
+	public  void  onResponded(   long  roomId , long  contactId , int  response )
 	{
 		//  deliver  the  reject  prompt  to  close  event.
-		if( responseCode!= CallAckPacket.ACCEPT )    ContextUtils.finish( this );
+		if( response!= CallAckPacket.ACK_ACCEPT )    ContextUtils.finish( this );
 	}
 
-	public  void  onClose( long  callID,final  long  contactID,final  boolean  proactive,final  CallState  callState )
+	public  void  onClose( long  roomId,final  long  contactID,final  boolean  proactive,final  CallState  callState )
 	{
 		DateTime  now   = DateTime.now( DateTimeZone.UTC );
 
