@@ -4,6 +4,8 @@
 
 * Copyright 2019 snowaver. https://mashroom.cc/
 
+This product includes/uses font(s) created in 2003 by 'George Williams' and licensed under OFL license
+- Monospace font
 This product includes/uses software(s) developed by 'The Project Lombok Authors' (https://www.projectlombok.org/) and licensed under the MIT license
 - Project Lombok
 This product includes/uses software(s) developed by 'Square, Inc.' (https://square.github.io/retrofit/) and licensed under Apache Licence 2.0
