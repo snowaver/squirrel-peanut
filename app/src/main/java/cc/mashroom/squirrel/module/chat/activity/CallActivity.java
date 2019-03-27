@@ -14,6 +14,7 @@ import  cc.mashroom.squirrel.client.connect.call.CallState;
 import  cc.mashroom.squirrel.client.connect.call.webrtc.PeerConnectionParameters;
 import  cc.mashroom.squirrel.client.storage.model.chat.ChatMessage;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
+import  cc.mashroom.squirrel.paip.message.call.CloseCallReason;
 import  cc.mashroom.squirrel.parent.Application;
 import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.squirrel.paip.message.TransportState;
@@ -83,7 +84,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
     @Setter
     private  CallContentType     callContentType;
 
-	private  Map<CallState,Integer>  closeProfiles = new  HashMap<CallState,Integer>().addEntry(CallState.REQUESTING,R.string.canceled).addEntry(CallState.REQUESTED,R.string.counterpart_canceled).addEntry(CallState.REJECT,R.string.rejected).addEntry( CallState.REJECTED,R.string.counterpart_reject );
+//	private  Map<String,Integer>  closeProfiles = new  HashMap<String,Integer>().addEntry(CloseCallReason.UNKNOWN.getValue()+":0",R.string.unknown_error).addEntry(CloseCallReason.UNKNOWN.getValue()+":1",R.string.unknown_error).addEntry(CloseCallReason.);
 
 	private  Map<CallError,Integer>  errors = new  HashMap<CallError,Integer>().addEntry(CallError.OFFLINE,R.string.contact_offline).addEntry( CallError.NO_RESPONSE,R.string.call_no_response );
 	@Accessors( chain= true )
@@ -110,9 +111,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		MultimediaUtils.setupCellphoneMode(this);
 
 		ObjectUtils.cast(super.findViewById(R.id.cancel_button),SimpleDraweeView.class).setOnClickListener( (v) -> call.close() );
-		/*
-		Size  videoSize = CameraCaptureUtils.getOptimalSize( new  Size(super.getResources().getDisplayMetrics().widthPixels,super.getResources().getDisplayMetrics().heightPixels),ObjectUtils.cast(super.getSystemService(Context.CAMERA_SERVICE),CameraManager.class).getCameraCharacteristics(String.valueOf(CameraCharacteristics.LENS_FACING_BACK)).get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP).getOutputSizes(android.media.MediaRecorder.class) );
-		*/
+
 		if( ! getIntent().getBooleanExtra("CALLED", true) )
 		{
             application().getSquirrelClient().newCall(-1,this.contactId,callContentType );
@@ -129,27 +128,17 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		}
 	}
 
-	public  void  onStart(  long  roomId, long  contactId )
+	public  void  onRoomCreated(     Call  call )
+	{
+		this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75,(int)  (((double)  ContextUtils.getStatusBarHeight(this)/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) ).demand();
+	}
+
+	public  void  onStart(Call  call )
 	{
 		this.application().getMainLooperHandler().post( () -> ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).start("HH:mm:ss") );
 	}
 
-    public  void  onRoomCreated(   long  roomId )
-    {
-        this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75,(int)  (((double)  ContextUtils.getStatusBarHeight(this)/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) ).demand();
-    }
-
-	public  void  onReceivedSdp( long  roomId,long  contactId,SDP  sdp )
-	{
-
-	}
-
-	public  void  onWaitingResponse( long  roomId,long  contactId )
-	{
-
-	}
-
-	public  void  onError( long  roomId,long  contactId,final  CallError  error )
+	public  void  onError( Call  call,   CallError  error )
 	{
 		application().getMainLooperHandler().post( () -> Toasty.error(this,super.getString(errors.containsKey(error) ? errors.get(error) : R.string.network_or_internal_server_error),Toast.LENGTH_LONG,false).show() );
 
@@ -163,21 +152,10 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		CallEventDispatcher.removeListener(this);
 	}
 
-	public  void  onReceivedCandidate( long  roomId,long  contactId,Candidate  candidate )
-	{
-
-	}
-
-	public  void  onResponded(   long  roomId , long  contactId , int  response )
-	{
-		//  deliver  the  reject  prompt  to  close  event.
-		if( response!= CallAckPacket.ACK_ACCEPT )    ContextUtils.finish( this );
-	}
-
-	public  void  onClose( long  roomId,final  long  contactID,final  boolean  proactive,final  CallState  callState )
+	public  void  onClose( Call  call,boolean  proactively, CloseCallReason  closeReason )
 	{
 		DateTime  now   = DateTime.now( DateTimeZone.UTC );
-
+		/*
 		if( !( "00:00:00".equals(ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()) ) )
 		{
 			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()+super.getString(R.string.comma)+super.getString(R.string.closed),0} );
@@ -191,7 +169,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE)  VALUES  (?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+super.getString(closeProfiles.get(callState)),TransportState.SENT.getValue()} );
 		}
-
+		*/
 		application().getMainLooperHandler().post( ()->{Toasty.warning( this,super.getString(R.string.call_closed),Toast.LENGTH_LONG,false ).show();  ContextUtils.finish(this);  super.overridePendingTransition(R.anim.fade_in,R.anim.fade_out);} );
 	}
 }

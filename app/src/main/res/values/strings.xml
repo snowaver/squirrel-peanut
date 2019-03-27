@@ -57,8 +57,6 @@
     <string  name="connect_form_error">账号或者密码为空</string>
     <string  name="waiting">请您稍等。。。</string>
     <string  name="contact_offline">联系人不在线</string>
-    <string  name="call_no_response">对方无响应</string>
-    <string  name="call_closed">通话已关闭</string>
     <string  name="invite_successfully">邀请成功</string>
     <string  name="member_list">成员列表</string>
     <string  name="recoding_voice">正在录音</string>
@@ -97,6 +95,15 @@
     <string  name="details">详情</string>
     <string  name="voice_duration_too_short">录音时长过短</string>
     <string  name="unknown_error">未知错误</string>
+    <string  name="call_room_not_found">已被关闭</string>
+    <string  name="call_state_error">状态错误</string>
+    <string  name="call_canceled">已经取消</string>
+    <string  name="call_counterpart_canceled">对方取消</string>
+    <string  name="call_no_response">没有响应</string>
+    <string  name="call_rejected">已经拒绝</string>
+    <string  name="call_counterpart_rejected">对方拒绝</string>
+    <string  name="call_closed">已经关闭</string>
+    <string  name="call_counterpart_closed">已被关闭</string>
     <string-array  name="group_chat_details_list">
         <item>查看成员</item><item>邀请好友</item>
     </string-array>
