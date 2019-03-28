@@ -72,7 +72,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 {
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList( new  PeerConnection.IceServer("stun:47.105.210.154:3478"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302"),new  PeerConnection.IceServer("turn:47.105.210.154:3478","snowaver","snowaver") );
 
-	public  static  String  BALANCING_PROXY_URL     ="https://192.168.1.114:8011/system/balancingproxy?action=1&keyword=0";
+	public  static  String  BALANCING_PROXY_URL     ="https://10.208.60.191:8011/system/balancingproxy?action=1&keyword=0";
 
 	public  static  List<String>  BALANCING_PROXY_BACKUP_ADDRESSES       = Lists.newArrayList( "118.24.16.67", "118.24.19.163","118.25.216.217" );
 
@@ -289,11 +289,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		SharedPreferences  sharedPreferences  = getSharedPreferences( "LOGIN_FORM",MODE_PRIVATE );
 
-		if( code != 200 )
-		{
-			//  use   default  balancing  proxy  or  last  fetched  proxy  instead  of  returning.
-		}
-		else
+		if( code == 200 )
 		{
 			sharedPreferences.edit().putString("HOST",getSquirrelClient().getHost()).putInt("PORT",getSquirrelClient().getPort()).putInt( "HTTPPORT" , getSquirrelClient().getHttpPort() );
 		}

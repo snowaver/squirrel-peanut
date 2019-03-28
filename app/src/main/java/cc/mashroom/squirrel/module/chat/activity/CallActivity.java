@@ -60,7 +60,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 		ContextUtils.setupImmerseBar( this );
 
-		super.setContentView( this.callContentType== CallContentType.AUDIO ? R.layout.activity_audio_call : R.layout.activity_video_call );
+		super.setContentView( this.callContentType  == CallContentType.AUDIO ? R.layout.activity_audio_call : R.layout.activity_video_call );
 
 		if( this.callContentType == CallContentType.VIDEO )
 		{
@@ -68,9 +68,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		}
 
 		getWindow().getDecorView().setKeepScreenOn( true );
-		/*
-		ObjectUtils.cast( super.findViewById(R.id.glsurface_view) , GLSurfaceView.class ).setRenderer( new  CallBlankRenderer() );
-		*/
+
 		ViewGroup.LayoutParams  statusBarlayoutParams  = super.findViewById( R.id.status_bar_hint ).getLayoutParams();
 
 		statusBarlayoutParams.height   = ContextUtils.getStatusBarHeight( this );
@@ -80,12 +78,9 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		super.findViewById(R.id.status_bar_hint).setLayoutParams( statusBarlayoutParams );
 	}
 
-    @Accessors( chain= true )
-    @Setter
-    private  CallContentType     callContentType;
-
-//	private  Map<String,Integer>  closeProfiles = new  HashMap<String,Integer>().addEntry(CloseCallReason.UNKNOWN.getValue()+":0",R.string.unknown_error).addEntry(CloseCallReason.UNKNOWN.getValue()+":1",R.string.unknown_error).addEntry(CloseCallReason.);
-
+	private  Map<String,Integer>  closeProfiles = new  HashMap<String,Integer>().addEntry(CloseCallReason.UNKNOWN.getValue()+":"+0,R.string.unknown_error).addEntry(CloseCallReason.UNKNOWN.getValue()+":"+1,R.string.unknown_error).addEntry(CloseCallReason.ROOM_NOT_FOUND.getValue()+":"+0,R.string.call_room_not_found).addEntry(CloseCallReason.ROOM_NOT_FOUND.getValue()+":"+1,R.string.call_room_not_found).addEntry(CloseCallReason.STATE_ERROR.getValue()+":"+0,R.string.call_state_error).addEntry(CloseCallReason.STATE_ERROR.getValue()+":"+1,R.string.call_state_error)
+		.addEntry(CloseCallReason.CANCEL.getValue()+":"+0,R.string.call_counterparty_canceled).addEntry(CloseCallReason.CANCEL.getValue()+":"+1,R.string.call_canceled).addEntry(CloseCallReason.TIMEOUT.getValue()+":"+0,R.string.call_counterparty_canceled).addEntry(CloseCallReason.TIMEOUT.getValue()+":"+1,R.string.call_no_response)
+		.addEntry(CloseCallReason.REJECT.getValue()+":"+0,R.string.call_counterparty_rejected).addEntry(CloseCallReason.REJECT.getValue()+":"+1,R.string.call_rejected).addEntry(CloseCallReason.NETWORK_ERROR.getValue()+":"+0,R.string.network_or_internal_server_error).addEntry(CloseCallReason.NETWORK_ERROR.getValue()+":"+1,R.string.network_or_internal_server_error);
 	private  Map<CallError,Integer>  errors = new  HashMap<CallError,Integer>().addEntry(CallError.OFFLINE,R.string.contact_offline).addEntry( CallError.NO_RESPONSE,R.string.call_no_response );
 	@Accessors( chain= true )
 	@Setter
@@ -94,25 +89,19 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 	@Accessors( chain= true )
 	@Setter
 	private  long  contactId;
+	@Accessors( chain= true )
+	@Setter
+	private  CallContentType     callContentType;
 
 	@SneakyThrows
 	public  void  permissionsGranted()
 	{
-		/*
-		if( this.callContentType == CallContentType.AUDIO )
-		{
-			ObjectUtils.cast(super.findViewById(R.id.glsurface_view),GLSurfaceView.class).setVisibility(  View.GONE );
-		}
-		else
-		{
-			VideoRendererGui.setView( ObjectUtils.cast(super.findViewById(R.id.glsurface_view),GLSurfaceView.class) );
-		}
-		*/
+		//  set  audio  manager  mode  as  MODE_IN_CALL  while  the  other  modes  appears  serious  noise  and  echo.
 		MultimediaUtils.setupCellphoneMode(this);
 
-		ObjectUtils.cast(super.findViewById(R.id.cancel_button),SimpleDraweeView.class).setOnClickListener( (v) -> call.close() );
+		ObjectUtils.cast(super.findViewById(R.id.cancel_button),SimpleDraweeView.class).setOnClickListener( (cancelButton) -> call.close() );
 
-		if( ! getIntent().getBooleanExtra("CALLED", true) )
+		if( !getIntent().getBooleanExtra("CALLED" , true) )
 		{
             application().getSquirrelClient().newCall(-1,this.contactId,callContentType );
 		}
@@ -122,15 +111,17 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 			ObjectUtils.cast(super.findViewById(R.id.control_switcher),    ViewSwitcher.class).setDisplayedChild( 1 );
 
-			ObjectUtils.cast(super.findViewById(R.id.accept_button),SimpleDraweeView.class).setOnClickListener( (button) -> {call.accept();  ObjectUtils.cast(super.findViewById(R.id.control_switcher),ViewSwitcher.class).setDisplayedChild(0);} );
+			ObjectUtils.cast(super.findViewById(R.id.accept_button),SimpleDraweeView.class).setOnClickListener( (button) -> {  call.accept();  ObjectUtils.cast(super.findViewById(R.id.control_switcher),ViewSwitcher.class).setDisplayedChild(0);} );
 
-			ObjectUtils.cast(super.findViewById(R.id.reject_button),SimpleDraweeView.class).setOnClickListener( (button) -> {call.reject();  ContextUtils.finish(this);} );
+			ObjectUtils.cast(super.findViewById(R.id.reject_button),SimpleDraweeView.class).setOnClickListener( (button) -> {  call.reject();  ContextUtils.finish(this);} );
 		}
 	}
 
 	public  void  onRoomCreated(     Call  call )
 	{
-		this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75,(int)  (((double)  ContextUtils.getStatusBarHeight(this)/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) ).demand();
+		{
+			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75,(int)  (((double)  ContextUtils.getStatusBarHeight(this)/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) ).demand();
+		}
 	}
 
 	public  void  onStart(Call  call )
@@ -138,9 +129,9 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		this.application().getMainLooperHandler().post( () -> ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).start("HH:mm:ss") );
 	}
 
-	public  void  onError( Call  call,   CallError  error )
+	public  void  onError(Call  call,CallError  callError )
 	{
-		application().getMainLooperHandler().post( () -> Toasty.error(this,super.getString(errors.containsKey(error) ? errors.get(error) : R.string.network_or_internal_server_error),Toast.LENGTH_LONG,false).show() );
+		application().getMainLooperHandler().post( () -> Toasty.error(this,super.getString(errors.containsKey(callError) ? errors.get(callError) : R.string.network_or_internal_server_error),Toast.LENGTH_LONG,false).show() );
 
 		ContextUtils.finish(   this );
 	}
@@ -152,24 +143,30 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		CallEventDispatcher.removeListener(this);
 	}
 
-	public  void  onClose( Call  call,boolean  proactively, CloseCallReason  closeReason )
+	public  void  onClose(       Call  call,boolean  proactively,CloseCallReason  reason )
 	{
 		DateTime  now   = DateTime.now( DateTimeZone.UTC );
-		/*
-		if( !( "00:00:00".equals(ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()) ) )
-		{
-			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()+super.getString(R.string.comma)+super.getString(R.string.closed),0} );
 
-			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE)  VALUES  (?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()+super.getString(R.string.comma)+super.getString(proactive ? R.string.closed : R.string.counterpart_closed),TransportState.SENT.getValue()} );
+		if( reason ==   CloseCallReason.BY_USER )
+		{
+			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()+super.getString(R.string.comma)+super.getString(proactively ? R.string.call_closed : R.string.call_counterparty_closed),0} );
+
+			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE)  VALUES  (?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()+super.getString(R.string.comma)+super.getString(proactively ? R.string.call_closed : R.string.call_counterparty_closed),TransportState.SENT.getValue()} );
 		}
 		else
-		if( this.closeProfiles.containsKey(   callState ) )
+		if( reason ==   CloseCallReason.TIMEOUT )
 		{
-			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+super.getString(closeProfiles.get(callState)),0} );
+			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+super.getString(closeProfiles.get(reason.getValue()+":"+(call.getState() == CallState.REQUESTING))),0} );
 
-			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE)  VALUES  (?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+super.getString(closeProfiles.get(callState)),TransportState.SENT.getValue()} );
+			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE)  VALUES  (?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+super.getString(closeProfiles.get(reason.getValue()+":"+(call.getState() == CallState.REQUESTING))),TransportState.SENT.getValue()} );
 		}
-		*/
+		else
+		{
+			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+super.getString(closeProfiles.get(reason.getValue()+":"+(proactively ? 1 : 0))),0} );
+
+			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE)  VALUES  (?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+super.getString(closeProfiles.get(reason.getValue()+":"+(proactively ? 1 : 0))),TransportState.SENT.getValue()} );
+		}
+
 		application().getMainLooperHandler().post( ()->{Toasty.warning( this,super.getString(R.string.call_closed),Toast.LENGTH_LONG,false ).show();  ContextUtils.finish(this);  super.overridePendingTransition(R.anim.fade_in,R.anim.fade_out);} );
 	}
 }
