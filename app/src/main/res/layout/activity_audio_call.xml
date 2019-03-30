@@ -3,13 +3,21 @@
 
     <View  android:id="@+id/status_bar_hint"  android:layout_width="match_parent"  android:layout_height="0dp"  android:background="#20000000"></View>
 
-    <cc.mashroom.hedgehog.widget.ViewSwitcher  android:id="@+id/control_switcher"  android:layout_width="match_parent"  android:layout_height="150dp"  android:background="@color/transparent"  android:layout_alignParentBottom="true">
+    <RelativeLayout  android:id="@+id/call_details"  android:layout_width="match_parent"  android:layout_height="95dp"  android:layout_below="@id/status_bar_hint"  android:layout_marginTop="50dp"  android:paddingLeft="10dp"  android:paddingTop="5dp"  android:paddingRight="10dp"  android:paddingBottom="5dp">
 
-        <RelativeLayout  android:layout_width="match_parent"  android:layout_height="60dp"  android:layout_centerInParent="true">
+        <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/portrait"  android:layout_width="85dp"  android:layout_height="85dp"   app:placeholderImage="@drawable/placeholder"  app:roundAsCircle="true"  app:roundingBorderWidth="5dp"  app:roundingBorderColor="@color/white"/>
 
-            <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/cancel_button"  android:layout_width="60dp"  android:layout_height="60dp"  android:layout_centerInParent="true"  app:roundAsCircle="true"  app:roundingBorderWidth="5dp"  app:roundingBorderColor="@color/white"/>
+        <TextView  android:id="@+id/nickname"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_alignParentRight="true"  android:textColor="@color/white"  android:textSize="18dp"/>
 
-        </RelativeLayout>
+        <cc.mashroom.hedgehog.widget.Stopwatch  android:id="@+id/chronometer"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_alignParentRight="true"  android:layout_centerVertical="true"  android:fontFamily="@font/monospace"  android:textSize="18dp"  android:textColor="@color/white"  android:format="00:00:00"/>
+
+        <TextView  android:id="@+id/prompt_message"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_alignParentBottom="true"  android:layout_alignParentRight="true"  android:textColor="@color/white"  android:textSize="18dp"/>
+
+    </RelativeLayout>
+
+    <cc.mashroom.hedgehog.widget.ViewSwitcher  android:id="@+id/control_switcher"  android:layout_width="match_parent"  android:layout_height="60dp"  android:layout_alignParentBottom="true"  android:layout_marginBottom="50dp">
+
+        <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/cancel_button"  android:layout_width="60dp"  android:layout_height="60dp"      android:layout_centerInParent="true"  app:roundAsCircle="true"  app:roundingBorderWidth="5dp"  app:roundingBorderColor="@color/white"/>
 
         <RelativeLayout  android:id="@+id/respond_layout"  android:layout_width="match_parent"  android:layout_height="60dp"  android:layout_centerInParent="true"  android:paddingLeft="10dp"  android:paddingRight="10dp"  android:visibility="gone">
 
@@ -20,7 +28,5 @@
         </RelativeLayout>
 
     </cc.mashroom.hedgehog.widget.ViewSwitcher>
-
-    <cc.mashroom.hedgehog.widget.Stopwatch  android:id="@+id/chronometer"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_above="@id/control_switcher"  android:textSize="22dp"  android:textColor="@color/white"  android:format="00:00:00"  android:layout_centerHorizontal="true"  android:layout_marginTop="50dp"/>
 
 </RelativeLayout>

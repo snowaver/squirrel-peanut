@@ -25,8 +25,13 @@ public  class  VideoCallActivity  extends  CallActivity
     protected  void  onCreate(Bundle  savedInstanceStateBundle )
     {
         super.onCreate( savedInstanceStateBundle );
+    }
 
-        VideoCallActivityPermissionsDispatcher.permissionsGrantedWithPermissionCheck( this );
+    protected  void  onStart()
+    {
+        super.onStart();
+
+        super.application().getExecutor().execute( () -> VideoCallActivityPermissionsDispatcher.permissionsGrantedWithPermissionCheck(this) );
     }
 
     public  void  onRequestPermissionsResult( int  requestCode,@NonNull  String[]  permissions,@NonNull  int[]  grantedResults )
@@ -37,9 +42,7 @@ public  class  VideoCallActivity  extends  CallActivity
 
         if( !PermissionUtils.verifyPermissions(grantedResults) )
         {
-            Toasty.error(this,super.getString(R.string.permission_grant_error),Toast.LENGTH_LONG,false).show();
-
-            super.finish();
+            Toasty.error(this,super.getString(R.string.permission_grant_error),Toast.LENGTH_LONG,false).show();  super.finish();
         }
     }
 

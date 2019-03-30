@@ -65,6 +65,8 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 	{
 		super.onCreate(   savedInstanceState );
 
+		PacketEventDispatcher.addListener(    SubscribeActivity.this );
+
 		super.setContentView(  R.layout.activity_subscribe );
 
 		KeyboardVisibilityEvent.setEventListener(this,this );
@@ -135,7 +137,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
     {
         if(            packet instanceof SubscribeAckPacket )
         {
-            ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor( super.getResources().getColor( R.color.limegreen ) );  ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setText( super.getResources().getText(R.string.chat) );
+        	application().getMainLooperHandler().post( () ->{ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor( super.getResources().getColor( R.color.limegreen ) );  ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setText(super.getResources().getText(R.string.chat));} );
         }
     }
 
@@ -285,7 +287,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		}
 	}
 
-	public  void  onVisibilityChanged(     boolean  softinputVisible )
+	public  void  onVisibilityChanged(boolean  softinputVisible )
 	{
 		ObjectUtils.cast(super.findViewById( R.id.collapsing_bar_layout),AppBarLayout.class).setExpanded( !softinputVisible,true );
 	}

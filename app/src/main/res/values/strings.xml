@@ -104,6 +104,10 @@
     <string  name="call_counterparty_rejected">对方拒绝</string>
     <string  name="call_closed">已经关闭</string>
     <string  name="call_counterparty_closed">已被关闭</string>
+    <string  name="call_calling">正在进行通话</string>
+    <string  name="call_waiting_for_response">等待对方响应</string>
+    <string  name="call_counterparty_demand_a_audio_call_with_you">请求与您进行语音通话</string>
+    <string  name="call_counterparty_demand_a_video_call_with_you">请求与您进行视频通话</string>
     <string-array  name="group_chat_details_list">
         <item>查看成员</item><item>邀请好友</item>
     </string-array>

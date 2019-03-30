@@ -2,7 +2,7 @@ package cc.mashroom.squirrel.module.chat.activity;
 
 import  android.Manifest;
 import  android.os.Bundle;
-import android.widget.Toast;
+import  android.widget.Toast;
 
 import  androidx.annotation.NonNull;
 
@@ -25,8 +25,13 @@ public  class  AudioCallActivity  extends  CallActivity
     protected  void  onCreate(Bundle  savedInstanceStateBundle )
     {
         super.onCreate( savedInstanceStateBundle );
+    }
 
-        AudioCallActivityPermissionsDispatcher.permissionsGrantedWithPermissionCheck( this );
+    protected  void  onStart()
+    {
+        super.onStart();
+
+        super.application().getExecutor().execute( () -> AudioCallActivityPermissionsDispatcher.permissionsGrantedWithPermissionCheck(this) );
     }
 
     public  void  onRequestPermissionsResult( int  requestCode,@NonNull  String[]  permissions,@NonNull  int[]  grantedResults )
@@ -37,9 +42,7 @@ public  class  AudioCallActivity  extends  CallActivity
 
         if( !PermissionUtils.verifyPermissions(grantedResults) )
         {
-            Toasty.error(this,super.getString(R.string.permission_grant_error),Toast.LENGTH_LONG,false).show();
-
-            super.finish();
+            Toasty.error(this,super.getString(R.string.permission_grant_error),Toast.LENGTH_LONG,false).show();  super.finish();
         }
     }
 
