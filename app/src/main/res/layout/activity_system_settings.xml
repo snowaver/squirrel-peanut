@@ -1,0 +1,14 @@
+<?xml  version="1.0"  encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:orientation="vertical"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:background="@color/white">
+
+    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  android:title="@string/system_settings"  app:backText="@string/back"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
+
+    <TextView  style="@style/Widget.AppCompat.Button.Borderless"  android:layout_width="match_parent"  android:layout_height="35dp"  android:paddingLeft="10dp"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:text="@string/language"  android:gravity="center_vertical"  android:background="@color/lightgray"/>
+
+    <ListView  android:id="@+id/languages"  android:layout_width="match_parent"  android:layout_height="100dp"  android:dividerHeight="1px"  android:divider="@color/lightgray"></ListView>
+
+    <View  android:layout_width="match_parent"  android:layout_height="0dp" android:layout_weight="1"></View>
+
+    <Button  android:id="@+id/logout_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:text="@string/logout"  android:textColor="@color/white"  android:textSize="18dp"  android:background="@color/red"/>
+
+</LinearLayout>

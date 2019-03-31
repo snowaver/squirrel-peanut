@@ -31,7 +31,7 @@ public  class  ContactGroupAdapter  extends  BaseAdapter
 
         Stream.forEach( Contact.dao.search("SELECT  DISTINCT(GROUP_NAME)  AS  GROUP_NAME  FROM  "+Contact.dao.getDataSourceBind().table()+"  WHERE  (GROUP_NAME  !=  ''  AND  GROUP_NAME  IS  NOT  NULL)"),(contact) -> super.items.add(contact.getString("GROUP_NAME")) );
 
-        if( ! super.items.contains( context.getString(R.string.my_buddies) ) )
+        if( !   super.items.contains(context.getString(R.string.my_buddies)) )
         {
             super.items.add( 0,context.getString(R.string.my_buddies) );
         }

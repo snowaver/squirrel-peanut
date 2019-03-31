@@ -6,6 +6,7 @@ import  android.net.Uri;
 import  android.os.Bundle;
 import  com.google.android.material.tabs.TabLayout;
 import  androidx.core.app.ActivityCompat;
+import  androidx.core.app.ActivityOptionsCompat;
 import  androidx.viewpager.widget.ViewPager;
 import  android.view.WindowManager;
 import  android.widget.Button;
@@ -25,6 +26,7 @@ import  cc.mashroom.squirrel.client.connect.ConnectState;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.common.services.UserService;
+import  cc.mashroom.squirrel.module.system.activity.RegisterActivity;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.adapters.SheetPagerAdapter;
 import  cc.mashroom.squirrel.module.system.activity.LoginActivity;
@@ -86,7 +88,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 			ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).addTab(       newTab );
 		}
 
-		ObjectUtils.cast(super.findViewById(R.id.logout_button),Button.class).setOnClickListener((logoutbtn)-> logout() );
+		ObjectUtils.cast(super.findViewById(R.id.settings_button),Button.class).setOnClickListener( (logoutButton) -> ActivityCompat.startActivity(this,new  Intent(this,SystemSettingsActivity.class),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+application().getUserMetadata().get("ID")+"/portrait").build().toString()) );
 
@@ -117,27 +119,5 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 	public  void  onTabUnselected( TabLayout.Tab  tab )
 	{
 		tab.getCustomView().setBackgroundColor(     super.getResources().getColor( R.color.white     ) );
-	}
-
-	public  void  logout()
-	{
-		RetrofitRegistry.get(UserService.class).logout(application().getSquirrelClient().getId()).enqueue
-		(
-			new AbstractRetrofit2Callback<Void>( this,new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(this,140)) )
-			{
-				public  void  onResponse(Call<Void> call,Response<Void>  response )
-				{
-					super.onResponse( call, response );
-
-					application().getSquirrelClient().disconnect();
-					//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  loginactivity.
-					Stream.forEach( AbstractActivity.STACK  , (Activity  activity) -> activity.finish() );
-
-					ActivityCompat.startActivity( SheetActivity.this,new  Intent(SheetActivity.this,LoginActivity.class).putExtra("USERNAME",SheetActivity.this.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",0).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),null );
-
-					SheetActivity.this.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).edit().remove("ID").remove("USERNAME").remove("NAME").remove("NICKNAME").commit();
-				}
-			}
-		);
 	}
 }

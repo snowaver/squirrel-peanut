@@ -30,6 +30,7 @@
         <activity  android:name=".module.chat.activity.AudioCallActivity"   android:screenOrientation="portrait"/>
         <activity  android:name=".module.home.activity.SubscribeActivity"   android:screenOrientation="portrait"  android:windowSoftInputMode="stateHidden|adjustResize"></activity>
         <activity  android:name=".module.home.activity.ContactProfileActivity"    android:screenOrientation="portrait"/>
+        <activity  android:name=".module.home.activity.SystemSettingsActivity"    android:screenOrientation="portrait"/>
         <activity  android:name=".module.chat.activity.VideoCallActivity"   android:screenOrientation="portrait"/>
         <activity  android:name=".module.chat.activity.GroupChatActivity"  android:screenOrientation="portrait"  android:windowSoftInputMode="stateHidden"/>
         <activity  android:name=".module.chat.activity.ChatGroupContactActivity"  android:screenOrientation="portrait"/>

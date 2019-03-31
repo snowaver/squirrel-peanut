@@ -194,6 +194,6 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE)  VALUES  (?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+super.getString(closeProfiles.get(reason.getValue()+":"+(proactively ? 1 : 0))),TransportState.SENT.getValue()} );
 		}
 
-		application().getMainLooperHandler().post( ()->{Toasty.warning( this,super.getString(R.string.call_closed),Toast.LENGTH_LONG,false ).show();  ContextUtils.finish(this);  super.overridePendingTransition(R.anim.fade_in,R.anim.fade_out);} );
+		application().getMainLooperHandler().post( () -> {Toasty.warning( this,super.getString(R.string.call_closed),Toast.LENGTH_LONG,false ).show();  ContextUtils.finish(this);  super.overridePendingTransition(R.anim.fade_in,R.anim.fade_out);} );
 	}
 }

@@ -108,6 +108,10 @@
     <string  name="call_waiting_for_response">等待对方响应</string>
     <string  name="call_counterparty_demand_a_audio_call_with_you">请求与您进行语音通话</string>
     <string  name="call_counterparty_demand_a_video_call_with_you">请求与您进行视频通话</string>
+    <string  name="language">语言</string>
+    <string  name="language_english">ENGLISH</string>
+    <string  name="language_chinese">中文</string>
+    <string  name="system_settings">系统设置</string>
     <string-array  name="group_chat_details_list">
         <item>查看成员</item><item>邀请好友</item>
     </string-array>
