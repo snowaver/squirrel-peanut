@@ -8,6 +8,8 @@ import  android.widget.ListView;
 
 import  com.aries.ui.widget.progress.UIProgressDialog;
 
+import java.util.Locale;
+
 import  androidx.core.app.ActivityCompat;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.squirrel.R;
@@ -45,7 +47,7 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Co
 			}
 		);
 	}
-	
+
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
@@ -59,6 +61,8 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Co
 
 	public  void  onCheckedChanged( CompoundButton  buttonView , boolean  isChecked )
 	{
+		super.getResources().getConfiguration().setLocale(buttonView.getText().toString().equals("ENGLISH") ? Locale.ENGLISH : Locale.CHINESE );
 
+		for( Activity  activity  : AbstractActivity.STACK )activity.recreate();
 	}
 }
