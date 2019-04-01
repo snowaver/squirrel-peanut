@@ -4,10 +4,11 @@ import  android.app.Activity;
 import  android.view.LayoutInflater;
 import  android.view.View;
 import  android.view.ViewGroup;
-import  android.widget.CompoundButton;
 import  android.widget.TextView;
 
 import  com.google.common.collect.Lists;
+
+import  java.util.Locale;
 
 import  cc.mashroom.hedgehog.module.common.listener.SinglechoiceListener;
 import  cc.mashroom.hedgehog.parent.BaseAdapter;
@@ -18,13 +19,15 @@ import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
 
+import  static android.content.Context.MODE_PRIVATE;
+
 public  class  SystemSettingsLanguageAdapter  extends  BaseAdapter
 {
-    public  SystemSettingsLanguageAdapter( Activity  context,CompoundButton.OnCheckedChangeListener  listener )
+    public  SystemSettingsLanguageAdapter( Activity  context,SmoothCheckBox.OnCheckedChangeListener  listener )
     {
-        super( Lists.newArrayList(context.getString(R.string.language_chinese),context.getString(R.string.language_english)) );
+        super(Lists.newArrayList(context.getString(R.string.language_chinese),context.getString(R.string.language_english)) );
 
-        setContext(context).setListener(new  SinglechoiceListener<String>(this,listener)).getListener().getChecked().set( ObjectUtils.cast(super.items.get(0)) );
+        setContext(context).setListener(new  SinglechoiceListener<String>(this,listener)).getListener().getChecked().set( ObjectUtils.cast(super.items.get(context.getSharedPreferences("CONFIGURATION",MODE_PRIVATE).getString("LOCAL",Locale.CHINESE.toLanguageTag()).equals(Locale.CHINESE.toLanguageTag()) ? 0 : 1)) );
     }
 
     @Accessors( chain=true )

@@ -3,9 +3,12 @@ package cc.mashroom.squirrel.parent;
 import  android.content.Context;
 import  android.content.Intent;
 import  android.content.SharedPreferences;
+import  android.content.res.Configuration;
 import  android.location.Location;
 import  android.net.ConnectivityManager;
 import  android.net.NetworkRequest;
+import  android.os.Build;
+
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 
@@ -44,6 +47,7 @@ import  cc.mashroom.squirrel.push.PushServiceNotifier;
 
 import  java.net.URL;
 import  java.util.List;
+import  java.util.Locale;
 import  java.util.concurrent.ScheduledThreadPoolExecutor;
 import  java.util.concurrent.TimeUnit;
 import  java.util.concurrent.atomic.AtomicInteger;
@@ -82,6 +86,21 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	public  void  onCreate()
 	{
 		super.onCreate();
+
+		Configuration  configuration   = super.getResources().getConfiguration();
+
+		Locale  locale = Locale.forLanguageTag(super.getSharedPreferences("CONFIGURATION",MODE_PRIVATE).getString("LOCAL",Locale.CHINESE.toLanguageTag()));
+
+		if( Build.VERSION.SDK_INT < Build.VERSION_CODES.N )
+		{
+			configuration.locale = locale;
+		}
+		else
+		{
+			configuration.setLocale(       locale );
+		}
+
+		getResources().updateConfiguration(    configuration,getResources().getDisplayMetrics() );
 
 		Toasty.Config.getInstance().setTextSize(14 ).allowQueue( false ).apply();
 		/*

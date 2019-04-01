@@ -4,7 +4,6 @@ import  android.app.Activity;
 import  android.view.LayoutInflater;
 import  android.view.View;
 import  android.view.ViewGroup;
-import  android.widget.CompoundButton;
 import  android.widget.TextView;
 
 import  com.google.common.collect.Lists;
@@ -25,7 +24,7 @@ import  lombok.experimental.Accessors;
 
 public  class  ContactGroupAdapter  extends  BaseAdapter
 {
-    public  ContactGroupAdapter( Activity  context,CompoundButton.OnCheckedChangeListener  listener )
+    public  ContactGroupAdapter( Activity  context,SmoothCheckBox.OnCheckedChangeListener  listener )
     {
         super(new  ArrayList() );
 

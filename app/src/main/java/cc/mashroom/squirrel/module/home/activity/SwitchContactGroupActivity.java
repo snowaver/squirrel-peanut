@@ -10,8 +10,9 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.module.home.adapters.ContactGroupAdapter;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.util.ObjectUtils;
+import  cn.refactor.library.SmoothCheckBox;
 
-public  class  SwitchContactGroupActivity  extends  AbstractActivity  implements  CompoundButton.OnCheckedChangeListener
+public  class  SwitchContactGroupActivity  extends  AbstractActivity  implements  SmoothCheckBox.OnCheckedChangeListener
 {
     protected  void  onCreate( Bundle  savedInstanceState )
     {
@@ -29,7 +30,7 @@ public  class  SwitchContactGroupActivity  extends  AbstractActivity  implements
         new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)).show();
     }
 
-    public  void  onCheckedChanged( CompoundButton  compoundButton,boolean  isChecked )
+    public  void  onCheckedChanged( SmoothCheckBox  smoothCheckbox,boolean  isChecked )
     {
 
     }

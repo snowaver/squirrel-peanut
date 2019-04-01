@@ -13,7 +13,6 @@ import  android.view.LayoutInflater;
 import  android.view.View;
 import  android.view.inputmethod.EditorInfo;
 import  android.widget.Button;
-import  android.widget.CompoundButton;
 import  android.widget.EditText;
 import  android.widget.ListView;
 import  android.widget.TextView;
@@ -59,7 +58,7 @@ import  lombok.experimental.Accessors;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
-public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  implements  View.OnClickListener , CompoundButton.OnCheckedChangeListener , DialogInterface.OnClickListener , KeyboardVisibilityEventListener
+public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  implements  View.OnClickListener , SmoothCheckBox.OnCheckedChangeListener , DialogInterface.OnClickListener , KeyboardVisibilityEventListener
 {
 	protected  void  onCreate(   Bundle  savedInstanceState )
 	{
@@ -261,7 +260,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		}
 	}
 
-	public  void  onCheckedChanged(  CompoundButton  smoothCompoundButton,boolean  otherGroupChecked )
+	public  void  onCheckedChanged(  SmoothCheckBox  smoothCheckboxButton,boolean  otherGroupChecked )
 	{
 		if( otherGroupChecked )
 		{
