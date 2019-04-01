@@ -83,7 +83,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 		if( StringUtils.isBlank(this.getUser().getString("NICKNAME")) )
 		{
-		    RetrofitRegistry.get(UserService.class).get(user.getLong("ID")).enqueue( new  AbstractRetrofit2Callback<User>(this){public  void  onResponse(Call<User>  call,Response<User>  response){ ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.nickname),PromptInputbox.class).setText(user.addEntry("NICKNAME",response.body().getString("NICKNAME")).getString("NICKNAME"));}} );
+		    RetrofitRegistry.get(UserService.class).get(user.getLong("ID")).enqueue( new  AbstractRetrofit2Callback<User>(this){public  void  onResponse(Call<User>  call,Response<User>  response){ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.nickname),PromptInputbox.class).setText(user.addEntry("NICKNAME",response.body().getString("NICKNAME")).getString("NICKNAME"));}} );
 		}
 		else
 		{
