@@ -19,9 +19,9 @@
     <string  name="password">PASSWORD</string>
     <string  name="register_if_no_account">NO ACCOUNT? REGISTER A NEW ONE</string>
     <string  name="register">REGISTER</string>
-    <string  name="register_successfully">REGISTERD AND CLOSE</string>
+    <string  name="register_successfully">REGISTERD AND GO BACK</string>
     <string  name="nickname">NICKNAME</string>
-    <string  name="password_confirm">RETYPE PASSWORD</string>
+    <string  name="password_confirm">PASSWORD CONFIRM</string>
     <string  name="message">MESSAGE</string>
     <string  name="buddy">FRIENDS</string>
     <string  name="discovery">DISCOVERY</string>
@@ -54,7 +54,7 @@
     <string  name="exit">EXIT</string>
     <string  name="offsite_landing_error">OFFSITE LANDING</string>
     <string  name="registration_form_error">NOTICE: ANY INPUT EMPTY OR TWO INPUT PASSWORDS NOT CONSISTENT</string>
-    <string  name="connect_form_error">USERNAME OR PASSWORD IS EMPTY</string>
+    <string  name="connect_form_error">USERNAME OR PASSWORD EMPTY</string>
     <string  name="waiting">WAITING PLEASE</string>
     <string  name="contact_offline">CONTACT OFFLINE</string>
     <string  name="invite_successfully">INVITED SUCCESSFULLY</string>
@@ -78,7 +78,7 @@
     <string  name="group">GROUP</string>
     <string  name="change">CHANGE</string>
     <string  name="subscribe_form_error">REMARK OR GROUP IS EMPTY</string>
-    <string  name="portrait_hidden">NOTICE: PORTRAIT IS HIDE, DRAG TO SEE</string>
+    <string  name="portrait_hidden">PORTRAIT HIDE, VIEW BY DRAG</string>
     <string  name="select_group">CHOOSE GROUP</string>
     <string  name="send">SEND</string>
     <string  name="updated">UPDATED</string>
@@ -106,6 +106,7 @@
     <string  name="language_english">ENGLISH</string>
     <string  name="language_chinese">中文</string>
     <string  name="system_settings">SETTINGS</string>
+    <string  name="cancel">CANCEL</string>
     <string-array  name="group_chat_details_list">
         <item>MEMBERS</item><item>INVITE</item>
     </string-array>

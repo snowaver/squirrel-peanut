@@ -4,8 +4,10 @@
 
 * Copyright 2019 snowaver. https://mashroom.cc/
 
-This product includes/uses font(s) created in 2003 by 'George Williams' and licensed under OFL license
-- Monospace font
+This product includes/uses font(s) created by 'DroidFonts.com' (https://www.droidfonts.com/info/droid-sans-mono-fonts/) and licensed under Creative Commons 2.5 Attribution license
+- Droid Sans Mono
+This product includes/uses software(s) developed by 'TextJustify-Android' (https://github.com/mathew-kurian/TextJustify-Android/) and licensed under Apache Licence 2.0
+- TextJustify-Android
 This product includes/uses software(s) developed by 'The Project Lombok Authors' (https://www.projectlombok.org/) and licensed under the MIT license
 - Project Lombok
 This product includes/uses software(s) developed by 'Square, Inc.' (https://square.github.io/retrofit/) and licensed under Apache Licence 2.0
@@ -33,11 +35,9 @@ This product includes/uses software(s) developed by 'The WebRTC project authors'
 - Libjingle Peerconnection
 This product includes/uses software(s) developed by 'ybq' (https://ybq.github.io/Android-SpinKit/) and licensed under MIT license
 - Android-SpinKit
-This product includes/uses software(s) developed by 'leibnik' (https://github.com/nyakokishi/JustifyTextView/) and licensed under MIT license
-- JustifyTextView
 This product includes/uses software(s) developed by 'daimajia' ( https://github.com/daimajia/AndroidSwipeLayout/) and licensed under MIT license
 - Android Swipe Layout
 This product includes/uses software(s) developed by 'H2 Group' ( http://www.h2database.com/html/main.html) licensed under MPL 2.0 and EPL 1.0
 - H2
-This product includes/uses software(s) developed by 'Shimizu Yasuhiro (yshrsmz)' (https://github.com/yshrsmz/KeyboardVisibilityEvent/) and licensed under MIT license
+This product includes/uses software(s) developed by 'Shimizu Yasuhiro (yshrsmz)' (  https://github.com/yshrsmz/KeyboardVisibilityEvent/) and licensed under MIT license
 - KeyboardVisibilityEvent

@@ -71,12 +71,6 @@
     <string  name="video_message">视频消息</string>
     <string  name="video_call">视频通话</string>
     <string  name="audio_call">语音通话</string>
-    <string  name="closed">已经关闭</string>
-    <string  name="counterpart_closed">对方关闭</string>
-    <string  name="rejected">已经拒绝</string>
-    <string  name="counterpart_reject">对方拒绝</string>
-    <string  name="canceled">已经取消</string>
-    <string  name="counterpart_canceled">对方取消</string>
     <string  name="whether_to_delete_news_profile">您是否要删除此聊天？不可恢复</string>
     <string  name="program_is_running">程序正在运行，点击打开应用。。。</string>
     <string  name="add_to_new_group">添加到新分组</string>
@@ -112,6 +106,7 @@
     <string  name="language_english">ENGLISH</string>
     <string  name="language_chinese">中文</string>
     <string  name="system_settings">系统设置</string>
+    <string  name="cancel">取消</string>
     <string-array  name="group_chat_details_list">
         <item>查看成员</item><item>邀请好友</item>
     </string-array>
