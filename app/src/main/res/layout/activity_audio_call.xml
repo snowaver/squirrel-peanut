@@ -9,7 +9,7 @@
 
         <TextView  android:id="@+id/nickname"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_alignParentRight="true"  android:textColor="@color/white"  android:textSize="18dp"/>
 
-        <cc.mashroom.hedgehog.widget.Stopwatch  android:id="@+id/chronometer"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_alignParentRight="true"  android:layout_centerVertical="true"  android:fontFamily="@font/monospace"  android:textSize="18dp"  android:textColor="@color/white"  android:format="00:00:00"/>
+        <cc.mashroom.hedgehog.widget.Stopwatch  android:id="@+id/chronometer"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_alignParentRight="true"  android:layout_centerVertical="true"  android:textSize="18dp"  android:textColor="@color/white"  android:format="00:00:00"/>
 
         <TextView  android:id="@+id/prompt_message"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_alignParentBottom="true"  android:layout_alignParentRight="true"  android:textColor="@color/white"  android:textSize="18dp"/>
 

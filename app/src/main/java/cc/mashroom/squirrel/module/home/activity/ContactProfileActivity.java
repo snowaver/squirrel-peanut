@@ -11,7 +11,7 @@ import  android.widget.TextView;
 
 import  com.facebook.drawee.view.SimpleDraweeView;
 import  com.fasterxml.jackson.core.type.TypeReference;
-import  cc.mashroom.hedgehog.widget.PromptInputbox;
+import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
@@ -30,7 +30,7 @@ import  cc.mashroom.util.collection.map.Map;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
 
-public  class  ContactProfileActivity   extends  AbstractPacketListenerActivity  implements  View.OnClickListener
+public  class  ContactProfileActivity     extends  AbstractPacketListenerActivity  implements  View.OnClickListener
 {
 	protected  void  onCreate(   Bundle  savedInstanceState )
 	{
@@ -42,7 +42,7 @@ public  class  ContactProfileActivity   extends  AbstractPacketListenerActivity 
 
 		super.findViewById(R.id.chat_or_subscribe_button).setOnClickListener( this );
 
-		this.setUser( ObjectUtils.cast(new  User().addEntries(ObjectUtils.cast(super.getIntent().getSerializableExtra("USER"),new  TypeReference<java.util.Map<String,Object>>(){}))) );
+		setUser( ObjectUtils.cast(new  User().addEntries(ObjectUtils.cast(getIntent().getSerializableExtra("USER"),  new  TypeReference<java.util.Map<String,Object>>(){}))) );
 
 		ObjectUtils.cast(super.findViewById(R.id.details_portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+user.getLong("ID")+"/portrait").build().toString()) );
 
@@ -50,35 +50,35 @@ public  class  ContactProfileActivity   extends  AbstractPacketListenerActivity 
 
 		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( !Contact.dao.getContactDirect().containsKey(user.getLong("ID")) ? R.string.add_contact : prompts.get(Contact.dao.getContactDirect().get(user.getLong("ID")).getInteger("SUBSCRIBE_STATUS")) );
 
-		ObjectUtils.cast(findViewById(R.id.username),PromptInputbox.class).setText( user.getString("USERNAME") );
+		ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).setText(     this.user.getString("USERNAME") );
 
 		if( StringUtils.isBlank(user.getString("NICKNAME")) )
 		{
-			ObjectUtils.cast(super.findViewById(R.id.nickname),PromptInputbox.class).setVisibility(  View.GONE );
+			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setVisibility( View.GONE );
 		}
 		else
 		{
-			ObjectUtils.cast(super.findViewById(R.id.nickname),PromptInputbox.class).setText( this.user.getString("NICKNAME") );
+			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText( this.user.getString("NICKNAME") );
 		}
 
 		if( StringUtils.isBlank(user.getString("REMARK"  )) )
 		{
-			ObjectUtils.cast(super.findViewById(R.id.remark ), PromptInputbox.class).setVisibility(  View.GONE );
+			ObjectUtils.cast(super.findViewById(R.id.remark ), StyleableEditView.class).setVisibility( View.GONE );
 		}
 		else
 		{
-			ObjectUtils.cast(super.findViewById(R.id.remark ), PromptInputbox.class).setText( this.user.getString( "REMARK" ) );
+			ObjectUtils.cast(super.findViewById(R.id.remark ), StyleableEditView.class).setText( this.user.getString(  "REMARK") );
 		}
 
 		Contact  contact = Contact.dao.getContactDirect().get( user.getLong( "ID") );
 
 		if( contact!= null )
 		{
-			ObjectUtils.cast(super.findViewById( R.id.group ), PromptInputbox.class).setText( contact.getString("GROUP_NAME") );
+			ObjectUtils.cast(super.findViewById( R.id.group ), StyleableEditView.class).setText( contact.getString("GROUP_NAME") );
 		}
 		else
 		{
-			ObjectUtils.cast(super.findViewById( R.id.group ), PromptInputbox.class).setVisibility(  View.GONE );
+			ObjectUtils.cast(super.findViewById( R.id.group ), StyleableEditView.class).setVisibility( View.GONE );
 		}
 
 		ObjectUtils.cast(super.findViewById(R.id.additional_text),TextView.class).setVisibility( user.getLong("ID") != Long.parseLong(application().getSquirrelClient().getId()) && contact != null ? View.VISIBLE : View.GONE );
@@ -88,6 +88,14 @@ public  class  ContactProfileActivity   extends  AbstractPacketListenerActivity 
 	@Accessors( chain=true )
 	@Setter
 	private  User  user;
+
+	public  void  sent( Packet  packet,TransportState  sendState )  throws  Exception
+	{
+		if( packet instanceof SubscribePacket && sendState == TransportState.SENT && ObjectUtils.cast(packet,SubscribePacket.class).getContactId() == this.user.getLong("ID") )
+		{
+			ObjectUtils.cast(findViewById(R.id.chat_or_subscribe_button) , Button.class).setText( R.string.subscribe_packet_sent );
+		}
+	}
 
 	public  void  received( Packet  packet )
 	{
@@ -99,21 +107,13 @@ public  class  ContactProfileActivity   extends  AbstractPacketListenerActivity 
 		application().getMainLooperHandler().post( ()->ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText(R.string.chat) );
 	}
 
-	public  void  sent( Packet  packet,TransportState  sendState )  throws  Exception
-	{
-		if( packet instanceof SubscribePacket && sendState == TransportState.SENT && ObjectUtils.cast(packet,SubscribePacket.class).getContactId() == user.getLong("ID") )
-		{
-			ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( R.string.subscribe_packet_sent );
-		}
-	}
-
 	public  void  onClick(  View    button )
 	{
-		Contact  contact = Contact.dao.getContactDirect().get( user.getLong( "ID") );
+		Contact  contact = Contact.dao.getContactDirect().get(user.getLong( "ID" ) );
 
 		if( button.getId() == R.id.chat_or_subscribe_button )
 		{
-			if( contact != null && (contact.getInteger("SUBSCRIBE_STATUS")== 6 || contact.getInteger("SUBSCRIBE_STATUS") == 7) )
+			if( contact != null && ( contact.getInteger("SUBSCRIBE_STATUS") == 6 || contact.getInteger("SUBSCRIBE_STATUS") == 7 ) )
 			{
 				ActivityCompat.startActivity( this,new  Intent(this,ChatActivity.class).putExtra("CONTACT_ID",user.getLong("ID")),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 			}

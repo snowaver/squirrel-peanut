@@ -9,13 +9,13 @@
 
     </LinearLayout>
 
-    <cc.mashroom.hedgehog.widget.PromptInputbox  android:id="@+id/username"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/username"  fresco:enableBottomBorder="true"  fresco:enableTopBorder="true"></cc.mashroom.hedgehog.widget.PromptInputbox>
+    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/username"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/username"  fresco:enableBottomBorder="true"  fresco:enableTopBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-    <cc.mashroom.hedgehog.widget.PromptInputbox  android:id="@+id/nickname"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/nickname"  fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.PromptInputbox>
+    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/nickname"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/nickname"  fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-    <cc.mashroom.hedgehog.widget.PromptInputbox  android:id="@+id/remark"    android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/remark"    fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.PromptInputbox>
+    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/remark"    android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/remark"    fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-    <cc.mashroom.hedgehog.widget.PromptInputbox  android:id="@+id/group"     android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/group"     fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.PromptInputbox>
+    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/group"     android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/group"     fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
     <View  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"></View>
 

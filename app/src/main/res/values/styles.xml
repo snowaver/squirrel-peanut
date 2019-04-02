@@ -6,7 +6,7 @@
 
     </style>
 
-    <style  name="DefaultTheme"    parent="Theme.AppCompat.NoActionBar"><item  name="android:includeFontPadding">false</item><item  name="android:windowAnimationStyle">@style/activityAnimation</item><item  name="android:activityCloseEnterAnimation">@anim/left_in</item></style>
+    <style  name="DefaultTheme"    parent="Theme.AppCompat.NoActionBar"><item  name="android:fontFamily">@font/droid_sans_mono</item><item  name="android:includeFontPadding">false</item><item  name="android:windowAnimationStyle">@style/activityAnimation</item><item  name="android:activityCloseEnterAnimation">@anim/left_in</item></style>
 
     <style  name="ExpandedToolbarTitleAppreance"   parent="android:Theme"><item  name="android:textColor">@color/transparent</item><item  name="android:textSize">14dp</item></style>
 

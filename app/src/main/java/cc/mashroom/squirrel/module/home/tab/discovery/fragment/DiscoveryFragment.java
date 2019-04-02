@@ -21,11 +21,11 @@ import  java.util.List;
 
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.DensityUtils;
-import  cc.mashroom.hedgehog.widget.PromptInputbox;
+import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.user.User;
 import  cc.mashroom.squirrel.module.home.activity.SubscribeActivity;
-import cc.mashroom.squirrel.parent.AbstractActivity;
+import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.parent.AbstractFragment;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
@@ -60,9 +60,9 @@ public  class   DiscoveryFragment  extends  AbstractFragment   implements  TextV
 	{
 		if( editorActionId == EditorInfo.IME_ACTION_DONE )
 		{
-			if( StringUtils.isNotBlank( ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor), PromptInputbox.class).getText().toString().trim() ) )
+			if( StringUtils.isNotBlank(ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim()) )
 			{
-				RetrofitRegistry.get(UserService.class).search(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),PromptInputbox.class).getText().toString().trim(),    "{}").enqueue
+				RetrofitRegistry.get(UserService.class).search(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim(), "{}").enqueue
 				(
 					new  AbstractRetrofit2Callback<List<User>>( this.getActivity(),new  UIProgressDialog.WeBoBuilder(this.getActivity()).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(this.getActivity(),140)) )
 					{

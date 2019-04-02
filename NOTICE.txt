@@ -33,6 +33,8 @@ This product includes/uses software(s) developed by 'The WebRTC project authors'
 - Libjingle Peerconnection
 This product includes/uses software(s) developed by 'ybq' (https://ybq.github.io/Android-SpinKit/) and licensed under MIT license
 - Android-SpinKit
+This product includes/uses software(s) developed by 'leibnik' (https://github.com/nyakokishi/JustifyTextView/) and licensed under MIT license
+- JustifyTextView
 This product includes/uses software(s) developed by 'daimajia' ( https://github.com/daimajia/AndroidSwipeLayout/) and licensed under MIT license
 - Android Swipe Layout
 This product includes/uses software(s) developed by 'H2 Group' ( http://www.h2database.com/html/main.html) licensed under MPL 2.0 and EPL 1.0

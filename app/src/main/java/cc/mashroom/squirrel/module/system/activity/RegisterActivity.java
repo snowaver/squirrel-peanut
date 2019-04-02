@@ -25,8 +25,7 @@ import  net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventLis
 import  java.io.File;
 import  java.util.List;
 
-import  cc.mashroom.hedgehog.util.ContextUtils;
-import  cc.mashroom.hedgehog.widget.PromptInputbox;
+import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
@@ -75,9 +74,9 @@ public  class  RegisterActivity  extends  AbstractActivity   implements  View.On
 
 	public  void  onClick( View  v )
 	{
-		if( StringUtils.isNoneBlank(ObjectUtils.cast(findViewById(R.id.username_input),PromptInputbox.class).getText().toString().trim(),ObjectUtils.cast(findViewById(R.id.nickname_input),PromptInputbox.class).getText().toString().trim(),ObjectUtils.cast(findViewById(R.id.password_input),PromptInputbox.class).getText().toString().trim()) && ObjectUtils.cast(findViewById(R.id.password_input),PromptInputbox.class).getText().toString().trim().equals(ObjectUtils.cast(findViewById(R.id.password_confirm_input),PromptInputbox.class).getText().toString().trim() ) )
+		if( StringUtils.isNoneBlank(ObjectUtils.cast(findViewById(R.id.username_input),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(findViewById(R.id.nickname_input),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(findViewById(R.id.password_input),StyleableEditView.class).getText().toString().trim()) && ObjectUtils.cast(findViewById(R.id.password_input),StyleableEditView.class).getText().toString().trim().equals(ObjectUtils.cast(findViewById(R.id.password_confirm_input),StyleableEditView.class).getText().toString().trim() ) )
 		{
-			RetrofitRegistry.get(UserService.class).register(RequestBody.create(MediaType.parse("multipart/form-data"),JsonUtils.toJson(new  HashMap<String,Object>().addEntry("username",ObjectUtils.cast(super.findViewById(R.id.username_input),PromptInputbox.class).getText().toString().trim()).addEntry("password",ObjectUtils.cast(super.findViewById(R.id.password_input),PromptInputbox.class).getText().toString().trim()).addEntry("nickname",ObjectUtils.cast(super.findViewById(R.id.nickname_input),PromptInputbox.class).getText().toString().trim()))),portrait == null ? null : MultipartBody.Part.createFormData("portrait",portrait.getName(),RequestBody.create(MediaType.parse("multipart/form-data"),portrait))).enqueue
+			RetrofitRegistry.get(UserService.class).register(RequestBody.create(MediaType.parse("multipart/form-data"),JsonUtils.toJson(new  HashMap<String,Object>().addEntry("username",ObjectUtils.cast(super.findViewById(R.id.username_input),StyleableEditView.class).getText().toString().trim()).addEntry("password",ObjectUtils.cast(super.findViewById(R.id.password_input),StyleableEditView.class).getText().toString().trim()).addEntry("nickname",ObjectUtils.cast(super.findViewById(R.id.nickname_input),StyleableEditView.class).getText().toString().trim()))),portrait == null ? null : MultipartBody.Part.createFormData("portrait",portrait.getName(),RequestBody.create(MediaType.parse("multipart/form-data"),portrait))).enqueue
 			(
 				new  AbstractRetrofit2Callback<Void>( this,new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(this,140)) )
 				{
@@ -91,7 +90,7 @@ public  class  RegisterActivity  extends  AbstractActivity   implements  View.On
 						}
 						else
 						{
-							new  UIAlertDialog.DividerIOSBuilder(RegisterActivity.this).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.register_successfully).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog,which) -> putResultDataAndFinish(RegisterActivity.this,0,new  Intent().putExtra("USERNAME",ObjectUtils.cast(RegisterActivity.this.findViewById(R.id.username_input),PromptInputbox.class).getText().toString().trim()))).create().setWidth((int)  (RegisterActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)).show();
+							new  UIAlertDialog.DividerIOSBuilder(RegisterActivity.this).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.register_successfully).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog,which) -> putResultDataAndFinish(RegisterActivity.this,0,new  Intent().putExtra("USERNAME",ObjectUtils.cast(RegisterActivity.this.findViewById(R.id.username_input),StyleableEditView.class).getText().toString().trim()))).create().setWidth((int)  (RegisterActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)).show();
 						}
 					}
 				}
