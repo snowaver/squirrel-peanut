@@ -157,7 +157,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		}
 		else
 		{
-			Toasty.warning(SubscribeActivity.this,super.getString(StringUtils.isBlank(name) ? R.string.content_blank_error : R.string.group_exist_error),Toast.LENGTH_LONG,false).show();
+			showSneakerWindow( new  Sneaker( this ),com.irozon.sneaker.R.drawable.ic_warning,StringUtils.isBlank(name) ? R.string.content_empty_error : R.string.group_exist_error,R.color.white,R.color.red );
 		}
 	}
 

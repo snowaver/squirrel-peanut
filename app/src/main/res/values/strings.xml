@@ -53,7 +53,7 @@
     <string  name="network_configuration_error">系统正在维护，请您稍后再试</string>
     <string  name="exit">退出</string>
     <string  name="offsite_landing_error">此账号异地登录</string>
-    <string  name="registration_form_error">提示：账号，昵称以及密码不得为空，并且两次输入密码必须相同</string>
+    <string  name="registration_form_error">账号，昵称以及密码不得为空，并且两次输入密码必须相同</string>
     <string  name="connect_form_error">账号或者密码为空</string>
     <string  name="waiting">请您稍等。。。</string>
     <string  name="contact_offline">联系人不在线</string>

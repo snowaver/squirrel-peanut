@@ -7,6 +7,7 @@ import  android.widget.Toast;
 import  androidx.annotation.NonNull;
 
 import  com.aries.ui.widget.alert.UIAlertDialog;
+import com.irozon.sneaker.Sneaker;
 
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.squirrel.R;
@@ -42,7 +43,7 @@ public  class  VideoCallActivity  extends  CallActivity
 
         if( !PermissionUtils.verifyPermissions(grantedResults) )
         {
-            Toasty.error(this,super.getString(R.string.permission_grant_error),Toast.LENGTH_LONG,false).show();  super.finish();
+            super.showSneakerWindow( new Sneaker(this).setOnSneakerDismissListener(() -> ContextUtils.finish(this)),com.irozon.sneaker.R.drawable.ic_error,cc.mashroom.hedgehog.R.string.permission_denied,R.color.white,R.color.red );
         }
     }
 
@@ -57,6 +58,6 @@ public  class  VideoCallActivity  extends  CallActivity
 
     public  void  showPermissionRationale( PermissionRequest  permissionRequest )
     {
-        new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(cc.mashroom.hedgehog.R.string.notice).setTitleTextSize(18).setMessage(cc.mashroom.hedgehog.R.string.camcorder_permission_check).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextSize(18).setNegativeButton(cc.mashroom.hedgehog.R.string.close,(dialog, which) -> {permissionRequest.cancel();  ContextUtils.finish(this);}).setPositiveButtonTextSize(18).setPositiveButton(cc.mashroom.hedgehog.R.string.ok,(dialog,which) -> permissionRequest.proceed()).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)).show();
+        new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(cc.mashroom.hedgehog.R.string.notice).setTitleTextSize(18).setMessage(cc.mashroom.hedgehog.R.string.permission_denied).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextSize(18).setNegativeButton(cc.mashroom.hedgehog.R.string.close,(dialog, which) -> {permissionRequest.cancel();  ContextUtils.finish(this);}).setPositiveButtonTextSize(18).setPositiveButton(cc.mashroom.hedgehog.R.string.ok,(dialog,which) -> permissionRequest.proceed()).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)).show();
     }
 }

@@ -162,7 +162,7 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 			}
 			else
 			{
-				Toasty.warning(this,super.getString(R.string.content_blank_error),Toast.LENGTH_LONG,false).show();
+				Toasty.warning(this,super.getString(R.string.content_empty_error),Toast.LENGTH_LONG,false).show();
 			}
 		}
 
