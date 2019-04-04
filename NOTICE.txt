@@ -6,8 +6,8 @@
 
 This product includes/uses font(s) created by 'DroidFonts.com' (https://www.droidfonts.com/info/droid-sans-mono-fonts/) and licensed under Creative Commons 2.5 Attribution license
 - Droid Sans Mono
-This product includes/uses software(s) developed by 'TextJustify-Android' (https://github.com/mathew-kurian/TextJustify-Android/) and licensed under Apache Licence 2.0
-- TextJustify-Android
+This product includes/uses software(s) developed by 'CodesGood' (https://github.com/amilcar-sr/JustifiedTextView/) and licensed under Apache Licence 2.0
+- JustifiedTextView
 This product includes/uses software(s) developed by 'The Project Lombok Authors' (https://www.projectlombok.org/) and licensed under the MIT license
 - Project Lombok
 This product includes/uses software(s) developed by 'Square, Inc.' (https://square.github.io/retrofit/) and licensed under Apache Licence 2.0
