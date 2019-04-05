@@ -13,9 +13,10 @@ import  android.widget.SimpleAdapter;
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
-import  cc.mashroom.hedgehog.util.ContextUtils;
+import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.db.common.Db;
+import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
@@ -78,7 +79,7 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 		{
 			RetrofitRegistry.get(ChatGroupUserService.class).invite(chatGroup.getLong("ID"),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"),",")).enqueue
 			(
-				new  AbstractRetrofit2Callback<List<Map<String,Object>>>( this,new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(this,140)) )
+				new  AbstractRetrofit2Callback<List<Map<String,Object>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) )
 				{
 					@SneakyThrows
 					public  void  onResponse( Call<List<Map<String,Object>>>  call,Response<List<Map<String,Object>>>  response )

@@ -2,16 +2,16 @@ package cc.mashroom.squirrel.module.chat.activity;
 
 import  android.Manifest;
 import  android.os.Bundle;
-import  android.widget.Toast;
 
 import  androidx.annotation.NonNull;
 
 import  com.aries.ui.widget.alert.UIAlertDialog;
-import com.irozon.sneaker.Sneaker;
+import  com.irozon.sneaker.Sneaker;
 
+import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.ContextUtils;
+import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.squirrel.R;
-import  es.dmoral.toasty.Toasty;
 import  lombok.SneakyThrows;
 import  permissions.dispatcher.NeedsPermission;
 import  permissions.dispatcher.OnShowRationale;
@@ -58,6 +58,6 @@ public  class  VideoCallActivity  extends  CallActivity
 
     public  void  showPermissionRationale( PermissionRequest  permissionRequest )
     {
-        new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(cc.mashroom.hedgehog.R.string.notice).setTitleTextSize(18).setMessage(cc.mashroom.hedgehog.R.string.permission_denied).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextSize(18).setNegativeButton(cc.mashroom.hedgehog.R.string.close,(dialog, which) -> {permissionRequest.cancel();  ContextUtils.finish(this);}).setPositiveButtonTextSize(18).setPositiveButton(cc.mashroom.hedgehog.R.string.ok,(dialog,which) -> permissionRequest.proceed()).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)).show();
+        ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(cc.mashroom.hedgehog.R.string.notice).setTitleTextSize(18).setMessage(cc.mashroom.hedgehog.R.string.permission_denied).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextSize(18).setNegativeButton(cc.mashroom.hedgehog.R.string.close,(dialog, which) -> {permissionRequest.cancel();  ContextUtils.finish(this);}).setPositiveButtonTextSize(18).setPositiveButton(cc.mashroom.hedgehog.R.string.ok,(dialog,which) -> permissionRequest.proceed()).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
     }
 }

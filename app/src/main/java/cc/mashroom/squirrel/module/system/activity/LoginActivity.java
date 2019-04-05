@@ -13,8 +13,10 @@ import  com.aries.ui.widget.alert.UIAlertDialog;
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
+import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.DensityUtils;
+import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
@@ -46,7 +48,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
 
         if( super.getIntent().getIntExtra("RELOGIN_REASON",0) == 1 )
         {
-            new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.login_remote_login_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).setPositiveButton(R.string.close,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)).show();
+            ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.login_remote_login_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).setPositiveButton(R.string.close,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
         }
         //  clear  the  password  input  box  after  successful  registration,  logout  or  squeezing  off  the  line  by  remote  login.
         ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().clear();
@@ -66,7 +68,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
         {
             ContextUtils.hideSoftinput(this );
 
-            application().connect( ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString(),ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString(),NetworkUtils.getLocation(this),new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(this,140)) );
+            application().connect( ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString(),ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString(),NetworkUtils.getLocation(this),ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) );
         }
     }
 }

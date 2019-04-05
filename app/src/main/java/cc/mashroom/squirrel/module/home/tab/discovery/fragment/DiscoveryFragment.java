@@ -19,8 +19,9 @@ import  com.irozon.sneaker.Sneaker;
 
 import  java.util.List;
 
-import  cc.mashroom.hedgehog.util.ContextUtils;
+import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.DensityUtils;
+import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.user.User;
@@ -64,7 +65,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment   implements  TextV
 			{
 				RetrofitRegistry.get(UserService.class).search(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim(), "{}").enqueue
 				(
-					new  AbstractRetrofit2Callback<List<User>>( this.getActivity(),new  UIProgressDialog.WeBoBuilder(this.getActivity()).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(this.getActivity(),140)) )
+					new  AbstractRetrofit2Callback<List<User>>( this.getActivity(),ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this.getActivity()).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this.getActivity(),R.font.droid_sans_mono)).setHeight(DensityUtils.px(this.getActivity(),140)) )
 					{
 						public  void  onResponse( Call<List<User>>  call, Response<List<User>>  response )
 						{

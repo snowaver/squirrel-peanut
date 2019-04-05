@@ -16,7 +16,6 @@ import  android.widget.Button;
 import  android.widget.EditText;
 import  android.widget.ListView;
 import  android.widget.TextView;
-import  android.widget.Toast;
 
 import  com.aries.ui.widget.alert.UIAlertDialog;
 import  com.aries.ui.widget.progress.UIProgressDialog;
@@ -27,8 +26,10 @@ import  com.irozon.sneaker.Sneaker;
 import  net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import  net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
+import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.DensityUtils;
+import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
@@ -50,7 +51,6 @@ import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
 import  cc.mashroom.util.collection.map.Map;
 import  cn.refactor.library.SmoothCheckBox;
-import  es.dmoral.toasty.Toasty;
 import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.SneakyThrows;
@@ -151,7 +151,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 	private  void    addGroup()
 	{
-		new  UIAlertDialog.DividerIOSBuilder(SubscribeActivity.this).setBackgroundRadius(15).setTitle(R.string.contact_add_to_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButton(R.string.cancel,(dialog,which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (SubscribeActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)).show();
+		ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(SubscribeActivity.this).setBackgroundRadius(15).setTitle(R.string.contact_add_to_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButton(R.string.cancel,(dialog,which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (SubscribeActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
 	}
 
 	public  void  onClick( DialogInterface  dialog , int  i )
@@ -197,7 +197,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
                     {
                         RetrofitRegistry.get(ContactService.class).changeSubscribeStatus(7,user.getLong("ID"),application().getUserMetadata().getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
-							new AbstractRetrofit2Callback<Void>( this,new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(this,140)) )
+							new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) )
 							{
 								@SneakyThrows
 								public  void  onResponse( Call<Void>  call , Response<Void>  response )
@@ -237,7 +237,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
                     {
 						RetrofitRegistry.get(ContactService.class).subscribe( application().getUserMetadata().getLong("ID"), user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(), ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
-							new AbstractRetrofit2Callback<Void>( this,new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(this,140)) )
+							new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) )
 							{
 								@SneakyThrows
 								public  void  onResponse( Call<Void>  call , Response<Void>  response )

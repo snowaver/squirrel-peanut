@@ -21,7 +21,9 @@ import  com.irozon.sneaker.Sneaker;
 import  org.joda.time.DateTime;
 import  org.webrtc.PeerConnection;
 
+import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.DensityUtils;
+import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.router.BalancerStateListener;
 import  cc.mashroom.router.DefaultBalancingProxyFactory;
@@ -315,7 +317,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		if( sharedPreferences.getLong("ID",0) >= 1 )
 		{
-			connect( sharedPreferences.getLong("ID",0),NetworkUtils.getLocation(this),connectWaitingDialog = AbstractActivity.STACK.isEmpty() ? null : new  UIProgressDialog.WeBoBuilder(AbstractActivity.STACK.get(0)).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(this,140)) );
+			connect( sharedPreferences.getLong("ID",0),NetworkUtils.getLocation(this),connectWaitingDialog = AbstractActivity.STACK.isEmpty() ? null : ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(AbstractActivity.STACK.get(0)).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) );
 		}
 	}
 }

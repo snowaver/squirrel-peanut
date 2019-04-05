@@ -15,7 +15,9 @@ import  com.aries.ui.widget.progress.UIProgressDialog;
 import  java.util.Locale;
 
 import  androidx.core.app.ActivityCompat;
+import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.DensityUtils;
+import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
@@ -35,7 +37,7 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 	{
 		RetrofitRegistry.get(UserService.class).logout(application().getSquirrelClient().getId()).enqueue
 		(
-			new AbstractRetrofit2Callback<Void>( this,new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(this , 140)) )
+			new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this , 140)) )
 			{
 				public  void  onResponse( Call<Void>  call,  Response<Void>  response )
 				{
