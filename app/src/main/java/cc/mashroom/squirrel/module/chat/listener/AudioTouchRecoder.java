@@ -57,7 +57,7 @@ public  class  AudioTouchRecoder   implements  View.OnTouchListener
             {
                 ObjectUtils.cast(context.findViewById(R.id.voice_recording_button),Button.class).setBackgroundResource(     R.drawable.voice_recording_backround_pressed );
 
-                ObjectUtils.cast(context.findViewById(R.id.voice_recording_button),Button.class).setText( R.string.recoding_voice );
+                ObjectUtils.cast(context.findViewById(R.id.voice_recording_button),Button.class).setText(           R.string.chat_talking );
 
                 try
                 {
@@ -93,7 +93,7 @@ public  class  AudioTouchRecoder   implements  View.OnTouchListener
                 {
                     ObjectUtils.cast(context.findViewById(R.id.voice_recording_button),Button.class).setBackgroundResource( R.drawable.voice_recording_backround_general );
 
-                    ObjectUtils.cast(context.findViewById(R.id.voice_recording_button),Button.class).setText( R.string.press_to_record_voice );
+                    ObjectUtils.cast(context.findViewById(R.id.voice_recording_button),Button.class).setText( R.string.chat_press_to_talk );
 
                     File  tmpAudioFile = new  File( cacheDir,"audio.amr.tmp" );
 
@@ -119,7 +119,7 @@ public  class  AudioTouchRecoder   implements  View.OnTouchListener
                 {
                     ObjectUtils.cast(context.findViewById(R.id.voice_recording_button),Button.class).setBackgroundResource( R.drawable.voice_recording_backround_general );
 
-                    ObjectUtils.cast(context.findViewById(R.id.voice_recording_button),Button.class).setText( R.string.press_to_record_voice );
+                    ObjectUtils.cast(context.findViewById(R.id.voice_recording_button),Button.class).setText( R.string.chat_press_to_talk );
 
                     File  tmpAudioFile = new  File( cacheDir,"audio.amr.tmp" );
 

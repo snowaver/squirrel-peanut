@@ -48,7 +48,7 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 	{
 		if( type==PAIPPacketType.SUBSCRIBE )
 		{
-			return  context.getString(Integer.valueOf(content) == 0 ? R.string.subscribe_packet_sent : R.string.add_contact_request_received );
+			return  context.getString(Integer.valueOf(content) == 0 ? R.string.subscribe_request_sent : R.string.subscribe_received_a_adding_contact_request );
 		}
 		else
 		{
@@ -86,7 +86,7 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 			{
 				public  void  onClick(View  v )
 				{
-					new  UIAlertDialog.DividerIOSBuilder(context.getActivity()).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.whether_to_delete_news_profile).setMessageTextSize(18).setCancelable(true).setCanceledOnTouchOutside(false).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(button,which) ->{}).setPositiveButtonTextColor(Color.RED).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog, which) -> {NewsProfile.dao.update("DELETE  FROM  "+NewsProfile.dao.getDataSourceBind().table()+"  WHERE  ID = ?  AND  PACKET_TYPE = ?",new  Object[]{newsProfile.getLong("ID"),newsProfile.getShort("PACKET_TYPE")});  NewsProfileListAdapter.this.notifyDataSetChanged();}).create().setWidth((int)  (context.getResources().getDisplayMetrics().widthPixels*0.9)).show();
+					new  UIAlertDialog.DividerIOSBuilder(context.getActivity()).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.message_whether_to_delete).setMessageTextSize(18).setCancelable(true).setCanceledOnTouchOutside(false).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(button,which) ->{}).setPositiveButtonTextColor(Color.RED).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog, which) -> {NewsProfile.dao.update("DELETE  FROM  "+NewsProfile.dao.getDataSourceBind().table()+"  WHERE  ID = ?  AND  PACKET_TYPE = ?",new  Object[]{newsProfile.getLong("ID"),newsProfile.getShort("PACKET_TYPE")});  NewsProfileListAdapter.this.notifyDataSetChanged();}).create().setWidth((int)  (context.getResources().getDisplayMetrics().widthPixels*0.9)).show();
 				}
 			}
 		);

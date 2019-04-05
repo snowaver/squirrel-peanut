@@ -47,7 +47,7 @@ public  class  PushServiceNotifier
 
 			notification.setTextViewText( R.id.time,newsProfile.get("CREATE_TIME").toString() );
 
-			notificationManager.notify( 0,new  NotificationCompat.Builder(context,"default").setSmallIcon(R.drawable.app).setTicker(context.getString(R.string.received_a_new_message)).setPriority(NotificationCompat.PRIORITY_DEFAULT).setContent(notification).setContentIntent(PendingIntent.getActivity(context,0,new  Intent(context,LoadingActivity.class),PendingIntent.FLAG_UPDATE_CURRENT)).build() );
+			notificationManager.notify( 0,new  NotificationCompat.Builder(context,"default").setSmallIcon(R.drawable.app).setTicker(context.getString(R.string.notification_received_a_new_message)).setPriority(NotificationCompat.PRIORITY_DEFAULT).setContent(notification).setContentIntent(PendingIntent.getActivity(context,0,new  Intent(context,LoadingActivity.class),PendingIntent.FLAG_UPDATE_CURRENT)).build() );
 		}
 
 		return    newsProfile;

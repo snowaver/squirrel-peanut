@@ -76,7 +76,7 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  ChatMessageListviewAdapter(this,contactId) );
 
-		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setSelection( ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter().getCount()-1 );
+		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setSelection( ObjectUtils.cast(super.findViewById(R.id.messages) , ListView.class).getAdapter().getCount() - 1 );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setVisibility(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getVisibility() == View.GONE ? View.VISIBLE : View.GONE) );
 
@@ -96,11 +96,11 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 
 		if( voiceDuration >= 200 )
 		{
-			application().getSquirrelClient().asynchronousSend( new  ChatPacket(contactId,audioFile.getName(),ChatContentType.AUDIO,String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
+			application().getSquirrelClient().asynchronousSend( new  ChatPacket(this.contactId,audioFile.getName() , ChatContentType.AUDIO , String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}
 		else
 		{
-			showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_warning,R.string.voice_duration_too_short,R.color.black,R.color.orange );
+			super.showSneakerWindow(   Sneaker.with( this ) , com.irozon.sneaker.R.drawable.ic_warning , R.string.chat_recorded_voice_duration_too_short , R.color.black , R.color.orange );
 		}
 	}
 

@@ -23,7 +23,7 @@ public  class  ContactMultichoiceActivity    extends  AbstractActivity
 
 		super.setContentView( R.layout.activity_contact_multichoice );
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( super.getString(R.string.selecting_contact) );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( super.getString(R.string.select) );
 
 		ObjectUtils.cast(super.findViewById(R.id.ok_button),TextView.class).setOnClickListener( (view) -> super.putResultDataAndFinish(this,0,new  Intent().putExtra("SELECTED_CONTACT_IDS",ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.contact_list),ListView.class).getAdapter(),ContactMultichoiceListviewAdapter.class).getContactIds(),Serializable.class))) );
 

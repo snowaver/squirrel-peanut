@@ -77,7 +77,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 		ObjectUtils.cast(super.findViewById(R.id.voice_recording_button),Button.class).setOnTouchListener( new  AudioTouchRecoder(this,application().getCacheDir(),(audioFile) -> send(audioFile)) );
 
-		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  GroupChatMessageListviewAdapter(this,groupId) );
+		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  GroupChatMessageListviewAdapter(this,this.groupId) );
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setSelection( ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter().getCount()-1 );
 
@@ -105,7 +105,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 		}
 		else
 		{
-			showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_warning,R.string.voice_duration_too_short,R.color.black,R.color.orange );
+			super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_warning,R.string.chat_recorded_voice_duration_too_short,R.color.black,R.color.orange );
 		}
 	}
 
@@ -189,7 +189,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 			/*
 			long  now  = DateTime.now(DateTimeZone.UTC).getMillis()-1;
 			*/
-			for( Media  choosedMedia : ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS"), new  TypeReference<List<Media>>(){}) )
+			for( Media  choosedMedia : ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS"),new  TypeReference<List<Media>>(){}) )
 			{
 				File  cachedFile = application().cache( choosedMedia.getId(),new  File(choosedMedia.getPath()),choosedMedia.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
 

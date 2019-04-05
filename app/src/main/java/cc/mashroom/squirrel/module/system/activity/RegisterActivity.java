@@ -48,7 +48,7 @@ import  okhttp3.RequestBody;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
-public  class  RegisterActivity  extends  AbstractActivity   implements  View.OnClickListener,UIActionSheetDialog.OnItemClickListener,KeyboardVisibilityEventListener
+public  class  RegisterActivity   extends  AbstractActivity  implements  View.OnClickListener,UIActionSheetDialog.OnItemClickListener,KeyboardVisibilityEventListener
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
@@ -63,7 +63,7 @@ public  class  RegisterActivity  extends  AbstractActivity   implements  View.On
 		ObjectUtils.cast(super.findViewById(R.id.register_button),Button.class).setOnClickListener( this );
 	}
 
-	protected  Map<Integer,Integer>  failures = new  HashMap<Integer,Integer>().addEntry(0,R.string.network_or_internal_server_error).addEntry( 601,R.string.username_registered );
+	protected  Map<Integer,Integer>  failures = new  HashMap<Integer,Integer>().addEntry(0,R.string.network_or_internal_server_error).addEntry( 601,R.string.register_username_registered );
 
 	protected  File   portrait;
 
@@ -90,7 +90,7 @@ public  class  RegisterActivity  extends  AbstractActivity   implements  View.On
 						}
 						else
 						{
-							new  UIAlertDialog.DividerIOSBuilder(RegisterActivity.this).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.register_successfully).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog,which) -> putResultDataAndFinish(RegisterActivity.this,0,new  Intent().putExtra("USERNAME",ObjectUtils.cast(RegisterActivity.this.findViewById(R.id.username_input),StyleableEditView.class).getText().toString().trim()))).create().setWidth((int)  (RegisterActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)).show();
+							new  UIAlertDialog.DividerIOSBuilder(RegisterActivity.this).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.register_registered).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog,which) -> putResultDataAndFinish(RegisterActivity.this,0,new  Intent().putExtra("USERNAME",ObjectUtils.cast(RegisterActivity.this.findViewById(R.id.username_input),StyleableEditView.class).getText().toString().trim()))).create().setWidth((int)  (RegisterActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)).show();
 						}
 					}
 				}
@@ -101,7 +101,7 @@ public  class  RegisterActivity  extends  AbstractActivity   implements  View.On
 			/*
 			Toast.makeText(this,R.string.registration_form_error,Toast.LENGTH_LONG).show();
 			*/
-			showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.registration_form_error,R.color.white,R.color.red );
+			showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.register_form_error,R.color.white,R.color.red );
 		}
 	}
 

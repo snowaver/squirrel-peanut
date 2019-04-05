@@ -28,11 +28,11 @@ public  class  PushService   extends  Service
 
 		RemoteViews  notification = new  RemoteViews( super.getPackageName(),R.layout.notification_push );
 
-		notification.setImageViewResource( R.id.icon,R.drawable.app);
+		notification.setImageViewResource(  R.id.icon , R.drawable.app );
 
 		notification.setTextViewText( R.id.title,super.getString(R.string.squirrel) );
 
-		notification.setTextViewText( R.id.content,super.getString(R.string.program_is_running) );
+		notification.setTextViewText( R.id.content,super.getString(R.string.program_running) );
 		//  running  notification  clicked  receiver  can  not  receive  the  broadcast  from  broadcast  pending  intent  or  with  a  very  high  delay,  so  use  an  empty  activity  instead.
 		super.startForeground( 1,new  NotificationCompat.Builder(this,"default").setPriority(NotificationCompat.PRIORITY_MAX).setAutoCancel(false).setSmallIcon(R.drawable.app).setCustomContentView(notification).setContentIntent(PendingIntent.getActivity(this,0,new  Intent(this,TransferActivity.class),PendingIntent.FLAG_UPDATE_CURRENT)).build() );
 	}

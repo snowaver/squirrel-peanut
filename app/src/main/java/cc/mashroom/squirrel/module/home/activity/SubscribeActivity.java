@@ -95,7 +95,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setAdapter( new  ContactGroupAdapter(this, this) );
 
-		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setOnItemClickListener( ( parent, view, position, id ) -> ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( true) );
+		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setOnItemClickListener( ( parent, view, position, id ) -> ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( true ) );
 
 		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.add_to_new_group_button),TextView.class).setOnClickListener( (addGroupButton) -> addGroup() );
 
@@ -103,9 +103,9 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
         //  press  enter  key  to  update  remark,  but  actually  group  is  updated  also.
 		ObjectUtils.cast(super.findViewById(R.id.remark).findViewById(R.id.edit_inputor),EditText.class).setOnEditorActionListener( (edit,actionId,event) -> {if(actionId == EditorInfo.IME_ACTION_DONE) { onCheckedChanged(null , true); }return  false;} );
 
-		ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.my_buddies) );
+		ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
 
-		ObjectUtils.cast(super.findViewById(R.id.title),TextView.class).setText(  contact != null && (contact.getInteger("SUBSCRIBE_STATUS") == 6 || contact.getInteger("SUBSCRIBE_STATUS") == 7 ) ? R.string.contact_profile : R.string.add_contact );
+		ObjectUtils.cast(super.findViewById(R.id.title),TextView.class).setText(      contact != null && (contact.getInteger("SUBSCRIBE_STATUS") == 6 || contact.getInteger("SUBSCRIBE_STATUS") == 7 ) ? R.string.profile : R.string.subscribe_add_contact );
 
 		if( contact   != null )
 		{
@@ -119,7 +119,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 		ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setText(  user.getString(StringUtils.isBlank(this.user.getString("REMARK")) ? "NICKNAME" : "REMARK") );
 
-		ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getListener().getChecked().set( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.my_buddies) );
+		ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getChoiceListener().getChecked().set( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
 	}
 
 	private  Map<Integer,Integer>  prompts = new  HashMap<Integer,Integer>().addEntry(0,R.string.send).addEntry(1,R.string.accept).addEntry(6,R.string.chat).addEntry( 7,R.string.chat );
@@ -136,20 +136,20 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
     {
         if(            packet instanceof SubscribeAckPacket )
         {
-        	application().getMainLooperHandler().post( () ->{ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor( super.getResources().getColor( R.color.limegreen ) );  ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setText(super.getResources().getText(R.string.chat));} );
+        	application().getMainLooperHandler().post( () ->{ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor( super.getResources().getColor( R.color.limegreen ) );       ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setText(super.getResources().getText(R.string.chat));} );
         }
     }
 
 	private  void    addGroup()
 	{
-		new  UIAlertDialog.DividerIOSBuilder(SubscribeActivity.this).setBackgroundRadius(15).setTitle(R.string.add_to_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButton(R.string.cancel,(dialog,which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (SubscribeActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)).show();
+		new  UIAlertDialog.DividerIOSBuilder(SubscribeActivity.this).setBackgroundRadius(15).setTitle(R.string.contact_add_to_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButton(R.string.cancel,(dialog,which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (SubscribeActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)).show();
 	}
 
 	public  void  onClick( DialogInterface  dialog , int  i )
 	{
 		String  name=ObjectUtils.cast(ObjectUtils.cast(dialog,UIAlertDialog.class).getContentView().findViewById(R.id.edit_inputor),EditText.class).getText().toString().trim();
 
-		if( StringUtils.isNotBlank(name) && !ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).groups().contains(name) )
+		if( StringUtils.isNotBlank(name) && !ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getGroups().contains(name) )
 		{
 			ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups), ListView.class).getAdapter(), ContactGroupAdapter.class).addNewGroup(name, true).notifyDataSetChanged();
 
@@ -157,7 +157,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		}
 		else
 		{
-			showSneakerWindow( new  Sneaker( this ),com.irozon.sneaker.R.drawable.ic_warning,StringUtils.isBlank(name) ? R.string.content_empty_error : R.string.group_exist_error,R.color.white,R.color.red );
+			showSneakerWindow( new  Sneaker( this ),com.irozon.sneaker.R.drawable.ic_warning,StringUtils.isBlank(name) ? R.string.content_empty_error : R.string.contact_group_exist,R.color.white,R.color.red );
 		}
 	}
 
@@ -175,7 +175,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 				if( contact.getInteger(  "SUBSCRIBE_STATUS" )    == 0 )
 				{
-					super.showSneakerWindow( Sneaker.with( this ), com.irozon.sneaker.R.drawable.ic_success, R.string.subscribe_packet_sent, R.color.white, R.color.limegreen );
+					super.showSneakerWindow( Sneaker.with(this ), com.irozon.sneaker.R.drawable.ic_success, R.string.subscribe_request_sent, R.color.white, R.color.limegreen );
 				}
 				else
 				if( contact.getInteger(  "SUBSCRIBE_STATUS" )    == 1 )
@@ -201,11 +201,11 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 										ObjectUtils.cast(findViewById(R.id.subscribe_button),Button.class).setText(R.string.chat );
 
-										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.contact_added,R.color.white,R.color.limegreen );
+										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success, R.string.subscribe_contact_added,R.color.white,R.color.limegreen );
 									}
 									else
 									{
-										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error, R.string.network_or_internal_server_error, R.color.white, R.color.red );
+										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
 									}
 								}
 							}
@@ -241,11 +241,11 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 										ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor(SubscribeActivity.super.getResources().getColor(R.color.gainsboro));
 
-										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_packet_sent,R.color.white,R.color.limegreen );
+										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success  ,R.string.subscribe_request_sent,R.color.white,R.color.limegreen );
 									}
 									else
 									{
-										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error, R.string.network_or_internal_server_error, R.color.white, R.color.red );
+										showSneakerWindow( Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
 									}
 								}
 							}
@@ -271,7 +271,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		{
 			bottomSheet.hide();
 
-			String  group = ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getListener().getChecked().get();
+			String  group    = ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups), ListView.class).getAdapter(),ContactGroupAdapter.class).getChoiceListener().getChecked().get();
 
 			ObjectUtils.cast( super.findViewById(R.id.remark) , StyleableEditView.class ).clearFocus();
 

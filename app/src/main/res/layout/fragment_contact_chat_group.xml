@@ -7,7 +7,7 @@
 
         <ImageView  android:layout_width="40dp"  android:layout_height="40dp"  android:src="@drawable/more"/>
 
-        <TextView  android:layout_width="match_parent"  android:layout_height="40dp"  android:layout_marginLeft="10dp"  android:background="@color/white"  android:gravity="left|center_vertical"  android:text="@string/create_chat_group"  android:textColor="@color/limegreen"  android:textSize="18dp"/>
+        <TextView  android:layout_width="match_parent"  android:layout_height="40dp"  android:layout_marginLeft="10dp"  android:background="@color/white"  android:gravity="left|center_vertical"  android:text="@string/chat_create_new_group"  android:textColor="@color/limegreen"  android:textSize="18dp"/>
 
     </LinearLayout>
 

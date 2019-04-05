@@ -46,7 +46,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
 
         if( super.getIntent().getIntExtra("RELOGIN_REASON",0) == 1 )
         {
-            new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.offsite_landing_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).setPositiveButton(R.string.close,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)).show();
+            new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.login_remote_login_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).setPositiveButton(R.string.close,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)).show();
         }
         //  clear  the  password  input  box  after  successful  registration,  logout  or  squeezing  off  the  line  by  remote  login.
         ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().clear();
@@ -60,7 +60,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
     {
         if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString(),ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString()) || !NetworkUtils.isNetworkAvailable(this) )
         {
-            application().getMainLooperHandler().post( () -> showSneakerWindow(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,!NetworkUtils.isNetworkAvailable(this) ? R.string.network_or_internal_server_error : R.string.connect_form_error,R.color.white,R.color.red) );
+            application().getMainLooperHandler().post( () -> showSneakerWindow(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,!NetworkUtils.isNetworkAvailable(this) ? R.string.network_or_internal_server_error : R.string.login_form_error,R.color.white,R.color.red) );
         }
         else
         {

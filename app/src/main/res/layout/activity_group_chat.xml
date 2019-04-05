@@ -1,7 +1,7 @@
 <?xml  version="1.0"  encoding="utf-8"?>
 <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:fitsSystemWindows="true">
 
-    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"   app:backText="@string/back"  app:additionalText="@string/details"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
+    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"   app:backText="@string/goback"  app:additionalText="@string/profile"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
 
     <ListView  android:id="@+id/messages"  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"  android:dividerHeight="0px"  android:transcriptMode="alwaysScroll"  android:background="@color/white"></ListView>
 
@@ -17,7 +17,7 @@
 
                     <ImageView  android:id="@+id/switch_to_voice_recording_button"  android:layout_width="40dp"  android:layout_height="40dp"  android:src="@drawable/voice_recorder"    android:scaleType="fitCenter"  android:layout_gravity="bottom"/>
 
-                    <EditText  android:id="@+id/editor"  android:layout_width="match_parent"  android:layout_height="wrap_content"  android:minHeight="40dp"  android:layout_marginLeft="10dp"  android:hint="@string/input_chat_message"  android:textColorHint="@color/darkgray"  android:textColor="@color/black"  android:textSize="18dp"  android:minLines="1"  android:background="@drawable/wrods_inputting_backround_general"  android:imeOptions="actionSend"  android:paddingLeft="10dp"/>
+                    <EditText  android:id="@+id/editor"  android:layout_width="match_parent"  android:layout_height="wrap_content"  android:minHeight="40dp"  android:layout_marginLeft="10dp"  android:hint="@string/message"  android:textColorHint="@color/darkgray"  android:textColor="@color/black"  android:textSize="18dp"  android:minLines="1"  android:background="@drawable/wrods_inputting_backround_general"  android:imeOptions="actionSend"  android:paddingLeft="10dp"/>
 
                 </LinearLayout>
 
@@ -25,7 +25,7 @@
 
                     <ImageView  android:id="@+id/switch_to_words_inputting_button"  android:layout_width="40dp"  android:layout_height="40dp"    android:src="@drawable/keyboard"  android:scaleType="fitCenter"  android:layout_gravity="bottom"/>
 
-                    <Button  android:id="@+id/voice_recording_button"  android:layout_width="match_parent"  android:layout_height="40dp"  android:layout_marginLeft="10dp"  android:text="@string/press_to_record_voice"  android:textSize="18dp"  android:textColor="@color/darkgray"  android:background="@drawable/voice_recording_backround_general"  android:layout_gravity="center"  style="@style/Widget.AppCompat.Button.Borderless"/>
+                    <Button  android:id="@+id/voice_recording_button"  android:layout_width="match_parent"  android:layout_height="40dp"  android:layout_marginLeft="10dp"  android:text="@string/chat_press_to_talk"  android:textSize="18dp"  android:textColor="@color/darkgray"  android:background="@drawable/voice_recording_backround_general"  android:layout_gravity="center"  style="@style/Widget.AppCompat.Button.Borderless"/>
 
                 </LinearLayout>
 

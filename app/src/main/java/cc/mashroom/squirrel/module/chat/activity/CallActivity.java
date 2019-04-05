@@ -87,15 +87,15 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
         }
         else
         {
-            ObjectUtils.cast(super.findViewById(R.id.prompt_message),TextView.class).setText(callContentType == CallContentType.AUDIO ? R.string.call_counterparty_demand_a_audio_call_with_you : R.string.call_counterparty_demand_a_video_call_with_you );
+            ObjectUtils.cast(super.findViewById(R.id.prompt_message),TextView.class).setText(callContentType == CallContentType.AUDIO ? R.string.call_peer_demand_a_audio_call_with_you : R.string.call_peer_demand_a_video_call_with_you );
         }
 
         ObjectUtils.cast(findViewById(R.id.cancel_button) , SimpleDraweeView.class).setImageURI( ImageUtils.toUri(this , cc.mashroom.hedgehog.R.drawable.red_placeholder ) );
 	}
 
 	private  Map<String,Integer>  closeProfiles = new  HashMap<String,Integer>().addEntry(CloseCallReason.UNKNOWN.getValue()+":"+0,R.string.unknown_error).addEntry(CloseCallReason.UNKNOWN.getValue()+":"+1,R.string.unknown_error).addEntry(CloseCallReason.ROOM_NOT_FOUND.getValue()+":"+0,R.string.call_room_not_found).addEntry(CloseCallReason.ROOM_NOT_FOUND.getValue()+":"+1,R.string.call_room_not_found).addEntry(CloseCallReason.STATE_ERROR.getValue()+":"+0,R.string.call_state_error).addEntry(CloseCallReason.STATE_ERROR.getValue()+":"+1,R.string.call_state_error)
-		.addEntry(CloseCallReason.CANCEL.getValue()+":"+0,R.string.call_counterparty_canceled).addEntry(CloseCallReason.CANCEL.getValue()+":"+1,R.string.call_canceled).addEntry(CloseCallReason.TIMEOUT.getValue()+":"+0,R.string.call_counterparty_canceled).addEntry(CloseCallReason.TIMEOUT.getValue()+":"+1,R.string.call_no_response)
-		.addEntry(CloseCallReason.REJECT.getValue()+":"+0,R.string.call_counterparty_rejected).addEntry(CloseCallReason.REJECT.getValue()+":"+1,R.string.call_rejected).addEntry(CloseCallReason.NETWORK_ERROR.getValue()+":"+0,R.string.network_or_internal_server_error).addEntry(CloseCallReason.NETWORK_ERROR.getValue()+":"+1,R.string.network_or_internal_server_error);
+		.addEntry(CloseCallReason.CANCEL.getValue()+":"+0,R.string.call_peer_canceled).addEntry(CloseCallReason.CANCEL.getValue()+":"+1,R.string.call_canceled).addEntry(CloseCallReason.TIMEOUT.getValue()+":"+0,R.string.call_peer_canceled).addEntry(CloseCallReason.TIMEOUT.getValue()+":"+1,R.string.call_no_response)
+		.addEntry(CloseCallReason.REJECT.getValue()+":"+0,R.string.call_peer_rejected).addEntry(CloseCallReason.REJECT.getValue()+":"+1,R.string.call_rejected).addEntry(CloseCallReason.NETWORK_ERROR.getValue()+":"+0,R.string.network_or_internal_server_error).addEntry(CloseCallReason.NETWORK_ERROR.getValue()+":"+1,R.string.network_or_internal_server_error);
 	private  Map<CallError,Integer>  errors = new  HashMap<CallError,Integer>().addEntry(CallError.OFFLINE,R.string.contact_offline).addEntry(     CallError.NO_RESPONSE , R.string.call_no_response );
 	@Accessors( chain= true )
 	@Setter
@@ -176,9 +176,9 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 		if( reason ==   CloseCallReason.BY_USER )
 		{
-			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()+super.getString(R.string.comma)+super.getString(proactively ? R.string.call_closed : R.string.call_counterparty_closed),0} );
+			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()+super.getString(R.string.comma)+super.getString(proactively ? R.string.call_closed : R.string.call_peer_closed),0} );
 
-			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE)  VALUES  (?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()+super.getString(R.string.comma)+super.getString(proactively ? R.string.call_closed : R.string.call_counterparty_closed),TransportState.SENT.getValue()} );
+			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE)  VALUES  (?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),super.getString(call.getContentType() == CallContentType.AUDIO ? R.string.audio_call : R.string.video_call)+super.getString(R.string.colon)+ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()+super.getString(R.string.comma)+super.getString(proactively ? R.string.call_closed : R.string.call_peer_closed),TransportState.SENT.getValue()} );
 		}
 		else
 		if( reason ==   CloseCallReason.TIMEOUT )

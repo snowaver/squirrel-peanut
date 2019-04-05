@@ -78,7 +78,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment   implements  TextV
 							{
                                 if( response.body().isEmpty() )
                                 {
-                                    Toasty.warning(DiscoveryFragment.this.getActivity(),DiscoveryFragment.this.getString(R.string.search_result_empty),Toast.LENGTH_LONG,false).show();
+                                    Toasty.warning(DiscoveryFragment.this.getActivity(),DiscoveryFragment.this.getString(R.string.discovery_searched_nothing),Toast.LENGTH_LONG,false).show();
                                 }
 
                                 Stream.forEach( response.body(),(user) -> user.addEntry("ID",Long.parseLong(user.get("ID").toString())) );

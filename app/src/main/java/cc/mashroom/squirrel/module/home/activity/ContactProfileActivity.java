@@ -48,7 +48,7 @@ public  class  ContactProfileActivity     extends  AbstractPacketListenerActivit
 
 		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setVisibility( user.getLong("ID") == application().getUserMetadata().getLong("ID") ? View.GONE : View.VISIBLE );
 
-		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( !Contact.dao.getContactDirect().containsKey(user.getLong("ID")) ? R.string.add_contact : prompts.get(Contact.dao.getContactDirect().get(user.getLong("ID")).getInteger("SUBSCRIBE_STATUS")) );
+		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( !Contact.dao.getContactDirect().containsKey(user.getLong("ID")) ? R.string.subscribe_add_contact : prompts.get(Contact.dao.getContactDirect().get(user.getLong("ID")).getInteger("SUBSCRIBE_STATUS")) );
 
 		ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).setText(     this.user.getString("USERNAME") );
 
@@ -84,7 +84,7 @@ public  class  ContactProfileActivity     extends  AbstractPacketListenerActivit
 		ObjectUtils.cast(super.findViewById(R.id.additional_text),TextView.class).setVisibility( user.getLong("ID") != Long.parseLong(application().getSquirrelClient().getId()) && contact != null ? View.VISIBLE : View.GONE );
 	}
 
-	private  Map<Integer,Integer>  prompts = new  HashMap<Integer,Integer>().addEntry(0,R.string.subscribe_packet_sent).addEntry(1,R.string.accept_adding_contact_request).addEntry(6,R.string.chat).addEntry(7, R.string.chat );
+	private  Map<Integer,Integer>  prompts = new  HashMap<Integer,Integer>().addEntry(0,R.string.subscribe_request_sent).addEntry(1,R.string.accept).addEntry(6,R.string.chat).addEntry(    7 , R.string.chat );
 	@Accessors( chain=true )
 	@Setter
 	private  User  user;
@@ -93,7 +93,7 @@ public  class  ContactProfileActivity     extends  AbstractPacketListenerActivit
 	{
 		if( packet instanceof SubscribePacket && sendState == TransportState.SENT && ObjectUtils.cast(packet,SubscribePacket.class).getContactId() == this.user.getLong("ID") )
 		{
-			ObjectUtils.cast(findViewById(R.id.chat_or_subscribe_button) , Button.class).setText( R.string.subscribe_packet_sent );
+			ObjectUtils.cast(findViewById(R.id.chat_or_subscribe_button), Button.class).setText( R.string.subscribe_request_sent );
 		}
 	}
 

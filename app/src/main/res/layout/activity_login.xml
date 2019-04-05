@@ -7,7 +7,7 @@
 
     <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/password"  android:layout_width="match_parent"  android:layout_height="50dp"  android:inputType="textPassword"  android:hint="@string/password"  app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-    <TextView  android:id="@+id/jump_to_registration_link"  android:layout_width="match_parent"  android:layout_height="50dp"  android:paddingRight="10dp"  android:text="@string/register_if_no_account"  android:textColor="@color/blue"  android:textSize="14dp"  android:gravity="center_vertical|end"/>
+    <TextView  android:id="@+id/jump_to_registration_link"  android:layout_width="match_parent"  android:layout_height="50dp"  android:paddingRight="10dp"  android:text="@string/register_register_if_no_account"  android:textColor="@color/blue"  android:textSize="14dp"  android:gravity="center_vertical|end"/>
 
     <View  android:layout_width="match_parent"  android:layout_height="0dp" android:layout_weight="1"></View>
 

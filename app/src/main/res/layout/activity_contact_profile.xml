@@ -1,7 +1,7 @@
 <?xml  version="1.0"  encoding="utf-8"?>
 <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:fresco="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:background="@color/lightgray">
 
-    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  fresco:backText="@string/back"  android:title="@string/contact_profile"  android:background="@color/steelblue"  fresco:additionalText="@string/edit"></cc.mashroom.hedgehog.widget.HeaderBar>
+    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  fresco:backText="@string/goback"  android:title="@string/profile"  android:background="@color/steelblue"  fresco:additionalText="@string/edit"></cc.mashroom.hedgehog.widget.HeaderBar>
 
     <LinearLayout  android:id="@+id/protrait_layout"  android:layout_width="match_parent"  android:layout_height="160dp"  android:orientation="horizontal"  android:gravity="center"  android:background="@color/lightgray">
 
@@ -15,7 +15,7 @@
 
     <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/remark"    android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/remark"    fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/group"     android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/group"     fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
+    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/group"     android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/grouping"  fresco:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
     <View  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"></View>
 

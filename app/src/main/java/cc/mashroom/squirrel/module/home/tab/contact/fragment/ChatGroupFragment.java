@@ -50,7 +50,7 @@ public  class  ChatGroupFragment  extends  AbstractFragment    implements  Dialo
 
 			ObjectUtils.cast(contentView.findViewById(R.id.chat_group_list),ListView.class).setOnItemClickListener( (parent,view,position,id) -> ActivityCompat.startActivity(super.getActivity(),new  Intent(this.getActivity(),GroupChatActivity.class).putExtra("CHAT_GROUP_ID",ObjectUtils.cast(parent.getAdapter().getItem(position),ChatGroup.class).getLong("ID")),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle()) );
 
-			ObjectUtils.cast(contentView.findViewById(R.id.create_button),LinearLayout.class).setOnClickListener( (view) -> new  UIAlertDialog.DividerIOSBuilder(this.getActivity()).setBackgroundRadius(15).setTitle(R.string.create_chat_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButton(R.string.cancel,(dialog, which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)).show() );
+			ObjectUtils.cast(contentView.findViewById(R.id.create_button),LinearLayout.class).setOnClickListener( (view) -> new  UIAlertDialog.DividerIOSBuilder(this.getActivity()).setBackgroundRadius(15).setTitle(R.string.chat_create_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButton(R.string.cancel,(dialog, which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)).show() );
 		}
 
 		return  contentView;
@@ -81,7 +81,7 @@ public  class  ChatGroupFragment  extends  AbstractFragment    implements  Dialo
 						}
 						else
 						{
-							ObjectUtils.cast(ChatGroupFragment.this,AbstractActivity.class).showSneakerWindow( Sneaker.with(ChatGroupFragment.this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,response.code() == 601 ? R.string.group_name_exist : R.string.network_or_internal_server_error,R.color.white,R.color.red );
+							ObjectUtils.cast(ChatGroupFragment.this,AbstractActivity.class).showSneakerWindow( Sneaker.with(ChatGroupFragment.this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,response.code() == 601 ? R.string.chat_group_exist : R.string.network_or_internal_server_error,R.color.white,R.color.red );
 						}
 					}
 				}
