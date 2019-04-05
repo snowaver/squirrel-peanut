@@ -46,7 +46,8 @@
     <string  name="discovery_searched_nothing">SEARCHED NOTHING</string>
     <string  name="exit">EXIT</string>
     <string  name="grouping">GROUPING</string>
-    <string  name="international">INTERNATONAL</string>
+    <string  name="language">LANGUAGE</string>
+    <string  name="language_select">SELECT LANGUAGE</string>
     <string  name="language_chinese">中文</string>
     <string  name="language_english">ENGLISH</string>
     <string  name="login">LOGIN</string>

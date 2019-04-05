@@ -11,6 +11,7 @@ import  android.widget.ListView;
 import  android.widget.TextView;
 
 import  com.aries.ui.widget.progress.UIProgressDialog;
+import  com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import  java.util.Locale;
 
@@ -18,6 +19,7 @@ import  androidx.core.app.ActivityCompat;
 import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
+import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
@@ -28,12 +30,15 @@ import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.stream.Stream;
 import  cn.refactor.library.SmoothCheckBox;
+import  lombok.Getter;
+import  lombok.Setter;
+import  lombok.experimental.Accessors;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
 public  class  SystemSettingsActivity  extends  AbstractActivity  implements  SmoothCheckBox.OnCheckedChangeListener
 {
-	public  void  logout()
+	private   void  logout()
 	{
 		RetrofitRegistry.get(UserService.class).logout(application().getSquirrelClient().getId()).enqueue
 		(
@@ -55,6 +60,11 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 		);
 	}
 
+	@Accessors( chain=true )
+	@Setter
+	@Getter
+	private   BottomSheetDialog  languageBottomSheetDialog;
+
 	public  void  onCheckedChanged( SmoothCheckBox  smoothCheckbox,boolean  isChecked )
 	{
 		Locale  locale = ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString().equals("ENGLISH") ? Locale.ENGLISH : Locale.CHINESE;
@@ -74,7 +84,9 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 
 		super.getSharedPreferences("CONFIGURATION",      Context.MODE_PRIVATE).edit().putString("LOCAL",locale.toLanguageTag()).commit();
 
-		for( Activity  activity  : AbstractActivity.STACK )activity.recreate();
+		ObjectUtils.cast(super.findViewById(R.id.language_selector),StyleableEditView.class).setText( ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString() );
+
+//		for( Activity  activity  : AbstractActivity.STACK )activity.recreate();
 	}
 
 	protected  void  onCreate( Bundle  savedInstanceState )
@@ -85,6 +97,14 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 
 		super.findViewById(R.id.logout_button).setOnClickListener( (view)-> logout() );
 
-		ObjectUtils.cast(super.findViewById(R.id.languages),ListView.class).setAdapter( new  SystemSettingsLanguageAdapter(this,this ) );
+		this.setLanguageBottomSheetDialog(new  BottomSheetDialog(this)).getLanguageBottomSheetDialog().setContentView( R.layout.activity_system_settings_language_bottomsheet );
+
+		this.getLanguageBottomSheetDialog().setCanceledOnTouchOutside(  true );
+
+		ObjectUtils.cast(super.findViewById(R.id.language_selector),StyleableEditView.class).findViewById(R.id.edit_inputor).setOnClickListener( (selector) -> languageBottomSheetDialog.show() );
+
+		ObjectUtils.cast(this.languageBottomSheetDialog.findViewById(R.id.languages),ListView.class).setAdapter( new  SystemSettingsLanguageAdapter(this,this ) );
+
+		ObjectUtils.cast(super.findViewById(R.id.language_selector),StyleableEditView.class).setText( ObjectUtils.cast(ObjectUtils.cast(this.languageBottomSheetDialog.findViewById(R.id.languages),ListView.class).getAdapter(),SystemSettingsLanguageAdapter.class).getListener().getChecked().get() );
 	}
 }

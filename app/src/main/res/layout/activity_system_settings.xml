@@ -1,11 +1,9 @@
 <?xml  version="1.0"  encoding="utf-8"?>
-<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:orientation="vertical"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:background="@color/white">
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:orientation="vertical"  android:layout_width="match_parent"  android:layout_height="match_parent"    android:background="@color/white">
 
     <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  android:title="@string/settings"  app:backText="@string/goback"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
 
-    <TextView  style="@style/Widget.AppCompat.Button.Borderless"  android:layout_width="match_parent"  android:layout_height="35dp"  android:paddingLeft="10dp"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:text="@string/international"  android:gravity="center_vertical"  android:background="@color/lightgray"/>
-
-    <ListView  android:id="@+id/languages"  android:layout_width="match_parent"  android:layout_height="100dp"  android:dividerHeight="1px"  android:divider="@color/lightgray"></ListView>
+    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/language_selector"  android:layout_width="match_parent"  android:layout_height="50dp"  android:textColor="@color/black"  android:textSize="18dp"  android:title="@string/language"  android:editable="false"  android:textAlignment="viewEnd"  app:enableBottomBorder="true"/>
 
     <View  android:layout_width="match_parent"  android:layout_height="0dp" android:layout_weight="1"></View>
 
