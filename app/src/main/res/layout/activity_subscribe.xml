@@ -1,7 +1,7 @@
 <?xml  version="1.0"  encoding="utf-8"?>
 <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:background="@color/lightgray"  android:fitsSystemWindows="true">
 
-    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  app:backText="@string/goback"  android:title="@string/subscribe_add_contact"  android:background="@color/steelblue"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
+    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  app:backText="@string/goback"  android:title="@string/profile"  android:background="@color/steelblue"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout  android:layout_width="match_parent"  android:layout_height="0dp"      android:layout_weight="1"  android:background="@color/lightgray">
 
@@ -25,13 +25,13 @@
 
             <LinearLayout  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical">
 
-                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/username"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/username"  android:textColor="@color/darkgray"  app:enableBottomBorder="true"  app:enableTopBorder="true"  ></cc.mashroom.hedgehog.widget.StyleableEditView>
+                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/username"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:textAlignment="viewEnd"  android:editable="false"  android:title="@string/username"  android:textColor="@color/darkgray"  app:enableBottomBorder="true"  app:enableTopBorder="true"  ></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/nickname"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/nickname"  android:textColor="@color/darkgray"  app:enableBottomBorder="true"    ></cc.mashroom.hedgehog.widget.StyleableEditView>
+                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/nickname"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:textAlignment="viewEnd"  android:editable="false"  android:title="@string/nickname"  android:textColor="@color/darkgray"  app:enableBottomBorder="true"    ></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/remark"    android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:title="@string/remark"     app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
+                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/remark"    android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:textAlignment="viewEnd"  android:title="@string/remark"     app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/group"     android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:editable="false"  android:title="@string/grouping"  app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
+                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/group"     android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:textAlignment="viewEnd"  android:editable="false"  android:title="@string/grouping"  app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
             </LinearLayout>
 
@@ -39,6 +39,6 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <Button  android:id="@+id/subscribe_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/limegreen"  android:textColor="@color/white"  android:textSize="18dp"  android:text="@string/ok"/>
+    <Button  android:id="@+id/subscribe_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/limegreen"  android:textColor="@color/white"  android:textSize="18dp"  android:text="@string/subscribe_add_contact"/>
 
 </LinearLayout>

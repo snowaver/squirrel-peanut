@@ -19,7 +19,7 @@ public  abstract  class  AbstractActivity  extends  cc.mashroom.hedgehog.parent.
 	{
 		Configuration  configuration = newBase.getResources().getConfiguration();
 
-		configuration.setLocale( Locale.forLanguageTag(newBase.getSharedPreferences("CONFIGURATION",MODE_PRIVATE).getString("LOCAL",Locale.CHINESE.toLanguageTag())) );
+		configuration.setLocale( Locale.forLanguageTag(newBase.getSharedPreferences("CONFIGURATION",MODE_PRIVATE).getString("LOCAL",Locale.ENGLISH.toLanguageTag())) );
 
 		super.attachBaseContext( Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? super.createConfigurationContext(configuration) : newBase );
 	}

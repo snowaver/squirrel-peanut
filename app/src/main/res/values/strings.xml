@@ -81,11 +81,12 @@
     <string  name="send">发送</string>
     <string  name="settings">设置</string>
     <string  name="squirrel">小松鼠</string>
-    <string  name="subscribe_add_contact">添加联系人</string>
+    <string  name="subscribe_add_contact">添加为联系人</string>
     <string  name="subscribe_contact_added">联系人已添加，可以开始聊天啦</string>
     <string  name="subscribe_form_error">备注以及分组不得为空</string>
     <string  name="subscribe_received_a_adding_contact_request">请求添加您为联系人</string>
     <string  name="subscribe_request_sent">添加联系人请求已经发送</string>
+    <string  name="subscribe_accept_request">接受添加请求</string>
     <string  name="unknown_error">未知错误</string>
     <string  name="updated">已经修改</string>
     <string  name="username">账号</string>
