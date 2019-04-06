@@ -5,8 +5,14 @@
 
     <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/language_selector"  android:layout_width="match_parent"  android:layout_height="50dp"  android:textColor="@color/black"  android:textSize="18dp"  android:title="@string/language"  android:editable="false"  android:textAlignment="viewEnd"  app:enableBottomBorder="true"/>
 
-    <View  android:layout_width="match_parent"  android:layout_height="0dp" android:layout_weight="1"></View>
+    <Button  android:id="@+id/change_password_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:paddingLeft="10dp"  android:textAlignment="viewStart"  android:text="@string/password"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:background="@color/white"/>
 
-    <Button  android:id="@+id/logout_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:text="@string/logout"  android:textColor="@color/white"  android:textSize="18dp"  android:background="@color/red"/>
+    <View  android:layout_width="match_parent"  android:layout_height="1px"  android:background="@color/gainsboro"></View>
+
+    <View  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"></View>
+
+    <View  android:layout_width="match_parent"  android:layout_height="1px"  android:background="@color/gainsboro"></View>
+
+    <Button  android:id="@+id/logout_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:paddingLeft="10dp"  android:textAlignment="viewStart"  android:text="@string/logout"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:background="@color/lightgray"/>
 
 </LinearLayout>

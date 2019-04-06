@@ -39,6 +39,7 @@
     <string  name="contact_group_exist">分组已存在</string>
     <string  name="contact_list">联系人列表</string>
     <string  name="contact_offline">联系人不在线</string>
+    <string  name="contact_select_group">分组</string>
     <string  name="delete">删除</string>
     <string  name="disconnected">连接已断开</string>
     <string  name="discovery">发现</string>
@@ -47,7 +48,7 @@
     <string  name="exit">退出</string>
     <string  name="grouping">分组</string>
     <string  name="language">语言</string>
-    <string  name="language_select">选择</string>
+    <string  name="language_select">语言</string>
     <string  name="language_chinese">中文</string>
     <string  name="language_english">ENGLISH</string>
     <string  name="login">登录</string>
@@ -88,6 +89,7 @@
     <string  name="subscribe_received_a_adding_contact_request">请求添加您为联系人</string>
     <string  name="subscribe_request_sent">添加联系人请求已经发送</string>
     <string  name="subscribe_accept_request">接受添加请求</string>
+    <string  name="system_settings">系统设置</string>
     <string  name="unknown_error">未知错误</string>
     <string  name="updated">已经修改</string>
     <string  name="username">账号</string>

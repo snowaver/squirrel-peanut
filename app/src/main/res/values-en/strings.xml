@@ -35,10 +35,11 @@
     <string  name="connectionless">NO CONNECT</string>
     <string  name="contact">CONTACT</string>
     <string  name="contact_add_to_new_group">ADD TO NEW GROUP</string>
-    <string  name="contact_group_default_name">DEFAULT</string>
+    <string  name="contact_group_default_name">DEFAULTS</string>
     <string  name="contact_group_exist">GROUP EXIST</string>
     <string  name="contact_list">CONTACTS</string>
     <string  name="contact_offline">CONTACT OFFLINE</string>
+    <string  name="contact_select_group">GROUPING</string>
     <string  name="delete">DELETE</string>
     <string  name="disconnected">DISCONNECTED</string>
     <string  name="discovery">DISCOVERY</string>
@@ -47,7 +48,7 @@
     <string  name="exit">EXIT</string>
     <string  name="grouping">GROUPING</string>
     <string  name="language">LANGUAGE</string>
-    <string  name="language_select">SELECT LANGUAGE</string>
+    <string  name="language_select">LANGUAGE</string>
     <string  name="language_chinese">中文</string>
     <string  name="language_english">ENGLISH</string>
     <string  name="login">LOGIN</string>
@@ -88,6 +89,7 @@
     <string  name="subscribe_received_a_adding_contact_request">REQUESTING TO ADD YOU AS CONTACT</string>
     <string  name="subscribe_request_sent">SUBSCRIBE REQUEST SENT</string>
     <string  name="subscribe_accept_request">ACCEPT REQUEST</string>
+    <string  name="system_settings">SYSTEM SETTINGS</string>
     <string  name="unknown_error">UNKNOWN ERROR</string>
     <string  name="updated">UPDATED</string>
     <string  name="username">USERNAME</string>

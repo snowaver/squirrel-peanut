@@ -1,7 +1,7 @@
 <?xml  version="1.0"  encoding="utf-8"?>
 <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  xmlns:tools="http://schemas.android.com/tools"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:fitsSystemWindows="true">
 
-    <cc.mashroom.hedgehog.widget.SlidingSidebarLayout  android:layout_width="match_parent"  android:layout_height="match_parent"  android:background="@color/lightgray"  tools:openDrawer="start"  app:transformMode="translate">
+    <cc.mashroom.hedgehog.widget.SlidingSidebarLayout  android:layout_width="match_parent"  android:layout_height="match_parent"  android:background="@color/lightgray"      tools:openDrawer="start"  app:transformMode="translate">
 
         <LinearLayout  android:tag="content"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical">
 
@@ -17,7 +17,7 @@
 
         <LinearLayout  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:layout_gravity="start"  android:background="@color/white">
 
-            <RelativeLayout  android:id="@+id/portrait_layout"  android:layout_width="match_parent" android:layout_height="200dp"  android:background="@color/lightgray">
+            <RelativeLayout  android:id="@+id/portrait_layout"  android:layout_width="match_parent"  android:layout_height="200dp"  android:background="@color/lightgray">
 
                 <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/portrait"  android:layout_width="85dp"  android:layout_height="85dp"  android:layout_centerInParent="true"  app:placeholderImage="@drawable/placeholder"  app:roundAsCircle="true"  app:roundingBorderWidth="5dp"  app:roundingBorderColor="@color/white"/>
 
@@ -25,7 +25,13 @@
 
             <ListView  android:id="@+id/menu_list"  android:layout_below="@id/portrait_layout"  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"  android:divider="@color/lightgray"   android:dividerHeight="1px"></ListView>
 
-            <Button  android:id="@+id/settings_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:text="@string/settings"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:background="@color/lightgray"/>
+            <LinearLayout  android:id="@+id/settings_button"  android:layout_width="match_parent"  android:layout_height="50dp"  android:paddingLeft="10dp"  android:orientation="horizontal"  android:background="@color/lightgray">
+
+                <ImageView  android:layout_width="18dp"  android:layout_height="18dp"  android:layout_gravity="center_vertical"      android:background="@drawable/more"/>
+
+                <TextView  android:id="@+id/name"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_marginLeft="15dp"  android:layout_gravity="center_vertical"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:text="@string/system_settings"/>
+
+            </LinearLayout  >
 
         </LinearLayout>
 

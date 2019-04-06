@@ -11,6 +11,7 @@ import  androidx.viewpager.widget.ViewPager;
 import  android.view.WindowManager;
 import  android.widget.Button;
 import  android.widget.ImageView;
+import android.widget.LinearLayout;
 import  android.widget.ListView;
 import  android.widget.SimpleAdapter;
 import  android.widget.TextView;
@@ -88,7 +89,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 			ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).addTab(       newTab );
 		}
 
-		ObjectUtils.cast(super.findViewById(R.id.settings_button),Button.class).setOnClickListener( (logoutButton) -> ActivityCompat.startActivity(this,new  Intent(this,SystemSettingsActivity.class),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+		ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).setOnClickListener( (logoutButton) -> ActivityCompat.startActivity(this,new  Intent(this,SystemSettingsActivity.class),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+application().getUserMetadata().get("ID")+"/portrait").build().toString()) );
 

@@ -38,7 +38,7 @@ public  class  SystemSettingsLanguageAdapter  extends  BaseAdapter
     @Setter
     protected  Activity  context;
 
-    public  View  getView(int  position,View  convertView,ViewGroup  parent )
+    public  View  getView( int  position, View  convertView, ViewGroup  parent )
     {
         convertView = convertView != null ? convertView : LayoutInflater.from( context ).inflate(R.layout.activity_system_settings_language_item, parent,false );
 
@@ -48,6 +48,8 @@ public  class  SystemSettingsLanguageAdapter  extends  BaseAdapter
 
         ObjectUtils.cast(convertView.findViewById(R.id.checkbox),SmoothCheckBox.class).setTag(    super.getItem( position ) );
 
-        ObjectUtils.cast(convertView.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( ObjectUtils.cast(super.getItem(position),String.class).equals(listener.getChecked().get().toString()) );  return  convertView;
+        ObjectUtils.cast(convertView.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( ObjectUtils.cast(super.getItem(position),String.class).equals(listener.getChecked().get().toString()) );
+
+        convertView.setBackgroundResource( ObjectUtils.cast(convertView.findViewById(R.id.checkbox),SmoothCheckBox.class).isChecked() ? R.color.lightgray : R.color.white );  return  convertView;
     }
 }
