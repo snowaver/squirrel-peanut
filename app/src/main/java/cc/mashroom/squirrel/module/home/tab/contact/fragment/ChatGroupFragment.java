@@ -11,15 +11,18 @@ import  android.view.ViewGroup;
 import  android.widget.EditText;
 import  android.widget.LinearLayout;
 import  android.widget.ListView;
+import  android.widget.TextView;
 
 import  com.aries.ui.widget.alert.UIAlertDialog;
 import  com.irozon.sneaker.Sneaker;
 
 import  java.sql.Connection;
 import  java.util.List;
+import  java.util.Locale;
 
 import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.db.common.Db;
+import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
@@ -37,10 +40,12 @@ import  lombok.SneakyThrows;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
-public  class  ChatGroupFragment  extends  AbstractFragment    implements  DialogInterface.OnClickListener
+public  class  ChatGroupFragment  extends  AbstractFragment  implements  DialogInterface.OnClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
 	public  View  onCreateView( LayoutInflater  inflater,ViewGroup  container,Bundle  savedInstanceState )
 	{
+		LocaleChangeEventDispatcher.addListener(    ChatGroupFragment.this );
+
 		if( contentView == null )
 		{
 			contentView = inflater.inflate( R.layout.fragment_contact_chat_group,container,false );
@@ -52,12 +57,24 @@ public  class  ChatGroupFragment  extends  AbstractFragment    implements  Dialo
 			ObjectUtils.cast(contentView.findViewById(R.id.create_button),LinearLayout.class).setOnClickListener( (view) -> ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(this.getActivity()).setBackgroundRadius(15).setTitle(R.string.chat_create_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(dialog, which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this.getActivity(),R.font.droid_sans_mono)).show() );
 		}
 
-		return  contentView;
+		return  this.contentView;
 	}
 
 	protected  View  contentView;
 
-	public  void  onClick( DialogInterface  dialog,int  which )
+	public  void  onDestroy()
+	{
+		super.onDestroy();
+
+		LocaleChangeEventDispatcher.removeListener( ChatGroupFragment.this );
+	}
+
+	public  void  onChange( Locale  locale )
+	{
+		ObjectUtils.cast(ObjectUtils.cast(this.contentView.findViewById(R.id.create_button),LinearLayout.class).getChildAt(1),TextView.class).setText( R.string.chat_create_new_group );
+	}
+
+	public  void  onClick( DialogInterface  dialog,int  witch )
 	{
 		String  addingGroupName = ObjectUtils.cast(ObjectUtils.cast(dialog,UIAlertDialog.class).getContentView().findViewById(R.id.edit_inputor),EditText.class).getText().toString().trim();
 

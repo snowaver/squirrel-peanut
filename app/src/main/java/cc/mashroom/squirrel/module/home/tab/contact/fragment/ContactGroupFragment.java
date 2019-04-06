@@ -9,6 +9,9 @@ import  android.view.View;
 import  android.view.ViewGroup;
 import  android.widget.ExpandableListView;
 
+import  java.util.Locale;
+
+import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
@@ -22,19 +25,13 @@ import  cc.mashroom.squirrel.paip.message.subscribes.SubscribeAckPacket;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.hedgehog.widget.PinnedHeaderExpandableListViewLayout;
 
-public  class  ContactGroupFragment  extends  AbstractPacketListenerFragment
+public  class  ContactGroupFragment  extends  AbstractPacketListenerFragment  implements  LocaleChangeEventDispatcher.LocaleChangeListener
 {
-	public  void  sent( Packet  packet,TransportState  sendState )  throws  Exception
-	{
-		if( packet instanceof SubscribeAckPacket )
-		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(contentView.findViewById(R.id.contact_group_layout),PinnedHeaderExpandableListViewLayout.class).notifyExpandableListAdapterDatasetChanged().expandAllGroups() );
-		}
-	}
-
 	public  View  onCreateView( LayoutInflater  inflater,ViewGroup  container,Bundle  savedInstanceState )
 	{
 		PacketEventDispatcher.addListener( this );
+
+		LocaleChangeEventDispatcher.addListener(    ContactGroupFragment.this );
 
 		if( contentView == null )
 		{
@@ -47,16 +44,36 @@ public  class  ContactGroupFragment  extends  AbstractPacketListenerFragment
 			ObjectUtils.cast(contentView.findViewById(R.id.contact_group),ExpandableListView.class).setOnChildClickListener( (parent,v,groupPosition,childPosition,id) -> {Contact  contact = ObjectUtils.cast(parent.getExpandableListAdapter().getChild(groupPosition,childPosition));  ActivityCompat.startActivity(super.getActivity(),new  Intent(this.getActivity(),SubscribeActivity.class).putExtra("USER",new  User().addEntry("ID",contact.getLong("ID")).addEntry("USERNAME",contact.getString("USERNAME")).addEntry("REMARK",contact.getString("REMARK"))),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle());  return  false;} );
 		}
 
-		return  contentView;
+		return  this.contentView;
 	}
 
 	protected  View  contentView;
+
+	public  void onDestroy()
+	{
+		super.onDestroy(  );
+
+		LocaleChangeEventDispatcher.removeListener( ContactGroupFragment.this );
+	}
 
 	public  void  onResume()
 	{
 		super.onResume();
 
 		ObjectUtils.cast(   contentView.findViewById(R.id.contact_group_layout),PinnedHeaderExpandableListViewLayout.class).notifyExpandableListAdapterDatasetChanged().expandAllGroups();
+	}
+
+	public  void  sent(     Packet  packet,TransportState  transportState )  throws  Exception
+	{
+		if( packet instanceof SubscribeAckPacket )
+		{
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(contentView.findViewById(R.id.contact_group_layout),PinnedHeaderExpandableListViewLayout.class).notifyExpandableListAdapterDatasetChanged().expandAllGroups() );
+		}
+	}
+
+	public  void  onChange( Locale  locale )
+	{
+
 	}
 
 	public  void  received( Packet  packet )  throws  Exception

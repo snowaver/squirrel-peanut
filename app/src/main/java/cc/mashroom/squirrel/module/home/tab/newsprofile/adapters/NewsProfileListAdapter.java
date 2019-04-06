@@ -5,6 +5,7 @@ import  android.net.Uri;
 import  android.view.LayoutInflater;
 import  android.view.View;
 import  android.view.ViewGroup;
+import  android.widget.RelativeLayout;
 import  android.widget.TextView;
 
 import  com.aries.ui.widget.alert.UIAlertDialog;
@@ -46,7 +47,7 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 	{
 		return  NewsProfile.dao.getOne("SELECT  COUNT(*)  AS  COUNT  FROM  "+NewsProfile.dao.getDataSourceBind().table(),new  Object[]{}).getLong("COUNT").intValue();
 	}
-	private  String  getProfileMessage( String  content, PAIPPacketType  type,NewsProfile  newsProfile )
+	private  String  getProfileMessage( String  content,PAIPPacketType  type,NewsProfile  newsProfile )
 	{
 		if( type==PAIPPacketType.SUBSCRIBE )
 		{
@@ -64,7 +65,7 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 
 		NewsProfile  newsProfile = this.getItem( position );
 
-		if( PAIPPacketType.valueOf(newsProfile.getShort("PACKET_TYPE")) == PAIPPacketType.GROUP_CHAT   )
+		if( PAIPPacketType.valueOf(newsProfile.getShort("PACKET_TYPE")) == PAIPPacketType.GROUP_CHAT  )
 		{
 			ObjectUtils.cast(convertView.findViewById(R.id.nickname),TextView.class).setText( ChatGroup.dao.getOne("SELECT  NAME  FROM  "+ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{newsProfile.getLong("ID")}).getString("NAME") );
 
@@ -82,16 +83,7 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 			ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( getProfileMessage(newsProfile.getString("CONTENT"),PAIPPacketType.valueOf(newsProfile.getShort("PACKET_TYPE")),newsProfile) );
 		}
 
-		ObjectUtils.cast(convertView.findViewById(R.id.remove_button),TextView.class).setOnClickListener
-		(
-			new View.OnClickListener()
-			{
-				public  void  onClick(View  v )
-				{
-					ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(context.getActivity()).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.message_whether_to_delete).setMessageTextSize(18).setCancelable(true).setCanceledOnTouchOutside(false).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(button,which) ->{}).setPositiveButtonTextColor(Color.RED).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog, which) -> {NewsProfile.dao.update("DELETE  FROM  "+NewsProfile.dao.getDataSourceBind().table()+"  WHERE  ID = ?  AND  PACKET_TYPE = ?",new  Object[]{newsProfile.getLong("ID"),newsProfile.getShort("PACKET_TYPE")});  NewsProfileListAdapter.this.notifyDataSetChanged();}).create().setWidth((int)  (context.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(context.getActivity(),R.font.droid_sans_mono)).show();
-				}
-			}
-		);
+		ObjectUtils.cast( convertView.findViewById(R.id.remove_button),RelativeLayout.class).setOnClickListener( (removeButton) -> {ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(context.getActivity()).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.message_whether_to_delete).setMessageTextSize(18).setCancelable(true).setCanceledOnTouchOutside(false).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(button,which) ->{}).setPositiveButtonTextColor(Color.RED).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog, which) -> {NewsProfile.dao.update("DELETE  FROM  "+NewsProfile.dao.getDataSourceBind().table()+"  WHERE  ID = ?  AND  PACKET_TYPE = ?",new  Object[]{newsProfile.getLong("ID"),newsProfile.getShort("PACKET_TYPE")});  NewsProfileListAdapter.this.notifyDataSetChanged();}).create().setWidth((int)  (context.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(context.getActivity(),R.font.droid_sans_mono)).show();} );
 
 		ObjectUtils.cast(convertView.findViewById(R.id.badge),BadgeView.class).setBadge( newsProfile.getInteger( "BADGE_COUNT" ), 0, 99, "." );   return  convertView;
 	}

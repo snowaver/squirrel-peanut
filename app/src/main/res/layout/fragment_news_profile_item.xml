@@ -1,15 +1,19 @@
 <?xml  version="1.0"  encoding="utf-8"?>
 <com.daimajia.swipe.SwipeLayout  xmlns:swipe="http://schemas.android.com/apk/res-auto"  xmlns:android="http://schemas.android.com/apk/res/android"  android:id="@+id/buddy_list_item"  android:layout_width="match_parent"  android:layout_height="wrap_content"  android:background="@color/white"  swipe:clickToClose="true">
 
-    <TextView  android:id="@+id/remove_button"  android:layout_width="50dp"  android:layout_height="match_parent"  android:textColor="@color/white"  android:textSize="14dp"  android:text="@string/delete"  android:gravity="center"  android:background="@color/red"  android:layout_gravity="right"/>
+    <RelativeLayout  android:id="@+id/remove_button"  android:layout_width="50dp"  android:layout_height="50dp"  android:background="@color/red"  android:layout_gravity="right">
 
-    <LinearLayout  android:layout_width="match_parent"  android:layout_height="wrap_content"  android:orientation="horizontal"  android:paddingLeft="10dp"  android:paddingTop="5dp"  android:paddingBottom="5dp"  android:paddingRight="10dp">
+        <ImageView  android:layout_width="22dp"  android:layout_height="22dp"  android:src="@drawable/trash"  android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+    <LinearLayout  android:layout_width="match_parent"  android:layout_height="50dp"  android:orientation="horizontal"  android:paddingLeft="10dp"  android:paddingTop="5dp"  android:paddingBottom="5dp"  android:paddingRight="10dp">
 
         <RelativeLayout  android:layout_width="40dp"  android:layout_height="40dp">
 
             <com.facebook.drawee.view.SimpleDraweeView  android:id="@+id/portrait"  android:layout_width="match_parent"  android:layout_height="match_parent"  swipe:roundAsCircle="true"  swipe:roundedCornerRadius="20dp"  swipe:placeholderImage="@drawable/placeholder"/>
 
-            <cc.mashroom.hedgehog.widget.BadgeView  android:id="@+id/badge"  android:layout_width="18dp"  android:layout_height="18dp"  android:layout_alignParentRight="true"/>
+            <cc.mashroom.hedgehog.widget.BadgeView  android:id="@+id/badge"  android:layout_width="18dp"  android:layout_height="18dp"   android:layout_alignParentRight="true"/>
 
         </RelativeLayout>
 

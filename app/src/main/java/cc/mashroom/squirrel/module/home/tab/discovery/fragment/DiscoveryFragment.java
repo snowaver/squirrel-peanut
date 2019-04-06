@@ -18,8 +18,10 @@ import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
 import  java.util.List;
+import  java.util.Locale;
 
 import  androidx.core.content.res.ResourcesCompat;
+import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
@@ -39,10 +41,12 @@ import  es.dmoral.toasty.Toasty;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
-public  class   DiscoveryFragment  extends  AbstractFragment   implements  TextView.OnEditorActionListener
+public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextView.OnEditorActionListener,   LocaleChangeEventDispatcher.LocaleChangeListener
 {
 	public  View  onCreateView( LayoutInflater  inflater,ViewGroup  container,Bundle  savedInstanceState )
 	{
+		LocaleChangeEventDispatcher.addListener(    DiscoveryFragment.this );
+
 		if( contentView == null )
 		{
 			contentView = inflater.inflate( R.layout.fragment_discovery,container,false );
@@ -52,10 +56,22 @@ public  class   DiscoveryFragment  extends  AbstractFragment   implements  TextV
 			ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor).findViewById(R.id.edit_inputor),EditText.class).setOnEditorActionListener( this );
 		}
 
-		return  contentView;
+		return  this.contentView;
 	}
 
 	protected  View  contentView;
+
+	public  void  onDestroy()
+	{
+		super.onDestroy();
+
+		LocaleChangeEventDispatcher.removeListener( DiscoveryFragment.this );
+	}
+
+	public  void  onChange( Locale  locale )
+	{
+		ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor).findViewById(cc.mashroom.hedgehog.R.id.edit_inputor),EditText.class).setHint( R.string.discovery_input_keyword );
+	}
 
 	public  boolean  onEditorAction( TextView  view,int  editorActionId, KeyEvent  event )
 	{
@@ -69,7 +85,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment   implements  TextV
 					{
 						public  void  onResponse( Call<List<User>>  call, Response<List<User>>  response )
 						{
-							super.onResponse( call , response );
+							super.onResponse( call, response );
 
 							if( response.code()   != 200 )
 							{

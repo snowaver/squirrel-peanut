@@ -7,7 +7,8 @@ import  android.content.res.Configuration;
 import  android.os.Build;
 import  android.os.Bundle;
 import  android.view.View;
-import android.widget.AdapterView;
+import  android.widget.AdapterView;
+import  android.widget.Button;
 import  android.widget.ListView;
 import  android.widget.TextView;
 
@@ -18,6 +19,7 @@ import  java.util.Locale;
 
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.content.res.ResourcesCompat;
+import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
@@ -37,7 +39,7 @@ import  lombok.experimental.Accessors;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
-public  class  SystemSettingsActivity  extends  AbstractActivity  implements  SmoothCheckBox.OnCheckedChangeListener  ,  AdapterView.OnItemClickListener
+public  class  SystemSettingsActivity  extends  AbstractActivity  implements  SmoothCheckBox.OnCheckedChangeListener,AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
 	private   void  logout()
 	{
@@ -85,6 +87,8 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 
 		super.getSharedPreferences("CONFIGURATION",      Context.MODE_PRIVATE).edit().putString("LOCAL",locale.toLanguageTag()).commit();
 
+		LocaleChangeEventDispatcher.onChange(     locale );
+
 		ObjectUtils.cast(super.findViewById(R.id.language_selector),StyleableEditView.class).setText( ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString() );
 	}
 
@@ -95,8 +99,32 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 		ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( true, true );
 	}
 
+	public  void  onChange(  Locale  locale )
+	{
+		ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.back_text),TextView.class).setText( R.string.goback );
+
+		ObjectUtils.cast(super.findViewById(R.id.language_selector).findViewById(cc.mashroom.hedgehog.R.id.title),TextView.class).setText( R.string.language );
+
+		ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.title),TextView.class).setText(   R.string.settings );
+
+		ObjectUtils.cast(super.findViewById(R.id.change_password_button),Button.class).setText( R.string.password );
+
+		ObjectUtils.cast(super.findViewById(R.id.logout_button),Button.class).setText( R.string.logout );
+
+		ObjectUtils.cast(this.getLanguageBottomSheetDialog().findViewById(R.id.title) ,     TextView.class).setText( R.string.language );
+	}
+
+	protected  void  onDestroy()
+	{
+		super.onDestroy();
+
+		LocaleChangeEventDispatcher.removeListener( this );
+	}
+
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
+		LocaleChangeEventDispatcher.addListener(    this );
+
 		super.onCreate( savedInstanceState );
 
 		super.setContentView(  R.layout.activity_system_settings );
@@ -109,7 +137,7 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 
 		ObjectUtils.cast(super.findViewById(R.id.language_selector),StyleableEditView.class).findViewById(R.id.edit_inputor).setOnClickListener( (selector) -> languageBottomSheetDialog.show() );
 
-		ObjectUtils.cast(this.getLanguageBottomSheetDialog().findViewById(R.id.languages),ListView.class).setAdapter( new  SystemSettingsLanguageAdapter(this,this ) );
+		ObjectUtils.cast(this.getLanguageBottomSheetDialog().findViewById(R.id.languages),ListView.class).setAdapter( new  SystemSettingsLanguageAdapter( this, this ) );
 
 		ObjectUtils.cast(this.getLanguageBottomSheetDialog().findViewById(R.id.languages),ListView.class).setOnItemClickListener( this );
 		/*

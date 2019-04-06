@@ -1,6 +1,5 @@
 package cc.mashroom.squirrel.module.home.activity;
 
-import  android.app.Activity;
 import  android.content.Intent;
 import  android.net.Uri;
 import  android.os.Bundle;
@@ -9,41 +8,32 @@ import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 import  androidx.viewpager.widget.ViewPager;
 import  android.view.WindowManager;
-import  android.widget.Button;
 import  android.widget.ImageView;
-import android.widget.LinearLayout;
+import  android.widget.LinearLayout;
 import  android.widget.ListView;
 import  android.widget.SimpleAdapter;
 import  android.widget.TextView;
 
-import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.facebook.drawee.view.SimpleDraweeView;
 
-import  cc.mashroom.hedgehog.util.DensityUtils;
+import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.ClientConnectEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.ClientConnectListener;
 import  cc.mashroom.squirrel.client.connect.ConnectState;
-import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import  cc.mashroom.squirrel.http.RetrofitRegistry;
-import  cc.mashroom.squirrel.module.common.services.UserService;
-import  cc.mashroom.squirrel.module.system.activity.RegisterActivity;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.adapters.SheetPagerAdapter;
-import  cc.mashroom.squirrel.module.system.activity.LoginActivity;
 import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.HashMap;
 import  cc.mashroom.util.collection.map.LinkedMap;
 import  cc.mashroom.util.collection.map.Map;
 import  cc.mashroom.util.ObjectUtils;
-import  cc.mashroom.util.stream.Stream;
-import  retrofit2.Call;
-import  retrofit2.Response;
 
 import  java.util.LinkedList;
 import  java.util.List;
+import  java.util.Locale;
 
-public  class  SheetActivity  extends  AbstractActivity  implements  ClientConnectListener,TabLayout.OnTabSelectedListener
+public  class  SheetActivity  extends  AbstractActivity  implements  ClientConnectListener,TabLayout.OnTabSelectedListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
 	public  void  onTabSelected(   TabLayout.Tab  tab )
 	{
@@ -60,6 +50,8 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 	protected  void  onCreate(  Bundle  savedInstanceState )
 	{
 		ClientConnectEventDispatcher.addListener(this);
+
+		LocaleChangeEventDispatcher.addListener(this );
 
 		super.onCreate( savedInstanceState );
 
@@ -100,9 +92,27 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 	private  Map<Integer,Integer>  tabs = new  LinkedMap<Integer,Integer>().addEntry(0,R.drawable.message).addEntry(1,R.drawable.contact).addEntry(2,R.drawable.discovery).addEntry( 3,R.drawable.dynam );
 
+	public  void  onChange( Locale  locale )
+	{
+		connectStateChanged( application().getSquirrelClient().getConnectState() );
+
+		List<Map<String,Object>>  carteBar = new  LinkedList<Map<String,Object>>();
+
+		for( String  title :  super.getResources().getStringArray( R.array.buddy_settings_menu_titles ) )
+		{
+			carteBar.add( new  HashMap<String,Object>().addEntry("title", title) );
+		}
+
+		ObjectUtils.cast(super.findViewById(R.id.menu_list),ListView.class).setAdapter( new  SimpleAdapter(this,carteBar,R.layout.activity_sheet_menu_item,new String[]{"title"},new  int[]{R.id.name}) );
+
+		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).getChildAt(1),TextView.class).setText( R.string.system_settings );
+	}
+
 	protected  void    onDestroy()
 	{
 		super.onDestroy();
+
+		LocaleChangeEventDispatcher.removeListener(  this );
 
 		ClientConnectEventDispatcher.removeListener( this );
 	}
@@ -119,6 +129,6 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 	public  void  onTabUnselected( TabLayout.Tab  tab )
 	{
-		tab.getCustomView().setBackgroundColor(     super.getResources().getColor( R.color.white     ) );
+		tab.getCustomView().setBackgroundColor(super.getResources().getColor(R.color.white)/* color */ );
 	}
 }

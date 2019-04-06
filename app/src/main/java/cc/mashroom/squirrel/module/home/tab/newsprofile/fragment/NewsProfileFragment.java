@@ -10,6 +10,9 @@ import  android.view.ViewGroup;
 import  android.widget.AdapterView;
 import  android.widget.ListView;
 
+import  java.util.Locale;
+
+import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
@@ -24,11 +27,13 @@ import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.util.ObjectUtils;
 
-public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  implements  AdapterView.OnItemClickListener
+public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  implements  AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
 	public  View  onCreateView( LayoutInflater inflater,ViewGroup  container,Bundle  savedInstanceState )
 	{
 		PacketEventDispatcher.addListener( this );
+
+		LocaleChangeEventDispatcher.addListener(        this );
 
 		if( contentView == null )
 		{
@@ -39,7 +44,7 @@ public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  imp
 			ObjectUtils.cast(contentView.findViewById(R.id.profile_list),ListView.class).setAdapter( new  NewsProfileListAdapter(this) );
 		}
 
-		return  contentView;
+		return  this.contentView;
 	}
 
 	protected  View  contentView;
@@ -73,10 +78,22 @@ public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  imp
 		}
 	}
 
+	public  void onDestroy()
+	{
+		super.onDestroy(  );
+
+		LocaleChangeEventDispatcher.removeListener(     this );
+	}
+
 	public  void  onResume()
 	{
 		super.onResume();
 
+		ObjectUtils.cast( ObjectUtils.cast(contentView.findViewById(R.id.profile_list),ListView.class).getAdapter(),NewsProfileListAdapter.class).notifyDataSetChanged();
+	}
+
+	public  void  onChange( Locale  updateLocale )
+	{
 		ObjectUtils.cast( ObjectUtils.cast(contentView.findViewById(R.id.profile_list),ListView.class).getAdapter(),NewsProfileListAdapter.class).notifyDataSetChanged();
 	}
 
