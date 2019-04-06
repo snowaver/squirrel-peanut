@@ -8,6 +8,8 @@ import  androidx.viewpager.widget.ViewPager;
 import  android.view.LayoutInflater;
 import  android.view.View;
 import  android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import  java.util.List;
 import  java.util.Locale;
@@ -28,6 +30,17 @@ public  class  ContactFragment  extends  AbstractFragment  implements  TabLayout
 		if( contentView == null )
 		{
 			contentView = inflater.inflate( R.layout.fragment_contact,container,false );
+
+			for(  Integer  tabIconDrawableRes : this.tabIconDrawableReses )
+			{
+				TabLayout.Tab  tab = ObjectUtils.cast(this.contentView.findViewById(R.id.tab_layout),TabLayout.class).newTab().setCustomView( R.layout.fragment_contact_tab_indicator );
+
+				ObjectUtils.cast(tab.getCustomView().findViewById(R.id.icon),ImageView.class).setImageResource( tabIconDrawableRes );
+
+				if( tabIconDrawableReses.indexOf(tabIconDrawableRes) == 0 )  tab.getCustomView().setBackgroundResource( R.color.lightgray );
+
+				ObjectUtils.cast(contentView.findViewById(R.id.tab_layout),TabLayout.class).addTab( tab );
+			}
 
 			ObjectUtils.cast(contentView.findViewById(R.id.tab_layout),TabLayout.class).addOnTabSelectedListener( this );
 
@@ -52,24 +65,26 @@ public  class  ContactFragment  extends  AbstractFragment  implements  TabLayout
 
 		for( int  position = 0;position <= layout.getTabCount()-1;position= position+1 )
 		{
-			layout.getTabAt(position).setText(tabTitleReses.get(position));
+			ObjectUtils.cast(layout.getTabAt(position).getCustomView().findViewById(R.id.icon),ImageView.class).setImageResource( this.tabIconDrawableReses.get(position) );
 		}
 	}
 
-	protected  List<Integer>  tabTitleReses = Lists.newArrayList( R.string.contact, R.string.chat_group );
+	protected  List<Integer>  tabIconDrawableReses    = Lists.newArrayList( R.drawable.contact , R.drawable.group_chat );
 
 	public  void  onTabSelected(   TabLayout.Tab  tab )
 	{
-		ObjectUtils.cast(this.contentView.findViewById(R.id.tab_content),ViewPager.class).setCurrentItem( tab.getPosition(),true );
-	}
+		tab.getCustomView().setBackgroundResource(     R.color.lightgray );
 
-	public  void  onTabReselected( TabLayout.Tab  tab )
-	{
-
+		ObjectUtils.cast(contentView.findViewById(R.id.tab_content),ViewPager.class).setCurrentItem( tab.getPosition() );
 	}
 
 	public  void  onTabUnselected( TabLayout.Tab  tab )
 	{
-
+        tab.getCustomView().setBackgroundResource(         R.color.white );
 	}
+
+    public  void  onTabReselected( TabLayout.Tab  tab )
+    {
+
+    }
 }

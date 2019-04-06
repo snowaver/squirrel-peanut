@@ -89,6 +89,8 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 
 		LocaleChangeEventDispatcher.onChange(     locale );
 
+		this.languageBottomSheetDialog.hide();
+
 		ObjectUtils.cast(super.findViewById(R.id.language_selector),StyleableEditView.class).setText( ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString() );
 	}
 
@@ -99,7 +101,7 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 		ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( true, true );
 	}
 
-	public  void  onChange(  Locale  locale )
+	public  void  onChange(   Locale  locale )
 	{
 		ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.back_text),TextView.class).setText( R.string.goback );
 
@@ -125,7 +127,7 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 	{
 		LocaleChangeEventDispatcher.addListener(    this );
 
-		super.onCreate( savedInstanceState );
+		super.onCreate(  savedInstanceState );
 
 		super.setContentView(  R.layout.activity_system_settings );
 
