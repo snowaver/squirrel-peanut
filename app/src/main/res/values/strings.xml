@@ -56,6 +56,7 @@
     <string  name="login_form_error">账号或者密码为空</string>
     <string  name="login_remote_login_error">此账号异地登录</string>
     <string  name="logout">注销</string>
+    <string  name="member">成员</string>
     <string  name="member_list">成员列表</string>
     <string  name="message">消息</string>
     <string  name="message_whether_to_delete">您是否要删除此聊天？不可恢复</string>

@@ -56,7 +56,8 @@
     <string  name="login_form_error">USERNAME OR PASSWORD EMPTY</string>
     <string  name="login_remote_login_error">OFFSITE LANDING</string>
     <string  name="logout">LOGOUT</string>
-    <string  name="member_list">MEMBERS</string>
+    <string  name="member">MEMBER</string>
+    <string  name="member_list">MEMBER</string>
     <string  name="message">MESSAGE</string>
     <string  name="message_whether_to_delete">DELETE CHAT HISTORY?</string>
     <string  name="moments">MOMENTS</string>
@@ -98,7 +99,7 @@
     <string  name="warning">WARNING</string>
     <string  name="withdraw">WITHDRAW</string>
     <string-array  name="group_chat_details_list">
-        <item>MEMBERS</item><item>INVITE</item>
+        <item>MEMBER</item><item>INVITE</item>
     </string-array>
     <string-array  name="buddy_settings_menu_titles">
         <item>PERSONAL CENTER</item><item>ALBUM</item><item>COLLECTIONS</item><item>FILES</item>
