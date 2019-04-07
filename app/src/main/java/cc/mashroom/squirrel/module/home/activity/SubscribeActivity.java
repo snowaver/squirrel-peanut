@@ -87,7 +87,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText( this.user.getString("NICKNAME") );
 		}
 
-		if( Long.parseLong(super.application().getSquirrelClient().getId())== this.user.getLong("ID") )
+		if( super.application().getUserMetadata().getLong("ID") == this.user.getLong("ID") )
 		{
 			ObjectUtils.cast(super.findViewById(R.id.remark), StyleableEditView.class).setVisibility( View.INVISIBLE );
 
