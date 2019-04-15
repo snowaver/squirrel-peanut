@@ -25,7 +25,7 @@ import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
-import  cc.mashroom.squirrel.paip.message.chat.GroupChatInvitedPacket;
+import  cc.mashroom.squirrel.paip.message.chat.GroupChatEventPacket;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -77,7 +77,7 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 	{
 		if( data    != null )
 		{
-			RetrofitRegistry.get(ChatGroupUserService.class).invite(chatGroup.getLong("ID"),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"),",")).enqueue
+			RetrofitRegistry.get(ChatGroupUserService.class).add(chatGroup.getLong("ID"),StringUtils.join((Set<Long>)data.getSerializableExtra("SELECTED_CONTACT_IDS"), ",")).enqueue
 			(
 				new  AbstractRetrofit2Callback<List<Map<String,Object>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) )
 				{
@@ -90,7 +90,7 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 						{
 							for(   Map<String,Object>  chatGroupUser : response.body() )
 							{
-								application().getSquirrelClient().asynchronousSend( new  GroupChatInvitedPacket(Long.parseLong(chatGroupUser.get("CONTACT_ID").toString()),chatGroup.getLong("ID")/*DateTime.now(DateTimeZone.UTC).getMillis()*/) );
+								application().getSquirrelClient().asynchronousSend( new  GroupChatEventPacket(chatGroup.getLong("ID"),GroupChatEventPacket.EVENT_MEMBER_ADDED,new  HashMap<String,Object>().addEntry("INVITER_ID",application().getUserMetadata().getLong("ID")).addEntry("INVITEE_ID",chatGroupUser.getLong("CONTACT_ID"))) );
 							}
 
 							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(new  HashMap<String,List<Map<String,Object>>>().addEntry("CHAT_GROUPS",new  LinkedList<Map<String,Object>>()).addEntry("CHAT_GROUP_USERS",response.body())) );
@@ -114,7 +114,7 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 		{
 			Set<Long>  excludeContactIds = new  HashSet<Long>();
 
-			for( ChatGroupUser  chatGroupUser : ChatGroupUser.dao.search("SELECT  CONTACT_ID  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?",new  Object[]{chatGroup.getLong("ID")}) )
+			for( ChatGroupUser  chatGroupUser : ChatGroupUser.dao.search("SELECT  CONTACT_ID  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?", new  Object[]{chatGroup.getLong( "ID" )}) )
 			{
 				excludeContactIds.add( chatGroupUser.getLong("CONTACT_ID") );
 			}
@@ -124,7 +124,7 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 		else
 		if( position == 0 )
 		{
-			ActivityCompat.startActivity( this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")) , ActivityOptionsCompat.makeCustomAnimation(this, R.anim.right_in, R.anim.left_out).toBundle() );
+			ActivityCompat.startActivity( this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")),ActivityOptionsCompat.makeCustomAnimation(this, R.anim.right_in, R.anim.left_out).toBundle() );
 		}
 	}
 }

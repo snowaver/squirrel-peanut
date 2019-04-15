@@ -12,5 +12,5 @@ public  interface  ChatGroupUserService
 {
 	@FormUrlEncoded
 	@POST( value="/chat/group/user" )
-	public  Call<List<Map<String,Object>>>  invite(@Field(value = "chatGroupId") long chatGroupId, @Field(value = "contactIds") String contactIds);
+	public  Call<List<Map<String,Object>>>  add( @Field(value="chatGroupId")  long  chatGroupId,@Field(value="inviteeIds") String  inviteeIds );
 }
