@@ -25,7 +25,6 @@ import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
-import  cc.mashroom.squirrel.paip.message.chat.GroupChatEventPacket;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -88,11 +87,6 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 
 						if( response.code() == 200 )
 						{
-							for(   Map<String,Object>  chatGroupUser : response.body() )
-							{
-								application().getSquirrelClient().asynchronousSend( new  GroupChatEventPacket(chatGroup.getLong("ID"),GroupChatEventPacket.EVENT_MEMBER_ADDED,new  HashMap<String,Object>().addEntry("INVITER_ID",application().getUserMetadata().getLong("ID")).addEntry("INVITEE_ID",chatGroupUser.getLong("CONTACT_ID"))) );
-							}
-
 							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(new  HashMap<String,List<Map<String,Object>>>().addEntry("CHAT_GROUPS",new  LinkedList<Map<String,Object>>()).addEntry("CHAT_GROUP_USERS",response.body())) );
 
 							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.added,R.color.white,R.color.limegreen );
@@ -112,19 +106,19 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 	{
 		if( position == 1 )
 		{
-			Set<Long>  excludeContactIds = new  HashSet<Long>();
+			Set<Long>  invitedContactIds      = new  HashSet<Long>();
 
-			for( ChatGroupUser  chatGroupUser : ChatGroupUser.dao.search("SELECT  CONTACT_ID  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?", new  Object[]{chatGroup.getLong( "ID" )}) )
+			for( ChatGroupUser  chatGroupUser : ChatGroupUser.dao.search("SELECT  CONTACT_ID  AS  INVITED_CONTACT_ID  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?",new  Object[]{chatGroup.getLong("ID")}) )
 			{
-				excludeContactIds.add( chatGroupUser.getLong("CONTACT_ID") );
+				invitedContactIds.add(  chatGroupUser.getLong( "INVITED_CONTACT_ID" ) );
 			}
 
-			super.startActivityForResult( new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS", ObjectUtils.cast(excludeContactIds,Serializable.class)),Activity.RESULT_FIRST_USER );
+			ActivityCompat.startActivityForResult( this,new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS",ObjectUtils.cast(invitedContactIds,Serializable.class)),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 		else
 		if( position == 0 )
 		{
-			ActivityCompat.startActivity( this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")),ActivityOptionsCompat.makeCustomAnimation(this, R.anim.right_in, R.anim.left_out).toBundle() );
+			ActivityCompat.startActivity( this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")),   ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 	}
 }
