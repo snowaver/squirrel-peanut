@@ -10,7 +10,7 @@ import  retrofit2.http.POST;
 
 public  interface  ChatGroupUserService
 {
-	@FormUrlEncoded
 	@POST( value="/chat/group/user" )
-	public  Call<List<Map<String,Object>>>  add( @Field(value="chatGroupId")  long  chatGroupId,@Field(value="inviteeIds") String  inviteeIds );
+	@FormUrlEncoded
+	public  Call<Map<String,List<Map<String,Object>>>>  add( @Field(value="chatGroupId")  long  chatGroupId,@Field(value="inviteeIds") String  inviteeIds );
 }
