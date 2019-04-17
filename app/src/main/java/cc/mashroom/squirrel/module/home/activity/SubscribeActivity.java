@@ -117,7 +117,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 		this.setBottomSheet(new  BottomSheetDialog(this)).getBottomSheet().setContentView( LayoutInflater.from( this ).inflate(R.layout.activity_switch_contact_group, null ) );
 		//  swiping  down  event  on  bottom  sheet  dialog  is  conflict  with  sliding  down  event  on  listview,   so  set  bottom  sheet  dialog's  behavior  non-hideable.
-		BottomSheetBehavior.from( this.getBottomSheet().findViewById(R.id.design_bottom_sheet) ).setHideable(  false );
+		BottomSheetBehavior.from(this.getBottomSheet().findViewById( R.id.design_bottom_sheet )).setHideable(  false );
 
 		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setAdapter( new  ContactGroupAdapter(this, this) );
 
@@ -127,11 +127,11 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
         Contact  contact       = Contact.dao.getContactDirect().get(  this.getUser().getLong( "ID" ) );
         //  press  enter  key  to  update  remark,  but  actually  group  is  updated  also.
-		ObjectUtils.cast(super.findViewById(R.id.remark).findViewById(R.id.edit_inputor),EditText.class).setOnEditorActionListener( (edit,actionId,event) -> { if( actionId == EditorInfo.IME_ACTION_DONE ){ onCheckedChanged(null, true); }  return  false;} );
+		ObjectUtils.cast(super.findViewById(R.id.remark).findViewById(R.id.edit_inputor),EditText.class).setOnEditorActionListener( (edit,actionId,event) -> { if( actionId == EditorInfo.IME_ACTION_DONE ){  onCheckedChanged(null,true); }  return  false;} );
 
 		ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
 
-		if( contact   != null )
+        if( contact   != null )
 		{
 			ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setText( this.buttonTexts.get( contact.getInteger("SUBSCRIBE_STATUS") ) );
 
@@ -146,7 +146,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getChoiceListener().getChecked().set( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
 	}
 
-	private  Map<Integer,Integer>  buttonTexts = new  HashMap<Integer,Integer>().addEntry(0 , R.string.subscribe_add_contact).addEntry(1, R.string.subscribe_accept_request).addEntry(6, R.string.message).addEntry( 7, R.string.message );
+	private  Map<Integer,Integer>  buttonTexts = new  HashMap<Integer,Integer>().addEntry(0 , R.string.subscribe_add_contact).addEntry(1, R.string.subscribe_accept_request).addEntry(6, R.string.message).addEntry( 7 , R.string.message );
 	@Accessors(  chain = true )
 	@Setter
 	@Getter
