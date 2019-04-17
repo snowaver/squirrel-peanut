@@ -210,7 +210,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
                     }
                     else
                     {
-                        RetrofitRegistry.get(ContactService.class).changeSubscribeStatus(7,user.getLong("ID"),application().getUserMetadata().getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue
+                        RetrofitRegistry.get(ContactService.class).changeSubscribeStatus(7,user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
 							new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) )
 							{
@@ -250,7 +250,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 				{
                     if( StringUtils.isNoneBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()) )
                     {
-						RetrofitRegistry.get(ContactService.class).subscribe( application().getUserMetadata().getLong("ID"), user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(), ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue
+						RetrofitRegistry.get(ContactService.class).subscribe( user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(), ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
 							new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) )
 							{
@@ -284,9 +284,9 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		}
 	}
 
-	public  void  onVisibilityChanged(      boolean  softinputVisible )
+	public  void  onVisibilityChanged(    boolean  isSoftinputVisible )
 	{
-		ObjectUtils.cast(super.findViewById( R.id.collapsing_bar_layout),AppBarLayout.class).setExpanded( !softinputVisible,true );
+		ObjectUtils.cast(super.findViewById(R.id.collapsing_bar_layout),AppBarLayout.class).setExpanded(!isSoftinputVisible,true );
 	}
 	
 	public  void  onCheckedChanged( SmoothCheckBox  smoothCheckboxButton , boolean  otherGroupChecked )
@@ -309,7 +309,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 			{
 				if( !contact.getString("REMARK").equals(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class ).getText().toString().trim())      || ! group.equals( contact.getString("GROUP_NAME") ) )
 				{
-					RetrofitRegistry.get(ContactService.class).update(Long.parseLong(application().getSquirrelClient().getId()),user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue( new  AbstractRetrofit2Callback<Void>(this){public  void  onResponse(Call<Void>  call,Response<Void>  response){ if(response.code() == 200){showSneakerWindow(Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen);  Contact.dao.update("UPDATE  "+Contact.dao.getDataSourceBind().table()+"  SET  REMARK = ?,GROUP_NAME = ?  WHERE  ID = ?",new  Object[]{ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),group,user.getLong("ID")});  Contact.dao.getContactDirect().get(user.getLong("ID")).addEntry("REMARK",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim()).addEntry("GROUP_NAME",group);}}} );
+					RetrofitRegistry.get(ContactService.class).update(user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue( new  AbstractRetrofit2Callback<Void>(this){public  void  onResponse(Call<Void>  call,Response<Void>  response){ if(response.code() == 200){showSneakerWindow(Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen);  Contact.dao.update("UPDATE  "+Contact.dao.getDataSourceBind().table()+"  SET  REMARK = ?,GROUP_NAME = ?  WHERE  ID = ?",new  Object[]{ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),group,user.getLong("ID")});  Contact.dao.getContactDirect().get(user.getLong("ID")).addEntry("REMARK",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim()).addEntry("GROUP_NAME",group);}}} );
 				}
 			}
 		}
