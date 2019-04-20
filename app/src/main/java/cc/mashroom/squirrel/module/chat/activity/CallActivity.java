@@ -154,11 +154,11 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		}
 	}
 
-	public  void  onRoomCreated(     Call  call )
+	protected  void  onDestroy()
 	{
-		{
-			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(74-(int)  (((double)  DensityUtils.px(this,10)/super.getResources().getDisplayMetrics().widthPixels)*100),(int)  ((((double)  ContextUtils.getStatusBarHeight(this)+DensityUtils.px(this,5))/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) ).demand();
-		}
+		super.onDestroy();
+
+		CallEventDispatcher.removeListener(this);
 	}
 
 	public  void  onStart(Call  call )
@@ -171,18 +171,18 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		this.application().getMainLooperHandler().post( () -> { ObjectUtils.cast(super.findViewById(R.id.prompt_message) , TextView.class).setText(  R.string.call_calling );  ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).start("HH:mm:ss");} );
 	}
 
-	public  void  onError(Call  call,CallError  callError )
+	public  void  onRoomCreated(     Call  call )
+	{
+		{
+			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(74-(int)  (((double)  DensityUtils.px(this,10)/super.getResources().getDisplayMetrics().widthPixels)*100),(int)  ((((double)  ContextUtils.getStatusBarHeight(this)+DensityUtils.px(this,5))/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) ).demand();
+		}
+	}
+
+	public  void  onError( Call  call,CallError  callError,Throwable  throwable )
 	{
 		application().getMainLooperHandler().post( () -> Toasty.error(this,super.getString(errors.containsKey(callError) ? errors.get(callError) : R.string.network_or_internal_server_error),Toast.LENGTH_LONG,false).show() );
 
 		ContextUtils.finish(   this );
-	}
-
-	protected  void  onDestroy()
-	{
-		super.onDestroy();
-
-		CallEventDispatcher.removeListener(this);
 	}
 
 	public  void  onClose(       Call  call,boolean  proactively,CloseCallReason  reason )

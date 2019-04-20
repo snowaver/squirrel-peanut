@@ -45,7 +45,7 @@ public  class  LoadingActivity  extends  AbstractActivity  implements  Runnable
 
 		super.setContentView(  R.layout.activity_loading );
 
-		super.application().getExecutor().schedule( this,super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getLong("ID",0) >= 1 ? 1 : 3, TimeUnit.SECONDS );
+		super.application().getScheduler().schedule( this,super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getLong("ID",0) >= 1 ? 1 : 3, TimeUnit.SECONDS );
 	}
 
 	public  void  run()

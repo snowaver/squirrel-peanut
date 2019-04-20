@@ -47,7 +47,7 @@ public  class  AudioCallActivity  extends  CallActivity
     {
         super.onStart();
 
-        super.application().getExecutor().execute( () -> AudioCallActivityPermissionsDispatcher.permissionsGrantedWithPermissionCheck(this) );
+        super.application().getScheduler().execute( () -> AudioCallActivityPermissionsDispatcher.permissionsGrantedWithPermissionCheck(this) );
     }
 
     public  void  onRequestPermissionsResult( int  requestCode,@NonNull  String[]  permissions,@NonNull  int[]  grantedResults )

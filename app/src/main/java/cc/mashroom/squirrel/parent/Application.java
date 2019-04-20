@@ -18,27 +18,22 @@ package cc.mashroom.squirrel.parent;
 import  android.content.Context;
 import  android.content.Intent;
 import  android.content.SharedPreferences;
-import  android.content.res.Configuration;
 import  android.location.Location;
 import  android.net.ConnectivityManager;
 import  android.net.NetworkRequest;
-import  android.os.Build;
+import  android.os.Bundle;
 
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 
-import  com.aries.ui.widget.progress.UIProgressDialog;
+import  com.facebook.common.internal.Sets;
 import  com.facebook.drawee.backends.pipeline.Fresco;
 import  com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import  com.google.common.collect.Lists;
-import  com.irozon.sneaker.Sneaker;
 
 import  org.joda.time.DateTime;
 import  org.webrtc.PeerConnection;
 
-import  androidx.core.content.res.ResourcesCompat;
-import  cc.mashroom.hedgehog.util.DensityUtils;
-import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.router.BalancerStateListener;
 import  cc.mashroom.router.DefaultBalancingProxyFactory;
@@ -53,18 +48,19 @@ import  cc.mashroom.squirrel.client.storage.model.user.User;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.chat.activity.AudioCallActivity;
 import  cc.mashroom.squirrel.module.chat.activity.VideoCallActivity;
-import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
 import  cc.mashroom.squirrel.module.system.activity.LoadingActivity;
 import  cc.mashroom.squirrel.module.system.activity.LoginActivity;
+import  cc.mashroom.squirrel.module.system.activity.RegisterActivity;
 import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.squirrel.paip.message.call.CallContentType;
 import  cc.mashroom.squirrel.paip.message.chat.ChatContentType;
+import  cc.mashroom.squirrel.paip.message.connect.DisconnectAckPacket;
 import  cc.mashroom.squirrel.push.PushService;
 import  cc.mashroom.squirrel.push.PushServiceNotifier;
 
 import  java.net.URL;
 import  java.util.List;
-import  java.util.Locale;
+import  java.util.Set;
 import  java.util.concurrent.ScheduledThreadPoolExecutor;
 import  java.util.concurrent.TimeUnit;
 import  java.util.concurrent.atomic.AtomicInteger;
@@ -73,6 +69,7 @@ import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.call.CallPacket;
 import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
+import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.NoopHostnameVerifier;
 import  cc.mashroom.util.NoopX509TrustManager;
 import  cc.mashroom.util.ObjectUtils;
@@ -97,43 +94,30 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  static  List<String>  BALANCING_PROXY_BACKUP_ADDRESSES       = Lists.newArrayList( "118.24.16.67", "118.24.19.163","118.25.216.217" );
 
-    public  final  static  Map<String,Integer>  PLACEHOLDER_PROFILES = new  HashMap<String,Integer>().addEntry("&0b01;",R.string.chat_image_message).addEntry("&0b02;",R.string.chat_audio_message).addEntry("&0b03;",R.string.chat_video_message).addEntry( "&0b00;",R.string.subscribe_contact_added );
+    public  static  final  Map<String,Integer>  PLACEHOLDER_PROFILES = new  HashMap<String,Integer>().addEntry("&0b01;",R.string.chat_image_message).addEntry("&0b02;",R.string.chat_audio_message).addEntry("&0b03;",R.string.chat_video_message).addEntry( "&0b00;",R.string.subscribe_contact_added );
 
     @SneakyThrows
 	public  void  onCreate()
 	{
 		super.onCreate();
 
-		Configuration  configuration   = super.getResources().getConfiguration();
-
-		Locale  locale = Locale.forLanguageTag(super.getSharedPreferences("CONFIGURATION",MODE_PRIVATE).getString("LOCAL",Locale.ENGLISH.toLanguageTag()));
-
-		if( Build.VERSION.SDK_INT < Build.VERSION_CODES.N )
-		{
-			configuration.locale = locale;
-		}
-		else
-		{
-			configuration.setLocale(       locale );
-		}
-
-		getResources().updateConfiguration(    configuration,getResources().getDisplayMetrics() );
-
-		Toasty.Config.getInstance().setTextSize(14 ).allowQueue( false ).apply();
-		/*
-		Toasty.Config.getInstance().setErrorColor(super.getResources().getColor( R.color.red ) ).setTextSize( 14 ).apply();
-		*/
-		setSquirrelClient( new  SquirrelClient(Application.this,getCacheDir()) );
+		this.squirrelClient = new  SquirrelClient(  this , super.getCacheDir() );
 
 		PacketEventDispatcher.addListener(   this );
 
+		LocaleUtils.change( this , null );
+
+		Toasty.Config.getInstance().setTextSize(14 ).allowQueue( false ).apply();
+
 		PushServiceNotifier.INSTANCE.install(this );
 
-		SharedPreferences  sharedPreferences  = getSharedPreferences( "LOGIN_FORM",MODE_PRIVATE );
+		Long  userId = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0);
 
-		if( sharedPreferences.getLong("ID",0) >= 1 )
+		if( userId >= 1 )
 		{
-			super.startService(new  Intent(this,PushService.class) );
+			super.startService(  new  Intent(this,PushService.class) );
+
+			SharedPreferences  networkSharedPreference = super.getSharedPreferences( "LATEST_NETWORK_ROUTE",MODE_PRIVATE );
 
 			//  scheduler  job  will  not  be  executed  on  xiaomi  (4a)  and   vivo  (y66)  after  pushing  off  the  application,  so  the  proposal  using  scheduler  job  is  not  available  to  keep  application  alive.  give  up.
             /*
@@ -141,46 +125,39 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
             ObjectUtils.cast(super.getSystemService(Context.JOB_SCHEDULER_SERVICE),JobScheduler.class).schedule(applicationProcessKeeperJobInfo );
             */
-			Storage.INSTANCE.initialize( getSquirrelClient(),this,super.getCacheDir(),(new  HashMap()).addEntry("ID"  , getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getLong("ID",0)) );
+			Storage.INSTANCE.initialize( squirrelClient, null, super.getCacheDir(), new  HashMap().addEntry("ID",userId) );
 
-			this.getSquirrelClient().route( sharedPreferences.getString("HOST",null) , sharedPreferences.getInt("PORT",8012) ,  sharedPreferences.getInt("HTTPPORT",8011) );
+			squirrelClient.route( networkSharedPreference.getString("HOST",null),networkSharedPreference.getInt("PORT",8012),networkSharedPreference.getInt("HTTPPORT",8011) );
 		}
 		else
 		{
-			URL  balancingProxyUrl = new  URL( BALANCING_PROXY_URL );
+			URL  balancingProxyUrl   = new  URL( BALANCING_PROXY_URL );
 
-			squirrelClient.route( balancingProxyUrl.getHost(),8012, balancingProxyUrl.getPort() );
+			squirrelClient.route( balancingProxyUrl.getHost(),  8012, balancingProxyUrl.getPort() );
 		}
 
-		Fresco.initialize( this,OkHttpImagePipelineConfigFactory.newBuilder(this,new  OkHttpClient.Builder().hostnameVerifier(new  NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new  NoopX509TrustManager()).connectTimeout(2,TimeUnit.SECONDS).writeTimeout(2,TimeUnit.SECONDS).readTimeout(8,TimeUnit.SECONDS).addInterceptor((chain) -> chain.proceed(chain.request().newBuilder().header("SECRET_KEY",getSquirrelClient().getUserMetadata().getString("SECRET_KEY") == null ? "" : getSquirrelClient().getUserMetadata().getString("SECRET_KEY")).build())).build()).build() );
+		RetrofitRegistry.install( Application.this);
 
-		RetrofitRegistry.install(Application.this );
+		Fresco.initialize( this,OkHttpImagePipelineConfigFactory.newBuilder(this,new  OkHttpClient.Builder().hostnameVerifier(new  NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new  NoopX509TrustManager()).connectTimeout(2,TimeUnit.SECONDS).writeTimeout(2,TimeUnit.SECONDS).readTimeout(8,TimeUnit.SECONDS).addInterceptor((chain) -> chain.proceed(chain.request().newBuilder().header("SECRET_KEY",squirrelClient.getUserMetadata().getString("SECRET_KEY") == null ? "" : squirrelClient.getUserMetadata().getString("SECRET_KEY")).build())).build()).build() );
 
-		getSquirrelClient().route( new  DefaultBalancingProxyFactory(new  URL(BALANCING_PROXY_URL),BALANCING_PROXY_BACKUP_ADDRESSES,SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS), Application.this );
+		squirrelClient.route( new  DefaultBalancingProxyFactory(new  URL(BALANCING_PROXY_URL),BALANCING_PROXY_BACKUP_ADDRESSES,SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS),this );
 
-		ObjectUtils.cast(super.getSystemService(Context.CONNECTIVITY_SERVICE),ConnectivityManager.class).requestNetwork( new  NetworkRequest.Builder().build(),new  ConnectivityStateListener(Application.this) );
+		ObjectUtils.cast(super.getSystemService(Context.CONNECTIVITY_SERVICE),ConnectivityManager.class).requestNetwork( new  NetworkRequest.Builder().build(),new  ConnectivityStateListener( this ) );
 	}
 
-	public  final  static  AtomicInteger  PROCESS_KEEPER_SCHEDUAL_JOB_ID= new  AtomicInteger( 0 );
-	@Accessors( chain=true )
+	private  Set<Class>  authenticateNeedlessActivityClasses = Sets.newHashSet(LoadingActivity.class,LoginActivity.class,RegisterActivity.class );
+
+	public  final  static  AtomicInteger  PROCESS_KEEPER_SCHEDUAL_JOB_ID  = new  AtomicInteger( 0 );
+	@Accessors(  chain = true )
 	@Getter
 	@Setter
 	private  SquirrelClient  squirrelClient  = null;
 	@Getter
-	private  ScheduledThreadPoolExecutor  executor    = new  ScheduledThreadPoolExecutor( 1 , new  DefaultThreadFactory( "SQUIRREL-SCHEDULER" ) );
-	@Accessors( chain=true )
-	@Setter
-	@Getter
-	private  UIProgressDialog  connectWaitingDialog;
+	private  ScheduledThreadPoolExecutor  scheduler = new  ScheduledThreadPoolExecutor( 1 , new  DefaultThreadFactory("DEFAULT-TASK-SCHEDULER") );
 
 	public   Map<String,Object>    getUserMetadata()
 	{
-		return  !squirrelClient.getUserMetadata().isEmpty() ? squirrelClient.getUserMetadata() : (super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getLong("ID",0) <= 0 ? null : User.dao.getOne("SELECT  ID,USERNAME,NAME,NICKNAME  FROM  "+User.dao.getDataSourceBind().table()+"  ORDER  BY  LAST_ACCESS_TIME  DESC  LIMIT  1  OFFSET  0",new  Object[]{}));
-	}
-
-	public      HttpUrl.Builder  baseUrl()
-	{
-		return  new  HttpUrl.Builder().scheme("https").host(squirrelClient.getHost()).port( squirrelClient.getHttpPort() );
+		return  !squirrelClient.getUserMetadata().isEmpty() ? squirrelClient.getUserMetadata() : (super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0) <= 0 ? null : User.dao.getOne("SELECT  ID,USERNAME,NAME,NICKNAME  FROM  "+User.dao.getDataSourceBind().table()+"  ORDER  BY  LAST_ACCESS_TIME  DESC  LIMIT  1  OFFSET  0",new  Object[]{}));
 	}
 
 	public  void  onTerminate()
@@ -189,91 +166,54 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		squirrelClient.close();
 
-		executor.shutdown();
+		scheduler.shutdown(  );
 	}
 
-	public  void  onAuthenticateComplete(int  code )
+	public      HttpUrl.Builder  baseUrl()
 	{
-		if( connectWaitingDialog != null )
-		{
-			getMainLooperHandler().post(   () -> connectWaitingDialog.cancel() );
-		}
+		return  new  HttpUrl.Builder().scheme("https").host(squirrelClient.getHost()).port( squirrelClient.getHttpPort() );
+	}
 
-		if( code   == 200  )
+	public  void  onAuthenticateComplete( int  returnCode )
+	{
+		if( returnCode == 601||  returnCode == 602 )
 		{
-			super.startService(new  Intent(this,PushService.class) );
+			super.getSharedPreferences( "LATEST_LOGIN_FORM", MODE_PRIVATE ).edit().clear().commit();
 
-			super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).edit().putLong("ID",getUserMetadata().getLong("ID")).putString("USERNAME",getUserMetadata().getString("USERNAME")).putString("NAME",getUserMetadata().getString("NAME")).putString("NICKNAME",getUserMetadata().getString("NICKNAME")).putString("HOST",squirrelClient.getHost()).putInt("PORT",squirrelClient.getPort()).putInt("HTTPPORT",squirrelClient.getHttpPort()).commit();
-			//  skipping  to  sheet  activity  action  is  yield  to  loading  activity  when  connecting  by  native  stored  credentials,  which  is  deprecated  on  2018.10.27.  new  rule  is  skipping  to  sheet  activity  directly  if  actiivty  stack  top  is  loading  or  login  activity.
-			if( ! AbstractActivity.STACK.isEmpty() && ( /* AbstractActivity.STACK.getLast() instanceof LoadingActivity || */  AbstractActivity.STACK.getLast() instanceof LoginActivity ) )
+			if( !AbstractActivity.STACK.isEmpty() && !authenticateNeedlessActivityClasses.contains(AbstractActivity.STACK.getLast().getClass() ) )
 			{
-				Stream.forEach(    AbstractActivity.STACK,(trmActivity) -> trmActivity.finish() );
-
-				ActivityCompat.startActivity( this,new  Intent(this,SheetActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.fade_in,R.anim.fade_out).toBundle() );
+				clearStackActivitiesAndStart( new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",0).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 			}
 		}
 		else
-		if( code   == 601 || code == 602 )
+		if( returnCode == 200 )
 		{
-			if( ! AbstractActivity.STACK.isEmpty() )
-			{
-				//  remove  credentials  and  skip  to  login  activity  if  connecting  by  native  stored  credentials  is  failed,  possible  reason  is  that  credentials  stored  is  expired  or  not  available  any  more.
-				if( !(AbstractActivity.STACK.getLast() instanceof LoadingActivity  || AbstractActivity.STACK.getLast() instanceof LoginActivity) )
-				{
-					Stream.forEach(AbstractActivity.STACK,(trmActivity) -> trmActivity.finish() );
+			super.startService(  new  Intent(this,PushService.class) );
 
-					ActivityCompat.startActivity( this,new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON" , 0).addFlags( Intent.FLAG_ACTIVITY_NEW_TASK ),null );
-				}
-				else
-				{
-					getMainLooperHandler().post( () -> ObjectUtils.cast(AbstractActivity.STACK.getLast(),AbstractActivity.class).showSneakerWindow(Sneaker.with(AbstractActivity.STACK.getLast()),com.irozon.sneaker.R.drawable.ic_error,R.string.login_failed,R.color.white,R.color.red) );
-				}
-
-				getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).edit().remove("ID").remove("USERNAME").remove("NAME").remove("NICKNAME").commit();
-			}
-		}
-		else
-		{
-			if( ! AbstractActivity.STACK.isEmpty() )
-			{
-				if(     AbstractActivity.STACK.getLast() instanceof LoadingActivity || AbstractActivity.STACK.getLast() instanceof LoginActivity )
-				{
-					getMainLooperHandler().post( () -> ObjectUtils.cast(AbstractActivity.STACK.getLast(),AbstractActivity.class).showSneakerWindow(Sneaker.with(AbstractActivity.STACK.getLast()),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red) );
-				}
-			}
+			super.getSharedPreferences("LATEST_LOGIN_FORM", MODE_PRIVATE).edit().putLong("ID",getUserMetadata().getLong("ID")).putString("USERNAME",getUserMetadata().getString("USERNAME")).putString("NAME",getUserMetadata().getString("NAME")).putString("NICKNAME",getUserMetadata().getString("NICKNAME")).commit();
 		}
 	}
 
 	@SneakyThrows
-	public  void  connect( String  username,String  password,Location  geometryLoc,UIProgressDialog  connectWaitingDialog )
+	public  void  connect( String  username, String  password, Location  geometryLoc,LifecycleListener  lifecycleListener )
 	{
 		if( !NetworkUtils.isNetworkAvailable(this) )
 		{
 			return;
 		}
 
-		if( connectWaitingDialog != null )
-		{
-			this.setConnectWaitingDialog(  connectWaitingDialog).getConnectWaitingDialog().show();
-		}
-
-		squirrelClient.asynchronousConnect( username,password,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),this );
+		squirrelClient.asynchronousConnect( username,password,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
 	}
 
 	@SneakyThrows
-	public  void  connect( Long  id,Location  geometryLoc,UIProgressDialog  connectWaitingDialog )
+	public  void  connect( Long  id , Location  geometryLoc , LifecycleListener  lifecycleListener )
 	{
 		if( !NetworkUtils.isNetworkAvailable(this) )
 		{
 			return;
 		}
 
-		if( connectWaitingDialog != null )
-		{
-			this.setConnectWaitingDialog( connectWaitingDialog ).getConnectWaitingDialog().show();
-		}
-
-		squirrelClient.asynchronousConnect( id,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),this );
+		squirrelClient.asynchronousConnect( id,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
 	}
 
 	public  void  onReceiveOfflineData( boolean  finished )
@@ -281,32 +221,52 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	}
 
-	public  void  onDisconnected(  boolean  active )
+	public  void  clearStackActivitiesAndStart( Intent  intent , Bundle  bundle )
 	{
-		//  active  logout  is  delivered  to  http  request  to  avoid  endless  waiting  if  active  disconnect  ack  packet  lost  on  network.
-		if( active )
-		{
-			return ;
-		}
-		//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  loginactivity.
 		Stream.forEach( AbstractActivity.STACK,(activity) -> activity.finish() );
 
-		ActivityCompat.startActivity( this,new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",!active ? 1 : 0).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),null );
-
-		super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).edit().remove( "ID" ).remove("USERNAME").remove("NAME").remove("NICKNAME").commit();
+		ActivityCompat.startActivity( this,intent,bundle );
 	}
 
-	public  boolean  beforeSend(    Packet  packet )throws  Exception
+	public  void  onDisconnected( int  closeReason )
+	{
+		//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  loginactivity.
+		if( closeReason    == DisconnectAckPacket.REASON_REMOTE_LOGIN )
+		{
+			clearStackActivitiesAndStart(     new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",1).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+
+			super.getSharedPreferences( "LATEST_LOGIN_FORM", MODE_PRIVATE ).edit().clear().commit();
+		}
+	}
+
+	public  boolean  beforeSend(    Packet  packet )  throws  Exception
 	{
 		return  true;
 	}
 
-	public  void  sent(       Packet  sentPacket,TransportState  transportState )throws  Exception
+	public  void  sent(       Packet  sentPacket,TransportState  transportState )  throws  Exception
 	{
 
 	}
 
-	public  void  received( Packet  receivedPacket )throws  Exception
+	public  void  onBalanceComplete( int  code , Throwable  throwable )
+	{
+		RetrofitRegistry.install(Application.this );
+
+		if( code == 200 )
+		{
+			super.getSharedPreferences("LATEST_NETWORK_ROUTE",MODE_PRIVATE).edit().putString("HOST",squirrelClient.getHost()).putInt("PORT",squirrelClient.getPort()).putInt("HTTPPORT",squirrelClient.getHttpPort()).commit();
+		}
+
+		Long  userId = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0);
+
+		if( userId >= 1 )
+		{
+			this.connect( userId,NetworkUtils.getLocation(this),this );
+		}
+	}
+
+	public  void  received( Packet  receivedPacket )  throws  Exception
 	{
 		if( receivedPacket instanceof   CallPacket )
 		{
@@ -316,23 +276,6 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		if( receivedPacket instanceof   ChatPacket )
 		{
 			PushServiceNotifier.INSTANCE.notify( ObjectUtils.cast(new  NewsProfile().addEntry("CONTACT_ID",ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId()).addEntry("CREATE_TIME",DateTime.now().toString("yyyy-MM-dd HH:mm:ss")).addEntry("CONTENT",((ChatPacket) receivedPacket).getContentType() == ChatContentType.WORDS ? new  String(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContent()) : super.getString(PLACEHOLDER_PROFILES.get("&"+StringUtils.leftPad(Integer.toHexString(PAIPPacketType.CHAT.getValue()),2,"0")+StringUtils.leftPad(Integer.toHexString(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType().getValue()),2,"0")+";")))) );
-		}
-	}
-
-	public  void  onBalanceComplete( int  code,Throwable  throwable )
-	{
-		RetrofitRegistry.install(Application.this );
-
-		SharedPreferences  sharedPreferences  = getSharedPreferences( "LOGIN_FORM",MODE_PRIVATE );
-
-		if( code == 200 )
-		{
-			sharedPreferences.edit().putString("HOST",getSquirrelClient().getHost()).putInt("PORT",getSquirrelClient().getPort()).putInt( "HTTPPORT" , getSquirrelClient().getHttpPort() );
-		}
-
-		if( sharedPreferences.getLong("ID",0) >= 1 )
-		{
-			connect( sharedPreferences.getLong("ID",0),NetworkUtils.getLocation(this),connectWaitingDialog = AbstractActivity.STACK.isEmpty() ? null : ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(AbstractActivity.STACK.get(0)).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) );
 		}
 	}
 }

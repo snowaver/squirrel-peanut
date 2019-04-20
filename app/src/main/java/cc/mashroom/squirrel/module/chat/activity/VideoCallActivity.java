@@ -47,7 +47,7 @@ public  class  VideoCallActivity  extends  CallActivity
     {
         super.onStart();
 
-        super.application().getExecutor().execute( () -> VideoCallActivityPermissionsDispatcher.permissionsGrantedWithPermissionCheck(this) );
+        super.application().getScheduler().execute( () -> VideoCallActivityPermissionsDispatcher.permissionsGrantedWithPermissionCheck(this) );
     }
 
     public  void  onRequestPermissionsResult( int  requestCode,@NonNull  String[]  permissions,@NonNull  int[]  grantedResults )

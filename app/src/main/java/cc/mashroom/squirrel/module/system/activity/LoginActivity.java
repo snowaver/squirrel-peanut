@@ -35,11 +35,14 @@ import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
+import cc.mashroom.squirrel.client.LifecycleListener;
+import cc.mashroom.squirrel.module.home.activity.SheetActivity;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
+import lombok.Setter;
 
-public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnClickListener
+public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnClickListener,LifecycleListener
 {
     protected  void  onActivityResult( int  requestCode,int  rstCode,Intent  data )
     {
@@ -71,6 +74,24 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
         ObjectUtils.cast(super.findViewById(R.id.login_button),Button.class).setOnClickListener(this);
 
         ObjectUtils.cast(super.findViewById(R.id.jump_to_registration_link),TextView.class).setOnClickListener( (view) -> ActivityCompat.startActivityForResult(this,new  Intent(this,RegisterActivity.class),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+
+        this.progressDialog = ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight( DensityUtils.px(this,140) );
+    }
+
+    private  UIProgressDialog  progressDialog;
+
+    public  void  onAuthenticateComplete( int  returnCode )
+    {
+        progressDialog.cancel(  );
+
+        if( returnCode    == 200 )
+        {
+            ActivityCompat.startActivity( this,new  Intent(this,SheetActivity.class),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+        }
+        else
+        {
+            application().getMainLooperHandler().post( () -> showSneakerWindow(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.login_failed,R.color.white,R.color.red) );
+        }
     }
 
     public  void  onClick( View  loginButton )
@@ -83,7 +104,19 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
         {
             ContextUtils.hideSoftinput(this );
 
-            application().connect( ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString(),ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString(),NetworkUtils.getLocation(this),ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) );
+            progressDialog.show();
+
+            application().connect( ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString(),ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString(),NetworkUtils.getLocation(this),this );
         }
+    }
+
+    public  void  onReceiveOfflineData( boolean  finished )
+    {
+
+    }
+
+    public  void  onDisconnected(int  reason )
+    {
+
     }
 }
