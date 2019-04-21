@@ -52,6 +52,8 @@ public  class  LocaleUtils
 
         context.getResources().updateConfiguration( configuration,resources.getDisplayMetrics() );
 
+        System.err.println( String.format("SQUIRREL-PEANUT:  ** LOCALE  UTILS **  using  locale/%s.",locale.toLanguageTag()) );
+
         configurationSharedPreferences.edit().putString("LOCALE",locale.toLanguageTag()).commit();
 
         LocaleChangeEventDispatcher.onChange(     locale );

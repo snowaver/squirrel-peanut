@@ -5,6 +5,6 @@
 
     <View  android:layout_width="match_parent"  android:layout_height="1px"  android:background="@color/gainsboro"/>
 
-    <ListView  android:id="@+id/languages"  android:layout_width="match_parent"  android:layout_height="300dp"  android:dividerHeight="1px"  android:divider="@color/lightgray"></ListView>
+    <ListView  android:id="@+id/languages"  android:layout_width="match_parent"  android:layout_height="250dp"  android:dividerHeight="1px"  android:divider="@color/lightgray"></ListView>
 
 </LinearLayout>

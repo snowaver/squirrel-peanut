@@ -42,7 +42,7 @@ public  class  SystemSettingsLanguageAdapter  extends  BaseAdapter
     {
         super(Lists.newArrayList(context.getString(R.string.language_chinese),context.getString(R.string.language_english)) );
 
-        setContext(context).setListener(new  SinglechoiceListener<String>(this,listener)).getListener().getChecked().set( ObjectUtils.cast(super.items.get(context.getSharedPreferences("CONFIGURATION",MODE_PRIVATE).getString("LOCAL",Locale.CHINESE.toLanguageTag()).equals(Locale.CHINESE.toLanguageTag()) ? 0 : 1)) );
+        setContext(context).setListener(new  SinglechoiceListener<String>(this,listener)).getListener().getChecked().set( ObjectUtils.cast(super.items.get(context.getSharedPreferences("CONFIGURATION",MODE_PRIVATE).getString("LOCALE",Locale.ENGLISH.toLanguageTag()).equals(Locale.CHINESE.toLanguageTag()) ? 0 : 1)) );
     }
 
     @Accessors( chain=true )
