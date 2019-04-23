@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cc.mashroom.squirrel.module.home.tab.dynamic.fragment;
+package cc.mashroom.squirrel.module.home.tab.moments.fragment;
 
 import  android.os.Bundle;
 import  android.view.LayoutInflater;
@@ -23,13 +23,13 @@ import  android.view.ViewGroup;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.parent.AbstractFragment;
 
-public  class  DynamicFragment  extends  AbstractFragment
+public  class MomentsFragment extends  AbstractFragment
 {
 	public  View  onCreateView( LayoutInflater  inflater,ViewGroup  container,Bundle  savedInstanceState )
 	{
 		if( contentView == null )
 		{
-			contentView = inflater.inflate( R.layout.fragment_dynamic,container,false );
+			contentView = inflater.inflate( R.layout.fragment_moments,container,false );
 		}
 
 		return  contentView;

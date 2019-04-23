@@ -44,24 +44,12 @@ import  cc.mashroom.util.collection.map.LinkedMap;
 import  cc.mashroom.util.collection.map.Map;
 import  cc.mashroom.util.ObjectUtils;
 
-import  java.util.LinkedList;
+import  java.util.ArrayList;
 import  java.util.List;
 import  java.util.Locale;
 
 public  class  SheetActivity  extends  AbstractActivity  implements  ClientConnectListener,TabLayout.OnTabSelectedListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
-	public  void  onTabSelected(   TabLayout.Tab  tab )
-	{
-		tab.getCustomView().setBackgroundColor(     super.getResources().getColor( R.color.lightgray ) );
-
-		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setCurrentItem( tab.getPosition(), false );
-
-		if( application().getSquirrelClient().getConnectState() == ConnectState.CONNECTED )
-		{
-			ObjectUtils.cast(super.findViewById(R.id.title),TextView.class).setText( ObjectUtils.cast(ObjectUtils.cast(this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(tab.getPosition()).getInteger("title") );
-		}
-	}
-
 	protected  void  onCreate(  Bundle  savedInstanceState )
 	{
 		ClientConnectEventDispatcher.addListener(this);
@@ -70,24 +58,26 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 		super.onCreate( savedInstanceState );
 
-		super.getWindow().clearFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN );
+		super.getWindow().clearFlags(    WindowManager.LayoutParams.FLAG_FULLSCREEN );
 
 		super.setContentView(R.layout.activity_sheet );
 
 		ObjectUtils.cast(findViewById(R.id.tab_layout),TabLayout.class).addOnTabSelectedListener( this );
 
-		connectStateChanged( application().getSquirrelClient().getConnectState() );
+		connectStateChanged(    application().getSquirrelClient().getConnectState() );
 
-		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setAdapter( new  SheetPagerAdapter(this.getSupportFragmentManager()) );
+		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setAdapter( new  SheetPagerAdapter(super.getSupportFragmentManager()) );
 
-		List<Map<String,Object>>  carteBar = new  LinkedList<Map<String,Object>>();
+		List<Map<String,Object>>  sidebarDatas = new  ArrayList<Map<String,Object>>();
 
 		for( String  title :  super.getResources().getStringArray( R.array.buddy_settings_menu_titles ) )
 		{
-			carteBar.add( new  HashMap<String,Object>().addEntry("title", title) );
+			sidebarDatas.add( new  HashMap<String,Object>().addEntry("title",title) );
 		}
 
-		for( java.util.Map.Entry<Integer,Integer>  tabResource  : tabs.entrySet() )
+		ObjectUtils.cast(super.findViewById(R.id.menu_list),ListView.class).setAdapter( new  SimpleAdapter( this,sidebarDatas,R.layout.activity_sheet_menu_item,new  String[]{"title"},new  int[]{R.id.name}) );
+
+		for( java.util.Map.Entry<Integer,Integer>  tabResource : tabIcons.entrySet() )
 		{
 			TabLayout.Tab  newTab = ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).newTab().setCustomView( R.layout.activity_sheet_tab_indicator );
 
@@ -99,31 +89,13 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 		ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).setOnClickListener( (logoutButton) -> ActivityCompat.startActivity(this,new  Intent(this,SystemSettingsActivity.class),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+application().getUserMetadata().get("ID")+"/portrait").build().toString()) );
-
-		ObjectUtils.cast(super.findViewById(R.id.menu_list),ListView.class).setAdapter( new  SimpleAdapter(this,carteBar,R.layout.activity_sheet_menu_item,new String[]{"title"},new  int[]{R.id.name}) );
 	}
 
 	private  Map<ConnectState,Integer>  connectStateResIds = new  ConcurrentHashMap<ConnectState,Integer>().addEntry(ConnectState.NONE,R.string.connectionless).addEntry(ConnectState.CONNECTED,R.string.squirrel).addEntry(ConnectState.CONNECTING,R.string.connecting).addEntry( ConnectState.DISCONNECTED,R.string.disconnected );
 
-	private  Map<Integer,Integer>  tabs = new  LinkedMap<Integer,Integer>().addEntry(0,R.drawable.message).addEntry(1,R.drawable.contact).addEntry(2,R.drawable.discovery).addEntry( 3,R.drawable.dynam );
+	private  Map<Integer,Integer>  tabIcons = new  LinkedMap<Integer,Integer>().addEntry(0,R.drawable.message).addEntry(1,R.drawable.contact).addEntry(2,R.drawable.discovery).addEntry( 3,R.drawable.moments );
 
-	public  void  onChange( Locale  locale )
-	{
-		connectStateChanged( application().getSquirrelClient().getConnectState() );
-
-		List<Map<String,Object>>  carteBar = new  LinkedList<Map<String,Object>>();
-
-		for( String  title :  super.getResources().getStringArray( R.array.buddy_settings_menu_titles ) )
-		{
-			carteBar.add( new  HashMap<String,Object>().addEntry("title", title) );
-		}
-
-		ObjectUtils.cast(super.findViewById(R.id.menu_list),ListView.class).setAdapter( new  SimpleAdapter(this,carteBar,R.layout.activity_sheet_menu_item,new String[]{"title"},new  int[]{R.id.name}) );
-
-		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).getChildAt(1),TextView.class).setText( R.string.system_settings );
-	}
-
-	protected  void    onDestroy()
+	protected  void  onDestroy()
 	{
 		super.onDestroy();
 
@@ -137,13 +109,41 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 	}
 
-	public  void  connectStateChanged( ConnectState  connectState )
+	public  void  connectStateChanged(   ConnectState  connectState )
 	{
 		application().getMainLooperHandler().post( () -> ObjectUtils.cast(SheetActivity.this.findViewById(R.id.title),TextView.class).setText(connectState == ConnectState.CONNECTED ? ObjectUtils.cast(ObjectUtils.cast(this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).getSelectedTabPosition()).getInteger("title") : connectStateResIds.get(connectState)) );
 	}
 
+	public  void  onTabSelected(   TabLayout.Tab  tab )
+	{
+		tab.getCustomView().setBackgroundColor(       super.getResources().getColor(R.color.lightgray) );
+
+		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setCurrentItem( tab.getPosition(), false );
+
+		if( super.application().getSquirrelClient().getConnectState()         == ConnectState.CONNECTED )
+		{
+			ObjectUtils.cast(super.findViewById(R.id.title),TextView.class).setText( ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(tab.getPosition()).getInteger("title") );
+		}
+	}
+
 	public  void  onTabUnselected( TabLayout.Tab  tab )
 	{
-		tab.getCustomView().setBackgroundColor(super.getResources().getColor(R.color.white)/* color */ );
+		tab.getCustomView().setBackgroundColor(super.getResources().getColor(R.color.white)/* COLOR */ );
+	}
+
+	public  void  onChange( Locale  locale )
+	{
+		connectStateChanged(    application().getSquirrelClient().getConnectState() );
+
+		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).getChildAt(1 ),TextView.class).setText( R.string.system_settings );
+
+		List<Map<String,Object>>  sidebarDatas = new  ArrayList<Map<String,Object>>();
+
+		for( String  title :  super.getResources().getStringArray( R.array.buddy_settings_menu_titles ) )
+		{
+			sidebarDatas.add( new  HashMap<String,Object>().addEntry("title",title) );
+		}
+
+		ObjectUtils.cast(super.findViewById(R.id.menu_list),ListView.class).setAdapter( new  SimpleAdapter( this,sidebarDatas,R.layout.activity_sheet_menu_item,new  String[]{"title"},new  int[]{R.id.name}) );
 	}
 }
