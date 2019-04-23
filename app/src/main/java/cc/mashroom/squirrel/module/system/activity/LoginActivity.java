@@ -34,6 +34,7 @@ import  com.irozon.sneaker.Sneaker;
 
 import  androidx.core.content.res.ResourcesCompat;
 
+import  java.util.List;
 import  java.util.Locale;
 
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
@@ -51,6 +52,7 @@ import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
+import  cc.mashroom.util.collection.map.Map;
 import  cn.refactor.library.SmoothCheckBox;
 import  lombok.Getter;
 import  lombok.Setter;
@@ -97,7 +99,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
 
         ObjectUtils.cast(this.getLanguagesBottomSheetDialog().findViewById(R.id.languages), ListView.class).setOnItemClickListener(   this );
 
-        ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.back_text),TextView.class).setOnClickListener( (view) -> languagesBottomSheetDialog.show()  );
+        ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.back_text),TextView.class).setOnClickListener( (backtt) -> this.languagesBottomSheetDialog.show() );
 
         this.progressDialog = ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight( DensityUtils.px(this,140) );
     }
@@ -168,9 +170,17 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
     {
         this.languagesBottomSheetDialog.hide();
 
-        Locale locale = ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString().equals("ENGLISH") ? Locale.ENGLISH : Locale.CHINESE;
+        LocaleUtils.change( this,(ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString().equals("ENGLISH") ? Locale.ENGLISH : Locale.CHINESE).toLanguageTag() );
+    }
 
-        LocaleUtils.change( this ,locale.toLanguageTag() );
+    public  void  onDisconnected( int  reason )
+    {
+
+    }
+
+    public  void  onReceivedOfflineData(     Map<String,List<Map<String,Object>>>  receivedOfflineData )
+    {
+
     }
 
     public  void  onClick(  View  loginButton )
@@ -187,15 +197,5 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
 
             application().connect( ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString(),ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString(),NetworkUtils.getLocation(this),this );
         }
-    }
-
-    public  void  onReceiveOfflineData( boolean  finished )
-    {
-
-    }
-
-    public  void  onDisconnected( int  reason )
-    {
-
     }
 }

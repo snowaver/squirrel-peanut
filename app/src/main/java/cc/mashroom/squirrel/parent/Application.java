@@ -90,7 +90,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 {
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList( new  PeerConnection.IceServer("stun:47.105.210.154:3478"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302"),new  PeerConnection.IceServer("turn:47.105.210.154:3478","snowaver","snowaver") );
 
-	public  static  String  BALANCING_PROXY_URL     ="https://192.168.1.114:8011/system/balancingproxy?action=1&keyword=0";
+	public  static  String  BALANCING_PROXY_URL     ="https://10.208.60.190:8011/system/balancingproxy?action=1&keyword=0";
 
 	public  static  List<String>  BALANCING_PROXY_BACKUP_ADDRESSES       = Lists.newArrayList( "118.24.16.67", "118.24.19.163","118.25.216.217" );
 
@@ -101,13 +101,13 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	{
 		super.onCreate();
 
-		this.squirrelClient = new  SquirrelClient(  this , super.getCacheDir() );
+		this.squirrelClient= new  SquirrelClient( this,getCacheDir() );
 
 		PacketEventDispatcher.addListener(   this );
 
 		LocaleUtils.change( this , null );
 
-		Toasty.Config.getInstance().setTextSize(14 ).allowQueue( false ).apply();
+		Toasty.Config.getInstance().setTextSize(14).apply();
 
 		PushServiceNotifier.INSTANCE.install(this );
 
@@ -115,17 +115,13 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		if( userId >= 1 )
 		{
+			//  scheduler  job  will  not  be  executed  on  xiaomi  (4a)  and   vivo  (y66)  after  pushing  off  the  application,  so  the  proposal  using  scheduler  job  is  not  available  to  keep  application  alive.  give  up.
+
 			super.startService(  new  Intent(this,PushService.class) );
 
 			SharedPreferences  networkSharedPreference = super.getSharedPreferences( "LATEST_NETWORK_ROUTE",MODE_PRIVATE );
 
-			//  scheduler  job  will  not  be  executed  on  xiaomi  (4a)  and   vivo  (y66)  after  pushing  off  the  application,  so  the  proposal  using  scheduler  job  is  not  available  to  keep  application  alive.  give  up.
-            /*
-            JobInfo  applicationProcessKeeperJobInfo = new  JobInfo.Builder(PROCESS_KEEPER_SCHEDUAL_JOB_ID.incrementAndGet(),new  ComponentName(super.getPackageName(),ProcessKeeper.class.getName())).setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setPersisted(true).setRequiresCharging(false).setRequiresDeviceIdle(false).setMinimumLatency(1000).setOverrideDeadline(15*1000).build();
-
-            ObjectUtils.cast(super.getSystemService(Context.JOB_SCHEDULER_SERVICE),JobScheduler.class).schedule(applicationProcessKeeperJobInfo );
-            */
-			Storage.INSTANCE.initialize( squirrelClient, null, super.getCacheDir(), new  HashMap().addEntry("ID",userId) );
+			Storage.INSTANCE.initialize( squirrelClient, true, null, getCacheDir(), new  HashMap().addEntry("ID",userId) );
 
 			squirrelClient.route( networkSharedPreference.getString("HOST",null),networkSharedPreference.getInt("PORT",8012),networkSharedPreference.getInt("HTTPPORT",8011) );
 		}
@@ -174,7 +170,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		return  new  HttpUrl.Builder().scheme("https").host(squirrelClient.getHost()).port( squirrelClient.getHttpPort() );
 	}
 
-	public  void  onAuthenticateComplete( int  returnCode )
+	public  void  onAuthenticateComplete(  int  returnCode )
 	{
 		if( returnCode == 601||  returnCode == 602 )
 		{
@@ -216,16 +212,16 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		squirrelClient.asynchronousConnect( id,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
 	}
 
-	public  void  onReceiveOfflineData( boolean  finished )
-	{
-
-	}
-
 	public  void  clearStackActivitiesAndStart( Intent  intent , Bundle  bundle )
 	{
 		Stream.forEach( AbstractActivity.STACK,(activity) -> activity.finish() );
 
-		ActivityCompat.startActivity( this,intent,bundle );
+		ActivityCompat.startActivity( this, intent,bundle );
+	}
+
+	public  void  onReceivedOfflineData( Map<String,List<Map<String,Object>>>  receivedOfflineData )
+	{
+
 	}
 
 	public  void  onDisconnected( int  closeReason )
