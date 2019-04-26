@@ -77,13 +77,15 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 		ObjectUtils.cast(super.findViewById(R.id.menu_list),ListView.class).setAdapter( new  SimpleAdapter( this,sidebarDatas,R.layout.activity_sheet_menu_item,new  String[]{"title"},new  int[]{R.id.name}) );
 
-		for( java.util.Map.Entry<Integer,Integer>  tabResource : tabIcons.entrySet() )
+		for( Map<String,Object>  bottomTabResources : ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().values() )
 		{
-			TabLayout.Tab  newTab = ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).newTab().setCustomView( R.layout.activity_sheet_tab_indicator );
+			TabLayout.Tab  newTab = ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).newTab().setCustomView(  R.layout.activity_sheet_tab_indicator );
 
-			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.icon),ImageView.class).setImageResource( tabResource.getValue() );
+			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.title),TextView.class).setText( bottomTabResources.getInteger("title") );
 
-			ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).addTab(       newTab );
+			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.icon),ImageView.class).setImageResource( bottomTabResources.getInteger("icon") );
+
+			ObjectUtils.cast(super.findViewById(R.id.tab_layout),      TabLayout.class).addTab( newTab );
 		}
 
 		ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).setOnClickListener( (logoutButton) -> ActivityCompat.startActivity(this,new  Intent(this,SystemSettingsActivity.class),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
@@ -135,7 +137,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 	{
 		connectStateChanged(    application().getSquirrelClient().getConnectState() );
 
-		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).getChildAt(1 ),TextView.class).setText( R.string.system_settings );
+		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).getChildAt(1),TextView.class).setText(   R.string.system_settings );
 
 		List<Map<String,Object>>  sidebarDatas = new  ArrayList<Map<String,Object>>();
 

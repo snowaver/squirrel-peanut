@@ -289,9 +289,9 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		ObjectUtils.cast(super.findViewById(R.id.collapsing_bar_layout),AppBarLayout.class).setExpanded(!isSoftinputVisible,true );
 	}
 	
-	public  void  onCheckedChanged( SmoothCheckBox  smoothCheckboxButton , boolean  otherGroupChecked )
+	public  void  onCheckedChanged(       SmoothCheckBox  smoothCheckbox , boolean  isNewGroupChecked )
 	{
-		if( otherGroupChecked )
+		if( isNewGroupChecked )
 		{
 			bottomSheet.hide();
 

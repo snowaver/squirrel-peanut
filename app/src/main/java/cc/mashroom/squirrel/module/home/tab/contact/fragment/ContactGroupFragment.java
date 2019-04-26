@@ -86,16 +86,16 @@ public  class  ContactGroupFragment  extends  AbstractPacketListenerFragment  im
 		}
 	}
 
-	public  void  onChange( Locale  locale )
-	{
-
-	}
-
 	public  void  received( Packet  packet )  throws  Exception
 	{
 		if( packet instanceof SubscribeAckPacket )
 		{
 			application().getMainLooperHandler().post( () -> ObjectUtils.cast(contentView.findViewById(R.id.contact_group_layout),PinnedHeaderExpandableListViewLayout.class).notifyExpandableListAdapterDatasetChanged().expandAllGroups() );
 		}
+	}
+
+	public  void  onChange( Locale  locale )
+	{
+
 	}
 }

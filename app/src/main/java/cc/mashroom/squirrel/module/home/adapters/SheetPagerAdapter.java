@@ -41,7 +41,7 @@ public  class  SheetPagerAdapter  extends  FragmentPagerAdapter
 		return  tabs;
 	}
 
-	private  LinkedMap<String,Map<String,Object>>  tabs = ObjectUtils.cast( new  LinkedMap<String,Map<String,Object>>().addEntry("news_profile",new  HashMap<String,Object>().addEntry("title",R.string.message).addEntry("fragment.instance",new  NewsProfileFragment())).addEntry("contact",new  HashMap<String,Object>().addEntry("title",R.string.contact).addEntry("fragment.instance",new  ContactGroupFragment())).addEntry("discovery",new  HashMap<String,Object>().addEntry("title",R.string.discovery).addEntry("fragment.instance",new  DiscoveryFragment())).addEntry("moments",new  HashMap<String,Object>().addEntry("title",R.string.moments).addEntry("fragment.instance",new  MomentsFragment())) );
+	private  LinkedMap<String,Map<String,Object>>  tabs = ObjectUtils.cast( new  LinkedMap<String,Map<String,Object>>().addEntry("news_profile",new  HashMap<String,Object>().addEntry("title",R.string.message).addEntry("icon",R.drawable.message).addEntry("fragment.instance",new  NewsProfileFragment())).addEntry("contact",new  HashMap<String,Object>().addEntry("title",R.string.contact).addEntry("icon",R.drawable.contact).addEntry("fragment.instance",new  ContactGroupFragment())).addEntry("discovery",new  HashMap<String,Object>().addEntry("title",R.string.discovery).addEntry("icon",R.drawable.discovery).addEntry("fragment.instance",new  DiscoveryFragment())).addEntry("moments",new  HashMap<String,Object>().addEntry("title",R.string.moments).addEntry("icon",R.drawable.moments).addEntry("fragment.instance",new  MomentsFragment())) );
 
 	public  int  getCount()
 	{
