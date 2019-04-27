@@ -95,8 +95,6 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 	private  Map<ConnectState,Integer>  connectStateResIds = new  ConcurrentHashMap<ConnectState,Integer>().addEntry(ConnectState.NONE,R.string.connectionless).addEntry(ConnectState.CONNECTED,R.string.squirrel).addEntry(ConnectState.CONNECTING,R.string.connecting).addEntry( ConnectState.DISCONNECTED,R.string.disconnected );
 
-	private  Map<Integer,Integer>  tabIcons = new  LinkedMap<Integer,Integer>().addEntry(0,R.drawable.message).addEntry(1,R.drawable.contact).addEntry(2,R.drawable.discovery).addEntry( 3,R.drawable.moments );
-
 	protected  void  onDestroy()
 	{
 		super.onDestroy();
@@ -147,5 +145,10 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 		}
 
 		ObjectUtils.cast(super.findViewById(R.id.menu_list),ListView.class).setAdapter( new  SimpleAdapter( this,sidebarDatas,R.layout.activity_sheet_menu_item,new  String[]{"title"},new  int[]{R.id.name}) );
+
+		for( int  i = 0;i <= ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).getTabCount()-1;i=i+1 )
+		{
+			ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).getTabAt(i).getCustomView().findViewById(R.id.title),TextView.class).setText( ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(i).getInteger("title") );
+		}
 	}
 }
