@@ -94,7 +94,7 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 		{
 			RetrofitRegistry.get(UserService.class).register(RequestBody.create(MediaType.parse("multipart/form-data"),JsonUtils.toJson(new  HashMap<String,Object>().addEntry("username",ObjectUtils.cast(super.findViewById(R.id.username_input),StyleableEditView.class).getText().toString().trim()).addEntry("password",ObjectUtils.cast(super.findViewById(R.id.password_input),StyleableEditView.class).getText().toString().trim()).addEntry("nickname",ObjectUtils.cast(super.findViewById(R.id.nickname_input),StyleableEditView.class).getText().toString().trim()))),portrait == null ? null : MultipartBody.Part.createFormData("portrait",portrait.getName(),RequestBody.create(MediaType.parse("multipart/form-data"),portrait))).enqueue
 			(
-				new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) )
+				new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					public  void  onResponse(   Call<Void>  call,Response<Void>  response )
 					{

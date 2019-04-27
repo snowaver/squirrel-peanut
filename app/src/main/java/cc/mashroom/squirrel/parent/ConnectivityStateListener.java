@@ -37,9 +37,7 @@ public  class  ConnectivityStateListener  extends  ConnectivityManager.NetworkCa
 
         if( sharedPreferences.getLong("ID",0) >= 1 && !application.getSquirrelClient().isAuthenticated() )
         {
-            /*
-            application.connect( sharedPreferences.getLong("ID",0),NetworkUtils.getLocation(application),AbstractActivity.STACK.isEmpty() ? null : new  UIProgressDialog.WeBoBuilder(AbstractActivity.STACK.get(0)).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create().setHeight(DensityUtils.px(application,140)) );
-            */
+
         }
     }
 }

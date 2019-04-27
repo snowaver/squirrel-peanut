@@ -58,7 +58,7 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 	{
 		RetrofitRegistry.get(UserService.class).logout(application().getSquirrelClient().getId()).enqueue
 		(
-			new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this , 140)) )
+			new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 			{
 				public  void  onResponse( Call<Void>  call,  Response<Void>  response )
 				{

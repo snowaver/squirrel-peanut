@@ -101,7 +101,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
 
         ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.back_text),TextView.class).setOnClickListener( (backtt) -> this.languagesBottomSheetDialog.show() );
 
-        this.progressDialog = ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight( DensityUtils.px(this,140) );
+        this.progressDialog = ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
     }
 
     public  void  onChange(    Locale  locale )

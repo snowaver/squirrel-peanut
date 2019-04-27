@@ -93,7 +93,7 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 		{
 			RetrofitRegistry.get(ChatGroupUserService.class).add(chatGroup.getLong("ID"),StringUtils.join((Set<Long>)data.getSerializableExtra("SELECTED_CONTACT_IDS"), ",")).enqueue
 			(
-				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setHeight(DensityUtils.px(this,140)) )
+				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					@SneakyThrows
 					public  void  onResponse( Call<Map<String,List<Map<String,Object>>>>  call,Response<Map<String,List<Map<String,Object>>>>  response )

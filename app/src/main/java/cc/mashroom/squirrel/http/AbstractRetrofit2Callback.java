@@ -20,12 +20,10 @@ import  android.app.Activity;
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
-import  cc.mashroom.hedgehog.util.ContextUtils;
-import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.squirrel.R;
 
-import cc.mashroom.squirrel.parent.AbstractActivity;
-import cc.mashroom.util.ObjectUtils;
+import  cc.mashroom.squirrel.parent.AbstractActivity;
+import  cc.mashroom.util.ObjectUtils;
 import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
