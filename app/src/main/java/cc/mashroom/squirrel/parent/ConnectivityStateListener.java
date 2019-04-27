@@ -33,7 +33,7 @@ public  class  ConnectivityStateListener  extends  ConnectivityManager.NetworkCa
     {
         super.onAvailable(  network );
 
-        SharedPreferences  sharedPreferences  = application.getSharedPreferences( "LOGIN_FORM",MODE_PRIVATE );
+        SharedPreferences  sharedPreferences  = application.getSharedPreferences( "LATEST_LOGIN_FORM",MODE_PRIVATE );
 
         if( sharedPreferences.getLong("ID",0) >= 1 && !application.getSquirrelClient().isAuthenticated() )
         {

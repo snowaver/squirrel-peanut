@@ -153,5 +153,9 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 		{
 			ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).getTabAt(i).getCustomView().findViewById(R.id.title),TextView.class).setText( ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(i).getInteger("title") );
 		}
+
+		ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.additional_text),           TextView.class).setText( R.string.option );
+
+		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).getAddtionalDropdownContent().getChildAt(0),TextView.class).setText( R.string.chat_create_new_group );
 	}
 }
