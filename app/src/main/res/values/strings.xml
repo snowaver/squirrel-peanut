@@ -20,7 +20,7 @@
     <string  name="change">CHANGE</string>
     <string  name="chat">CHAT</string>
     <string  name="chat_audio_message">VOICE MESSAGE</string>
-    <string  name="chat_create_new_group">NEW GROUP</string>
+    <string  name="chat_create_new_group">NEW CHAT GROUP</string>
     <string  name="chat_group">CHAT GROUP</string>
     <string  name="chat_group_exist">CHAT GROUP EXIST</string>
     <string  name="chat_image_message">IMAGE MESSAGE</string>
@@ -79,6 +79,7 @@
     <string  name="register_username_registered">USERNAME REGISTERED</string>
     <string  name="remark">REMARK</string>
     <string  name="resend">RESEND</string>
+    <string  name="scan">SCAN</string>
     <string  name="second">SECOND</string>
     <string  name="select">SELECT</string>
     <string  name="send">SEND</string>

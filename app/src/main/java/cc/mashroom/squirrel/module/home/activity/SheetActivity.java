@@ -32,6 +32,8 @@ import  android.widget.TextView;
 import  com.facebook.drawee.view.SimpleDraweeView;
 
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
+import cc.mashroom.hedgehog.util.DensityUtils;
+import cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.ClientConnectEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.ClientConnectListener;
@@ -40,7 +42,6 @@ import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.adapters.SheetPagerAdapter;
 import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.HashMap;
-import  cc.mashroom.util.collection.map.LinkedMap;
 import  cc.mashroom.util.collection.map.Map;
 import  cc.mashroom.util.ObjectUtils;
 
@@ -91,6 +92,8 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 		ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).setOnClickListener( (logoutButton) -> ActivityCompat.startActivity(this,new  Intent(this,SystemSettingsActivity.class),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+application().getUserMetadata().get("ID")+"/portrait").build().toString()) );
+
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).addDropdownItem( R.string.chat_create_new_group,R.color.white,18,super.getResources().getDisplayMetrics().widthPixels/2,DensityUtils.px(this,50) );
 	}
 
 	private  Map<ConnectState,Integer>  connectStateResIds = new  ConcurrentHashMap<ConnectState,Integer>().addEntry(ConnectState.NONE,R.string.connectionless).addEntry(ConnectState.CONNECTED,R.string.squirrel).addEntry(ConnectState.CONNECTING,R.string.connecting).addEntry( ConnectState.DISCONNECTED,R.string.disconnected );
