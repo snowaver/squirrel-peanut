@@ -94,7 +94,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  static  List<String>  BALANCING_PROXY_BACKUP_ADDRESSES       = Lists.newArrayList( "118.24.16.67", "118.24.19.163","118.25.216.217" );
 
-    public  static  final  Map<String,Integer>  PLACEHOLDER_PROFILES = new  HashMap<String,Integer>().addEntry("&0a01;",R.string.chat_image_message).addEntry("&0a02;",R.string.chat_audio_message).addEntry("&0a03;",R.string.chat_video_message).addEntry( "&0707;",R.string.subscribe_contact_added );
+    public  static  final  Map<String,Integer>  PLACEHOLDER_PROFILES = new  HashMap<String,Integer>().addEntry(ChatContentType.IMAGE.getPlaceholder(),R.string.chat_image_message).addEntry(ChatContentType.AUDIO.getPlaceholder(),R.string.chat_audio_message).addEntry(ChatContentType.VIDEO.getPlaceholder(),R.string.chat_video_message).addEntry( "$(0707)",R.string.subscribe_contact_added );
 
     @SneakyThrows
 	public  void  onCreate()

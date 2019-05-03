@@ -15,7 +15,6 @@
  */
 package cc.mashroom.squirrel.module.chat.activity;
 
-import  android.app.Activity;
 import  android.content.Intent;
 import  android.os.Bundle;
 import  androidx.core.app.ActivityCompat;
@@ -69,7 +68,9 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 
 		this.setChatGroup( ChatGroup.dao.getOne("SELECT  ID,CREATE_TIME,LAST_MODIFY_TIME,NAME  FROM  "+ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?",new Object[]{super.getIntent().getLongExtra("CHAT_GROUP_ID",0)}) );
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( chatGroup.getString("NAME") );
+		this.setChatGroupUser( ChatGroupUser.dao.getOne("SELECT  *  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?",new  Object[]{chatGroupUser.getLong("ID"),application().getUserMetadata().get("ID")}) );
+
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle(    this.chatGroup.getString( "NAME" ) );
 
 		List<Map<String,Object>>  functionTitles = new LinkedList<Map<String,Object>>();
 
@@ -81,11 +82,17 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 		ObjectUtils.cast(super.findViewById(R.id.function_list),ListView.class).setOnItemClickListener( this );
 
 		ObjectUtils.cast(super.findViewById(R.id.function_list),ListView.class).setAdapter( new  SimpleAdapter(this,functionTitles,R.layout.activity_group_chat_details_item,new  String[]{"title"},new  int[]{R.id.name}) );
+
+	    super.findViewById(R.id.leave_or_delete_button).setOnClickListener( (v)->leaveOrDelete() );
 	}
 
 	@Accessors( chain= true )
 	@Setter
 	private  ChatGroup  chatGroup;
+
+    @Accessors( chain= true )
+    @Setter
+    private  ChatGroupUser     chatGroupUser;
 
 	protected  void  onActivityResult( int  requestCode, int  resultCode, Intent  data )
 	{
@@ -136,4 +143,32 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 			ActivityCompat.startActivity( this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")),   ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 	}
+
+	private  void  leaveOrDelete()
+    {
+		{
+			RetrofitRegistry.get(ChatGroupUserService.class).remove(chatGroup.getLong("ID"),chatGroupUser.getLong("ID")).enqueue
+			(
+				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				{
+					@SneakyThrows
+					public  void  onResponse( Call<Map<String,List<Map<String,Object>>>>  call,Response<Map<String,List<Map<String,Object>>>>  response )
+					{
+						super.onResponse( call, response );
+
+						if( response.code() == 200 )
+						{
+							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(response.body()) );
+
+							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.added,R.color.white,R.color.limegreen );
+						}
+						else
+						{
+							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
+						}
+					}
+				}
+			);
+		}
+    }
 }

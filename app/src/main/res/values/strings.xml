@@ -23,6 +23,7 @@
     <string  name="chat_create_new_group">NEW CHAT GROUP</string>
     <string  name="chat_group">CHAT GROUP</string>
     <string  name="chat_group_exist">CHAT GROUP EXIST</string>
+    <string  name="chat_group_leave_or_delete">LEAVE/DELETE</string>
     <string  name="chat_image_message">IMAGE MESSAGE</string>
     <string  name="chat_press_to_talk">PRESS TO TALK</string>
     <string  name="chat_recorded_voice_duration_too_short">VOICE RECORD DURING TO SHORT</string>
@@ -85,6 +86,7 @@
     <string  name="send">SEND</string>
     <string  name="settings">SETTINGS</string>
     <string  name="squirrel">SQUIRREL</string>
+    <string  name="start_to_chat">START TO CHAT</string>
     <string  name="subscribe_add_contact">ADD AS CONTACT</string>
     <string  name="subscribe_contact_added">CONTACT ADDED, START TO CHAT</string>
     <string  name="subscribe_form_error">REMARK OR GROUP EMPTY</string>

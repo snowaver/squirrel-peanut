@@ -15,14 +15,22 @@
  */
 package cc.mashroom.squirrel.module.home.activity;
 
+import  android.content.DialogInterface;
 import  android.content.Intent;
 import  android.net.Uri;
 import  android.os.Bundle;
+
+import com.aries.ui.widget.alert.UIAlertDialog;
+import com.aries.ui.widget.progress.UIProgressDialog;
 import  com.google.android.material.tabs.TabLayout;
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
+import androidx.core.content.res.ResourcesCompat;
 import  androidx.viewpager.widget.ViewPager;
+
+import android.view.View;
 import  android.view.WindowManager;
+import android.widget.EditText;
 import  android.widget.ImageView;
 import  android.widget.LinearLayout;
 import  android.widget.ListView;
@@ -30,26 +38,40 @@ import  android.widget.SimpleAdapter;
 import  android.widget.TextView;
 
 import  com.facebook.drawee.view.SimpleDraweeView;
+import com.irozon.sneaker.Sneaker;
 
+import cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
-import cc.mashroom.hedgehog.util.DensityUtils;
-import cc.mashroom.hedgehog.widget.HeaderBar;
+import  cc.mashroom.hedgehog.util.DensityUtils;
+import cc.mashroom.hedgehog.util.ExtviewsAdapter;
+import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.ClientConnectEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.ClientConnectListener;
 import  cc.mashroom.squirrel.client.connect.ConnectState;
+import cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
+import cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
+import cc.mashroom.squirrel.http.RetrofitRegistry;
+import cc.mashroom.squirrel.module.chat.services.ChatGroupService;
+import cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
+import cc.mashroom.squirrel.module.home.tab.newsprofile.fragment.NewsProfileFragment;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.adapters.SheetPagerAdapter;
+import cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.HashMap;
 import  cc.mashroom.util.collection.map.Map;
 import  cc.mashroom.util.ObjectUtils;
+import lombok.SneakyThrows;
+import retrofit2.Call;
+import retrofit2.Response;
 
+import java.sql.Connection;
 import  java.util.ArrayList;
 import  java.util.List;
 import  java.util.Locale;
 
-public  class  SheetActivity  extends  AbstractActivity  implements  ClientConnectListener,TabLayout.OnTabSelectedListener,LocaleChangeEventDispatcher.LocaleChangeListener
+public  class  SheetActivity  extends  AbstractActivity  implements  ClientConnectListener,TabLayout.OnTabSelectedListener,LocaleChangeEventDispatcher.LocaleChangeListener,HeaderBar.OnItemClickListener,DialogInterface.OnClickListener
 {
 	protected  void  onCreate(  Bundle  savedInstanceState )
 	{
@@ -67,7 +89,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 		connectStateChanged(    application().getSquirrelClient().getConnectState() );
 
-		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setAdapter( new  SheetPagerAdapter(super.getSupportFragmentManager()) );
+		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setAdapter( new  SheetPagerAdapter( super.getSupportFragmentManager() ) );
 
 		List<Map<String,Object>>  sidebarDatas = new  ArrayList<Map<String,Object>>();
 
@@ -84,7 +106,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.title),TextView.class).setText( bottomTabResources.getInteger("title") );
 
-			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.icon),ImageView.class).setImageResource( bottomTabResources.getInteger("icon") );
+			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.icon),ImageView.class).setImageResource( bottomTabResources.getInteger( "icon" ) );
 
 			ObjectUtils.cast(super.findViewById(R.id.tab_layout),      TabLayout.class).addTab( newTab );
 		}
@@ -93,7 +115,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+application().getUserMetadata().get("ID")+"/portrait").build().toString()) );
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).addDropdownItem( R.string.chat_create_new_group,R.color.white,18,super.getResources().getDisplayMetrics().widthPixels/2,DensityUtils.px(this,50) );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).addDropdownItem(R.string.chat_create_new_group,R.color.white,18,super.getResources().getDisplayMetrics().widthPixels/2,DensityUtils.px(this,50)).setOnItemClickListener( this );
 	}
 
 	private  Map<ConnectState,Integer>  connectStateResIds = new  ConcurrentHashMap<ConnectState,Integer>().addEntry(ConnectState.NONE,R.string.connectionless).addEntry(ConnectState.CONNECTED,R.string.squirrel).addEntry(ConnectState.CONNECTING,R.string.connecting).addEntry( ConnectState.DISCONNECTED,R.string.disconnected );
@@ -112,9 +134,50 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 	}
 
-	public  void  connectStateChanged(   ConnectState  connectState )
+	public  void  onItemClick(View  itemView,int  position )
 	{
-		application().getMainLooperHandler().post( () -> ObjectUtils.cast(SheetActivity.this.findViewById(R.id.title),TextView.class).setText(connectState == ConnectState.CONNECTED ? ObjectUtils.cast(ObjectUtils.cast(this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).getSelectedTabPosition()).getInteger("title") : connectStateResIds.get(connectState)) );
+		if( position  == 0 )
+		{
+			ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.chat_create_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(dialog, which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
+		}
+	}
+	
+	public  void  connectStateChanged( ConnectState  state )
+	{
+		application().getMainLooperHandler().post( () -> ObjectUtils.cast(SheetActivity.this.findViewById(R.id.title),TextView.class).setText(state == ConnectState.CONNECTED ? ObjectUtils.cast(ObjectUtils.cast(this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).getSelectedTabPosition()).getInteger("title") : connectStateResIds.get(state)) );
+	}
+	
+	public  void  onClick( DialogInterface  dialog, int  i )
+	{
+		String  createdGroupName = ObjectUtils.cast(ObjectUtils.cast(dialog, UIAlertDialog.class).getContentView().findViewById(R.id.edit_inputor), EditText.class).getText().toString().trim();
+
+		if( StringUtils.isNotBlank( createdGroupName) )
+		{
+			RetrofitRegistry.get(ChatGroupService.class).add( super.application().getUserMetadata().getLong("ID" ) , createdGroupName ).enqueue
+			(
+				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(), ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				{
+					@SneakyThrows
+					public  void  onResponse( Call<Map<String,List<Map<String,Object>>>>  call,Response<Map<String,List<Map<String,Object>>>>  response )
+					{
+						super.onResponse( call , response );
+
+						if( response.code()    == 200 )
+						{
+							response.body().get("CHAT_GROUP_USERS").get(0).addEntry( "VCARD" , application().getUserMetadata().getString( "NICKNAME" ) );
+
+							Db.tx(String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(response.body()) );
+
+							ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(SheetActivity.this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().get("news_profile").get("fragment.instance"),NewsProfileFragment.class).getContentView().findViewById(R.id.profile_list),ListView.class).getAdapter(),NewsProfileListAdapter.class).notifyDataSetChanged();
+						}
+						else
+						{
+							showSneakerWindow( Sneaker.with(SheetActivity.this),com.irozon.sneaker.R.drawable.ic_error,response.code() == 601 ? R.string.chat_group_exist : R.string.network_or_internal_server_error,R.color.white,R.color.red );
+						}
+					}
+				}
+			);
+		}
 	}
 
 	public  void  onTabSelected(   TabLayout.Tab  tab )
@@ -123,7 +186,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setCurrentItem( tab.getPosition(), false );
 
-		if( super.application().getSquirrelClient().getConnectState()         == ConnectState.CONNECTED )
+		if(         super.application().getSquirrelClient().getConnectState() == ConnectState.CONNECTED )
 		{
 			ObjectUtils.cast(super.findViewById(R.id.title),TextView.class).setText( ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(tab.getPosition()).getInteger("title") );
 		}
