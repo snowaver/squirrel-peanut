@@ -24,6 +24,7 @@
     <string  name="chat_group">聊天组</string>
     <string  name="chat_group_exist">聊天组已存在</string>
     <string  name="chat_group_leave_or_delete">离开或者删除</string>
+    <string  name="chat_group_left_or_deleted">已离开或已删除</string>
     <string  name="chat_image_message">图片消息</string>
     <string  name="chat_press_to_talk">按住讲话</string>
     <string  name="chat_recorded_voice_duration_too_short">录音时长过短</string>

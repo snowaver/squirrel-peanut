@@ -23,6 +23,7 @@ import  retrofit2.http.DELETE;
 import  retrofit2.http.Field;
 import  retrofit2.http.FormUrlEncoded;
 import  retrofit2.http.POST;
+import  retrofit2.http.Query;
 
 public  interface  ChatGroupUserService
 {
@@ -31,6 +32,5 @@ public  interface  ChatGroupUserService
 	public  Call<Map<String,List<Map<String,Object>>>>  add( @Field(value="chatGroupId")  long  chatGroupId,@Field(value="inviteeIds") String  inviteeIds );
 
 	@DELETE( value="/chat/group/user" )
-	@FormUrlEncoded
-	public  Call<Map<String,List<Map<String,Object>>>>  remove( @Field(value="chatGroupId")  long  chatGroupId,@Field(value="chatGroupUserId")  long  chatGroupUserId );
+	public  Call<Map<String,List<Map<String,Object>>>>  secede( @Query(value="chatGroupId")  long  chatGroupId,@Query(value="chatGroupUserId")  long  chatGroupUserId );
 }

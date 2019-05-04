@@ -20,17 +20,17 @@ import  android.content.Intent;
 import  android.net.Uri;
 import  android.os.Bundle;
 
-import com.aries.ui.widget.alert.UIAlertDialog;
-import com.aries.ui.widget.progress.UIProgressDialog;
+import  com.aries.ui.widget.alert.UIAlertDialog;
+import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.google.android.material.tabs.TabLayout;
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
-import androidx.core.content.res.ResourcesCompat;
+import  androidx.core.content.res.ResourcesCompat;
 import  androidx.viewpager.widget.ViewPager;
 
-import android.view.View;
+import  android.view.View;
 import  android.view.WindowManager;
-import android.widget.EditText;
+import  android.widget.EditText;
 import  android.widget.ImageView;
 import  android.widget.LinearLayout;
 import  android.widget.ListView;
@@ -38,35 +38,35 @@ import  android.widget.SimpleAdapter;
 import  android.widget.TextView;
 
 import  com.facebook.drawee.view.SimpleDraweeView;
-import com.irozon.sneaker.Sneaker;
+import  com.irozon.sneaker.Sneaker;
 
-import cc.mashroom.db.common.Db;
+import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.hedgehog.util.DensityUtils;
-import cc.mashroom.hedgehog.util.ExtviewsAdapter;
+import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.ClientConnectEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.ClientConnectListener;
 import  cc.mashroom.squirrel.client.connect.ConnectState;
-import cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
-import cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import cc.mashroom.squirrel.http.RetrofitRegistry;
-import cc.mashroom.squirrel.module.chat.services.ChatGroupService;
-import cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
-import cc.mashroom.squirrel.module.home.tab.newsprofile.fragment.NewsProfileFragment;
+import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
+import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
+import  cc.mashroom.squirrel.http.RetrofitRegistry;
+import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
+import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
+import  cc.mashroom.squirrel.module.home.tab.newsprofile.fragment.NewsProfileFragment;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.adapters.SheetPagerAdapter;
-import cc.mashroom.util.StringUtils;
+import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.HashMap;
 import  cc.mashroom.util.collection.map.Map;
 import  cc.mashroom.util.ObjectUtils;
-import lombok.SneakyThrows;
-import retrofit2.Call;
-import retrofit2.Response;
+import  lombok.SneakyThrows;
+import  retrofit2.Call;
+import  retrofit2.Response;
 
-import java.sql.Connection;
+import  java.sql.Connection;
 import  java.util.ArrayList;
 import  java.util.List;
 import  java.util.Locale;
@@ -166,7 +166,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 						{
 							response.body().get("CHAT_GROUP_USERS").get(0).addEntry( "VCARD" , application().getUserMetadata().getString( "NICKNAME" ) );
 
-							Db.tx(String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(response.body()) );
+							Db.tx(String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
 
 							ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(SheetActivity.this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().get("news_profile").get("fragment.instance"),NewsProfileFragment.class).getContentView().findViewById(R.id.profile_list),ListView.class).getAdapter(),NewsProfileListAdapter.class).notifyDataSetChanged();
 						}

@@ -24,6 +24,7 @@
     <string  name="chat_group">CHAT GROUP</string>
     <string  name="chat_group_exist">CHAT GROUP EXIST</string>
     <string  name="chat_group_leave_or_delete">LEAVE/DELETE</string>
+    <string  name="chat_group_left_or_deleted">LEFT OR DELETED</string>
     <string  name="chat_image_message">IMAGE MESSAGE</string>
     <string  name="chat_press_to_talk">PRESS TO TALK</string>
     <string  name="chat_recorded_voice_duration_too_short">VOICE RECORD DURING TO SHORT</string>
