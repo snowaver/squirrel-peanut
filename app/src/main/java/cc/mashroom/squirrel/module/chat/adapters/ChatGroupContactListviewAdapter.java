@@ -46,12 +46,12 @@ public  class  ChatGroupContactListviewAdapter  extends  cc.mashroom.hedgehog.pa
 	@SneakyThrows
 	public  int   getCount()
 	{
-		return  ChatGroupUser.dao.getOne("SELECT  COUNT(ID)  AS  COUNT  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?",new  Object[]{chatGroupId}).getLong("COUNT").intValue();
+		return  ChatGroupUser.dao.getOne("SELECT  COUNT(ID)  AS  COUNT  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{chatGroupId}).getLong("COUNT").intValue();
 	}
 	@SneakyThrows
 	public  ChatGroupUser  getItem(int  position )
 	{
-		return  ChatGroupUser.dao.getOne("SELECT  ID,CREATE_TIME,LAST_MODIFY_TIME,CONTACT_ID,VCARD  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  ORDER  BY  ID  ASC  LIMIT  1  OFFSET  ?",new  Object[]{chatGroupId,position});
+		return  ChatGroupUser.dao.getOne("SELECT  ID,CREATE_TIME,LAST_MODIFY_TIME,CONTACT_ID,VCARD  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE  ORDER  BY  ID  ASC  LIMIT  1  OFFSET  ?",new  Object[]{chatGroupId,position});
 	}
 
 	public  View  getView( int  position,View  convertView,ViewGroup  parent )

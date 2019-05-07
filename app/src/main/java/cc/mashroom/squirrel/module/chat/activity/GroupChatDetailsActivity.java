@@ -160,7 +160,7 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 						{
 							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
 
-							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this).setOnSneakerDismissListener(() -> {STACK.get(STACK.size()-2).finish();  GroupChatDetailsActivity.this.finish();}),com.irozon.sneaker.R.drawable.ic_success,R.string.chat_group_left_or_deleted,R.color.white,R.color.limegreen );
+							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> {STACK.get(STACK.size()-2).finish();  GroupChatDetailsActivity.this.finish();},500)),com.irozon.sneaker.R.drawable.ic_success,R.string.chat_group_left_or_deleted,R.color.white,R.color.limegreen );
 						}
 						else
 						{
