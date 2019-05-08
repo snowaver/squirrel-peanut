@@ -41,7 +41,7 @@ import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileLis
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.util.ObjectUtils;
-import lombok.Getter;
+import  lombok.Getter;
 
 public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  implements  AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
