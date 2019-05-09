@@ -21,8 +21,7 @@ import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 import  android.view.View;
 import  android.widget.AdapterView;
-import  android.widget.ListView;
-import  android.widget.SimpleAdapter;
+import  android.widget.GridView;
 
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
@@ -31,10 +30,11 @@ import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
-import cc.mashroom.hedgehog.widget.StyleableEditView;
+import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
+import  cc.mashroom.squirrel.module.chat.adapters.GroupChatProfileMemberGridviewAdapter;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
@@ -42,7 +42,6 @@ import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
-import  cc.mashroom.util.collection.map.HashMap;
 import  cc.mashroom.util.collection.map.Map;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  lombok.Setter;
@@ -54,12 +53,18 @@ import  retrofit2.Response;
 import  java.io.Serializable;
 import  java.sql.Connection;
 import  java.util.HashSet;
-import  java.util.LinkedList;
 import  java.util.List;
 import  java.util.Set;
 
 public  class  GroupChatProfileActivity  extends  AbstractActivity  implements  AdapterView.OnItemClickListener
 {
+    @Accessors( chain= true )
+    @Setter
+    private  ChatGroupUser     chatGroupUser;
+    @Accessors( chain= true )
+    @Setter
+    private  ChatGroup  chatGroup;
+
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
@@ -73,29 +78,12 @@ public  class  GroupChatProfileActivity  extends  AbstractActivity  implements  
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle(    this.chatGroup.getString( "NAME" ) );
 
-		ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).setText(   this.chatGroup.getString( "NAME" ) );
-		/*
-		List<Map<String,Object>>  functionTitles = new LinkedList<Map<String,Object>>();
+		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( this.chatGroup.getString( "NAME" ) );
 
-		for( String  title : super.getResources().getStringArray(R.array.group_chat_details_list) )
-		{
-			functionTitles.add( new  HashMap<String,Object>().addEntry("title",title) );
-		}
+	    super.findViewById(R.id.leave_or_delete_button).setOnClickListener( (leaveButtono) ->leaveOrDelete() );
 
-		ObjectUtils.cast(super.findViewById(R.id.function_list),ListView.class).setOnItemClickListener( this );
-
-		ObjectUtils.cast(super.findViewById(R.id.function_list),ListView.class).setAdapter( new  SimpleAdapter(this,functionTitles,R.layout.activity_group_chat_details_item,new  String[]{"title"},new  int[]{R.id.name}) );
-		*/
-	    super.findViewById(R.id.leave_or_delete_button).setOnClickListener( (v)->leaveOrDelete() );
-	}
-
-	@Accessors( chain= true )
-	@Setter
-	private  ChatGroup  chatGroup;
-
-    @Accessors( chain= true )
-    @Setter
-    private  ChatGroupUser     chatGroupUser;
+        ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).setAdapter( new  GroupChatProfileMemberGridviewAdapter(this,this.chatGroup.getLong("ID")) );
+    }
 
 	protected  void  onActivityResult( int  requestCode, int  resultCode, Intent  data )
 	{

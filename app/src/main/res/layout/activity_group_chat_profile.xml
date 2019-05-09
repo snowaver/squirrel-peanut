@@ -1,27 +1,23 @@
 <?xml  version="1.0"  encoding="utf-8"?>
-<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:background="@color/lightgray"  android:fitsSystemWindows="true">
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"     android:background="@color/lightgray"  android:fitsSystemWindows="true">
 
     <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  app:backText="@string/goback"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
 
-    <View  android:layout_width="match_parent"  android:layout_height="1px"  android:background="@color/gainsboro"></View>
+    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/name"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:title="@string/name"  android:textAlignment="viewEnd"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/name"  android:layout_width="match_parent"  android:layout_height="50dp"  android:title="@string/name"></cc.mashroom.hedgehog.widget.StyleableEditView>
-
-    <LinearLayout  android:layout_width="match_parent"  android:layout_height="30dp"  android:background="@color/lightgray"  android:orientation="horizontal">
+    <RelativeLayout  android:layout_width="match_parent"  android:layout_height="30dp"  android:background="@color/lightgray"  android:orientation="horizontal">
 
         <TextView  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:paddingLeft="10dp"   android:textColor="@color/darkgray"  android:textSize="18dp"  android:gravity="center_vertical"  android:text="@string/member_list"/>
 
-        <View  android:layout_width="0dp"  android:layout_height="match_parent"  android:layout_weight="1"></View>
+        <TextView  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:paddingRight="10dp"  android:layout_alignParentRight="true"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:gravity="center_vertical"  android:text="@string/more"/>
 
-        <TextView  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:paddingRight="10dp"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:gravity="center_vertical"  android:text="@string/more"/>
+    </RelativeLayout>
 
-    </LinearLayout>
+    <GridView  android:id="@+id/members"  android:layout_width="match_parent"  android:layout_height="50dp"  android:numColumns="6"  android:background="@color/white"></GridView>
 
-    <GridView  android:id="@+id/members"  android:layout_width="match_parent"  android:layout_height="50dp"  android:numColumns="6"></GridView>
+    <TextView  android:id="@+id/invite_button"  android:layout_width="match_parent"  android:layout_height="50dp"  android:paddingLeft="10dp"  android:layout_marginTop="1px"  android:gravity="center_vertical"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:text="@string/invite"  android:background="@color/white"/>
 
-    <View  android:layout_width="match_parent"  android:layout_height="1px"  android:background="@color/gainsboro"></View>
-
-    <TextView  android:id="@+id/invite_button"  android:layout_width="match_parent"  android:layout_height="50dp"  android:paddingLeft="10dp"  android:gravity="center_vertical"  android:textColor="@color/darkgray"  android:textSize="18dp"   android:text="@string/invite"/>
+    <View  android:layout_width="match_parent"  android:layout_height="0dp" android:layout_weight="1"></View>
 
     <Button  android:id="@+id/leave_or_delete_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/red"  android:textColor="@color/white"  android:textSize="18dp"  android:text="@string/chat_group_leave_or_delete"/>
 
