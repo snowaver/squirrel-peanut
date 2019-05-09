@@ -34,7 +34,7 @@
         <activity  android:name=".module.chat.activity.VideoCallActivity"   android:screenOrientation="portrait"/>
         <activity  android:name=".module.chat.activity.GroupChatActivity"  android:screenOrientation="portrait"  android:windowSoftInputMode="stateHidden"/>
         <activity  android:name=".module.chat.activity.ChatGroupContactActivity"  android:screenOrientation="portrait"/>
-        <activity  android:name=".module.chat.activity.GroupChatDetailsActivity"  android:screenOrientation="portrait"/>
+        <activity  android:name=".module.chat.activity.GroupChatProfileActivity"  android:screenOrientation="portrait"/>
         <activity  android:name=".module.common.activity.ContactMultichoiceActivity"  android:screenOrientation="portrait"></activity>
     </application>
 </manifest>

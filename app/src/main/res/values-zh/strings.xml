@@ -23,7 +23,7 @@
     <string  name="chat_create_new_group">新建聊天组</string>
     <string  name="chat_group">聊天组</string>
     <string  name="chat_group_exist">聊天组已存在</string>
-    <string  name="chat_group_leave_or_delete">离开或者删除</string>
+    <string  name="chat_group_leave_or_delete">退出或删除</string>
     <string  name="chat_group_left_or_deleted">已离开或已删除</string>
     <string  name="chat_image_message">图片消息</string>
     <string  name="chat_press_to_talk">按住讲话</string>
@@ -49,6 +49,7 @@
     <string  name="discovery_searched_nothing">未查询到任何数据</string>
     <string  name="exit">退出</string>
     <string  name="grouping">分组</string>
+    <string  name="invite">邀请</string>
     <string  name="language">语言</string>
     <string  name="language_select">语言</string>
     <string  name="language_chinese">中文</string>
@@ -63,6 +64,8 @@
     <string  name="message">消息</string>
     <string  name="message_whether_to_delete">您是否要删除此聊天？不可恢复</string>
     <string  name="moments">动态</string>
+    <string  name="more">更多</string>
+    <string  name="name">名称</string>
     <string  name="network_configuration_error">系统正在维护，请您稍后再试</string>
     <string  name="nickname">昵称</string>
     <string  name="not_implement">暂未实现</string>

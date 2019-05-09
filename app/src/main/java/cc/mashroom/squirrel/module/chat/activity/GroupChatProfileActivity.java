@@ -31,6 +31,7 @@ import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
+import cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
@@ -57,14 +58,14 @@ import  java.util.LinkedList;
 import  java.util.List;
 import  java.util.Set;
 
-public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  AdapterView.OnItemClickListener
+public  class  GroupChatProfileActivity  extends  AbstractActivity  implements  AdapterView.OnItemClickListener
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
 
-		super.setContentView( R.layout.activity_group_chat_details );
+		super.setContentView( R.layout.activity_group_chat_profile );
 
 		this.setChatGroup( ChatGroup.dao.getOne("SELECT  ID,CREATE_TIME,LAST_MODIFY_TIME,NAME  FROM  "+ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?",new Object[]{super.getIntent().getLongExtra("CHAT_GROUP_ID",0)}) );
 
@@ -72,6 +73,8 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle(    this.chatGroup.getString( "NAME" ) );
 
+		ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).setText(   this.chatGroup.getString( "NAME" ) );
+		/*
 		List<Map<String,Object>>  functionTitles = new LinkedList<Map<String,Object>>();
 
 		for( String  title : super.getResources().getStringArray(R.array.group_chat_details_list) )
@@ -82,7 +85,7 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 		ObjectUtils.cast(super.findViewById(R.id.function_list),ListView.class).setOnItemClickListener( this );
 
 		ObjectUtils.cast(super.findViewById(R.id.function_list),ListView.class).setAdapter( new  SimpleAdapter(this,functionTitles,R.layout.activity_group_chat_details_item,new  String[]{"title"},new  int[]{R.id.name}) );
-
+		*/
 	    super.findViewById(R.id.leave_or_delete_button).setOnClickListener( (v)->leaveOrDelete() );
 	}
 
@@ -111,11 +114,11 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 						{
 							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
 
-							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.added,R.color.white,R.color.limegreen );
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.added,R.color.white,R.color.limegreen );
 						}
 						else
 						{
-							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
 						}
 					}
 				}
@@ -160,11 +163,11 @@ public  class  GroupChatDetailsActivity  extends  AbstractActivity  implements  
 						{
 							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
 
-							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> {STACK.get(STACK.size()-2).finish();  GroupChatDetailsActivity.this.finish();},500)),com.irozon.sneaker.R.drawable.ic_success,R.string.chat_group_left_or_deleted,R.color.white,R.color.limegreen );
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> {STACK.get(STACK.size()-2).finish();  GroupChatProfileActivity.this.finish();},500)),com.irozon.sneaker.R.drawable.ic_success,R.string.chat_group_left_or_deleted,R.color.white,R.color.limegreen );
 						}
 						else
 						{
-							showSneakerWindow( Sneaker.with(GroupChatDetailsActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
 						}
 					}
 				}

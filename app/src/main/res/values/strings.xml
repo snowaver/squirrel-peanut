@@ -23,7 +23,7 @@
     <string  name="chat_create_new_group">NEW CHAT GROUP</string>
     <string  name="chat_group">CHAT GROUP</string>
     <string  name="chat_group_exist">CHAT GROUP EXIST</string>
-    <string  name="chat_group_leave_or_delete">LEAVE/DELETE</string>
+    <string  name="chat_group_leave_or_delete">LEAVE OR DELETE</string>
     <string  name="chat_group_left_or_deleted">LEFT OR DELETED</string>
     <string  name="chat_image_message">IMAGE MESSAGE</string>
     <string  name="chat_press_to_talk">PRESS TO TALK</string>
@@ -49,6 +49,7 @@
     <string  name="discovery_searched_nothing">SEARCHED NOTHING</string>
     <string  name="exit">EXIT</string>
     <string  name="grouping">GROUPING</string>
+    <string  name="invite">INVITE</string>
     <string  name="language">LANGUAGE</string>
     <string  name="language_select">LANGUAGE</string>
     <string  name="language_chinese">中文</string>
@@ -63,6 +64,8 @@
     <string  name="message">MESSAGE</string>
     <string  name="message_whether_to_delete">DELETE CHAT HISTORY?</string>
     <string  name="moments">MOMENTS</string>
+    <string  name="more">MORE</string>
+    <string  name="name">NAME</string>
     <string  name="network_configuration_error">SYSTEM MAINTAING, TRY LATER PLEASE</string>
     <string  name="nickname">NICKNAME</string>
     <string  name="not_implement">UNIMPLEMENT</string>
@@ -77,7 +80,7 @@
     <string  name="register">REGISTER</string>
     <string  name="register_form_error">NOTICE: ANY INPUT EMPTY OR TWO INPUT PASSWORDS NOT CONSISTENT</string>
     <string  name="register_register_if_no_account">NO ACCOUNT? REGISTER A NEW ONE</string>
-    <string  name="register_registered">REGISTERD AND GO BACK</string>
+    <string  name="register_registered">REGISTERD AND RETURN</string>
     <string  name="register_username_registered">USERNAME REGISTERED</string>
     <string  name="remark">REMARK</string>
     <string  name="resend">RESEND</string>
