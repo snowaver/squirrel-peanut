@@ -32,6 +32,7 @@ import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
+import cc.mashroom.squirrel.util.LocaleUtils;
 
 public  class  LoadingActivity  extends  AbstractActivity  implements  Runnable
 {
@@ -39,13 +40,15 @@ public  class  LoadingActivity  extends  AbstractActivity  implements  Runnable
 	{
 		super.onCreate( savedInstanceState );
 
+		LocaleUtils.change(    this , null );
+
 		super.getWindow().addFlags( WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS );
 
 		super.getWindow().setStatusBarColor( super.getResources().getColor(R.color.gainsboro) );
 
 		super.setContentView(  R.layout.activity_loading );
 
-		super.application().getScheduler().schedule( this,super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getLong("ID",0) >= 1 ? 1 : 3, TimeUnit.SECONDS );
+		super.application().getScheduler().schedule( this,super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0) >= 1 ? 1 : 3, TimeUnit.SECONDS );
 	}
 
 	public  void  run()

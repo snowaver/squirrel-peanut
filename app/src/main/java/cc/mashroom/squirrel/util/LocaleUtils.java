@@ -33,7 +33,7 @@ public  class  LocaleUtils
      */
     public  static  void  change( Context  context,String  languageTag )
     {
-        Configuration  configuration = context.getResources().getConfiguration();
+        Configuration  configuration     = context.getResources().getConfiguration();
 
         Resources  resources = context.getResources();
 
@@ -50,9 +50,9 @@ public  class  LocaleUtils
             configuration.setLocale( locale );
         }
 
-        context.getResources().updateConfiguration( configuration,resources.getDisplayMetrics() );
+        resources.updateConfiguration( configuration,resources.getDisplayMetrics() );
 
-        System.err.println( String.format("SQUIRREL-PEANUT:  ** LOCALE  UTILS **  using  locale/%s.",locale.toLanguageTag()) );
+        System.err.println( String.format("SQUIRREL-PEANUT:  ** LOCALE  UTILS **  using  locale/%s." , locale.toLanguageTag()) );
 
         configurationSharedPreferences.edit().putString("LOCALE",locale.toLanguageTag()).commit();
 

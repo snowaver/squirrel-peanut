@@ -23,15 +23,15 @@
 
         <androidx.core.widget.NestedScrollView  android:layout_width="match_parent"  android:layout_height="match_parent"  app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <LinearLayout  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical">
+            <LinearLayout  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:background="@color/lightgray">
 
-                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/username_input"  android:layout_width="match_parent"  android:layout_height="50dp"  android:hint="@string/username"  app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
+                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/username"  android:layout_width="match_parent"  android:layout_height="50dp"  android:hint="@string/username"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/nickname_input"  android:layout_width="match_parent"  android:layout_height="50dp"  android:hint="@string/nickname"  app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
+                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/nickname"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:hint="@string/nickname"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/password_input"  android:layout_width="match_parent"  android:layout_height="50dp"  android:inputType="textPassword"  android:hint="@string/password"  app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
+                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/password"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:inputType="textPassword"  android:hint="@string/password"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/password_confirm_input"  android:layout_width="match_parent"  android:layout_height="50dp"  android:inputType="textPassword"  android:hint="@string/password_confirm"     app:enableBottomBorder="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
+                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/password_confirm"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:inputType="textPassword"  android:hint="@string/password_confirm"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
             </LinearLayout>
 
@@ -39,6 +39,6 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <Button  android:id="@+id/register_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_alignParentBottom="true"  android:text="@string/register"     android:textSize="18dp"  android:textColor="@color/white"  android:background="@color/limegreen"/>
+    <Button  android:id="@+id/register_button"  style="?android:attr/borderlessButtonStyle"  android:layout_width="match_parent"  android:layout_height="50dp"  android:text="@string/register"  android:textSize="18dp"  android:textColor="@color/white"  android:background="@color/limegreen"/>
 
 </LinearLayout>

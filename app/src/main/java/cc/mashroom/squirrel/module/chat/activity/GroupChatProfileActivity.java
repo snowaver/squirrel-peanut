@@ -19,9 +19,8 @@ import  android.content.Intent;
 import  android.os.Bundle;
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
-import  android.view.View;
-import  android.widget.AdapterView;
 import  android.widget.GridView;
+import  android.widget.TextView;
 
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
@@ -56,34 +55,38 @@ import  java.util.HashSet;
 import  java.util.List;
 import  java.util.Set;
 
-public  class  GroupChatProfileActivity  extends  AbstractActivity  implements  AdapterView.OnItemClickListener
+public  class  GroupChatProfileActivity     extends  AbstractActivity
 {
-    @Accessors( chain= true )
-    @Setter
-    private  ChatGroupUser     chatGroupUser;
-    @Accessors( chain= true )
-    @Setter
-    private  ChatGroup  chatGroup;
-
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
-		super.onCreate( savedInstanceState );
+		super.onCreate(        savedInstanceState );
 
 		super.setContentView( R.layout.activity_group_chat_profile );
 
-		this.setChatGroup( ChatGroup.dao.getOne("SELECT  ID,CREATE_TIME,LAST_MODIFY_TIME,NAME  FROM  "+ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?",new Object[]{super.getIntent().getLongExtra("CHAT_GROUP_ID",0)}) );
+		this.setChatGroup( ChatGroup.dao.getOne("SELECT  *  FROM  "+ ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{ super.getIntent().getLongExtra("CHAT_GROUP_ID", 0) }) );
 
-		this.setChatGroupUser( ChatGroupUser.dao.getOne("SELECT  *  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?",new  Object[]{chatGroup.getLong("ID"),application().getUserMetadata().get("ID")}) );
+		this.setChatGroupUser( ChatGroupUser.dao.getOne("SELECT  *  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?",new  Object[]{this.chatGroup.getLong("ID") , application().getUserMetadata().get("ID")}) );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle(    this.chatGroup.getString( "NAME" ) );
 
 		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( this.chatGroup.getString( "NAME" ) );
 
-	    super.findViewById(R.id.leave_or_delete_button).setOnClickListener( (leaveButtono) ->leaveOrDelete() );
+	    ObjectUtils.cast(super.findViewById(R.id.invite_button),TextView.class).setOnClickListener( (inviteButton) -> inviteMembers() );
+
+		ObjectUtils.cast(super.findViewById(R.id.more_members_button),TextView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+
+		super.findViewById(R.id.leave_or_delete_button).setOnClickListener((leaveButton) ->  leaveOrDelete() );
 
         ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).setAdapter( new  GroupChatProfileMemberGridviewAdapter(this,this.chatGroup.getLong("ID")) );
     }
+
+	@Accessors( chain= true )
+	@Setter
+	private  ChatGroup  chatGroup;
+	@Accessors( chain= true )
+	@Setter
+	private  ChatGroupUser  chatGroupUser;
 
 	protected  void  onActivityResult( int  requestCode, int  resultCode, Intent  data )
 	{
@@ -114,25 +117,16 @@ public  class  GroupChatProfileActivity  extends  AbstractActivity  implements  
 		}
 	}
 
-	@SneakyThrows
-	public  void  onItemClick(AdapterView<?>  parent,View  view,int  position,long  id )
+	private  void  inviteMembers()
 	{
-		if( position == 1 )
-		{
-			Set<Long>  invitedContactIds      = new  HashSet<Long>();
+		Set<Long>  invitedContactIds =new  HashSet<Long>();
 
-			for( ChatGroupUser  chatGroupUser : ChatGroupUser.dao.search("SELECT  CONTACT_ID  AS  INVITED_CONTACT_ID  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?",new  Object[]{chatGroup.getLong("ID")}) )
-			{
-				invitedContactIds.add(  chatGroupUser.getLong( "INVITED_CONTACT_ID" ) );
-			}
-
-			ActivityCompat.startActivityForResult( this,new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS",ObjectUtils.cast(invitedContactIds,Serializable.class)),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
-		}
-		else
-		if( position == 0 )
+		for( ChatGroupUser  chatGroupUser : ChatGroupUser.dao.search("SELECT  CONTACT_ID  AS  INVITED_CONTACT_ID  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{chatGroup.getLong("ID")}) )
 		{
-			ActivityCompat.startActivity( this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")),   ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+			invitedContactIds.add(  chatGroupUser.getLong( "INVITED_CONTACT_ID" ) );
 		}
+
+		ActivityCompat.startActivityForResult( this,new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS",ObjectUtils.cast(invitedContactIds,Serializable.class)),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 	}
 
 	private  void  leaveOrDelete()
