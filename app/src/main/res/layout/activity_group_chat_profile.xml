@@ -3,19 +3,19 @@
 
     <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  app:backText="@string/goback"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
 
-    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/name"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:title="@string/name"  android:textAlignment="viewEnd"></cc.mashroom.hedgehog.widget.StyleableEditView>
+    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/name"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:title="@string/name"  android:textAlignment="viewEnd"  android:editable="false"  app:showRightArrow="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
     <RelativeLayout  android:layout_width="match_parent"  android:layout_height="30dp"  android:background="@color/lightgray"  android:orientation="horizontal">
 
         <TextView  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:paddingLeft="10dp"   android:textColor="@color/darkgray"  android:textSize="18dp"  android:gravity="center_vertical"  android:text="@string/member_list"/>
 
-        <TextView  android:id="@+id/more_members_button"  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:paddingRight="10dp"  android:layout_alignParentRight="true"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:gravity="center_vertical"  android:text="@string/more"/>
+        <TextView  android:id="@+id/more_members_button"  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:paddingLeft="10dp"  android:paddingRight="10dp"  android:layout_alignParentRight="true"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:gravity="center_vertical"  android:text=">"/>
 
     </RelativeLayout>
 
     <GridView  android:id="@+id/members"  android:layout_width="match_parent"  android:layout_height="50dp"  android:numColumns="6"  android:background="@color/white"></GridView>
 
-    <TextView  android:id="@+id/invite_button"  android:layout_width="match_parent"  android:layout_height="50dp"  android:paddingLeft="10dp"  android:layout_marginTop="1px"  android:gravity="center_vertical"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:text="@string/invite"  android:background="@color/white"/>
+    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/invite_button"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:title="@string/invite"  android:textAlignment="viewEnd"  android:editable="false"  app:showRightArrow="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
     <View  android:layout_width="match_parent"  android:layout_height="0dp" android:layout_weight="1"></View>
 

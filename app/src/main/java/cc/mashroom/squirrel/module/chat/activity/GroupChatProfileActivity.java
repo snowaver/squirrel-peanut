@@ -72,7 +72,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( this.chatGroup.getString( "NAME" ) );
 
-	    ObjectUtils.cast(super.findViewById(R.id.invite_button),TextView.class).setOnClickListener( (inviteButton) -> inviteMembers() );
+	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnContentAndRightArrowClickListener( (inviteButton)  -> inviteMembers() );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_members_button),TextView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 

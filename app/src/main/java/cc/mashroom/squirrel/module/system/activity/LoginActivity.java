@@ -87,8 +87,6 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
             ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.login_remote_login_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColorResource(R.color.red).setPositiveButtonTextSize(18).setPositiveButton(R.string.close,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
         }
         //  clear  the  password  styleable  editview  after  successful  registration,  logout  or  squeezing  off  line  by  remote  login.
-        ObjectUtils.cast(super.findViewById(R.id.password), StyleableEditView.class ).getText().clear();
-
         ObjectUtils.cast(super.findViewById(R.id.login_button),Button.class).setOnClickListener( this );
 
         ObjectUtils.cast(super.findViewById(R.id.jump_to_registration_link),TextView.class).setOnClickListener( (view) -> ActivityCompat.startActivityForResult(this,new  Intent(this,RegisterActivity.class),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
