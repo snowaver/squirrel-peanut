@@ -72,7 +72,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( this.chatGroup.getString( "NAME" ) );
 
-	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnContentAndRightArrowClickListener( (inviteButton)  -> inviteMembers() );
+	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener( (inviteContactButton)  -> inviteMembers() );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_members_button),TextView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
@@ -90,7 +90,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 	protected  void  onActivityResult( int  requestCode, int  resultCode, Intent  data )
 	{
-		if( data    != null )
+		if( requestCode ==0 )
 		{
 			RetrofitRegistry.get(ChatGroupUserService.class).add(chatGroup.getLong("ID"),StringUtils.join((Set<Long>)data.getSerializableExtra("SELECTED_CONTACT_IDS"), ",")).enqueue
 			(
@@ -105,6 +105,8 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 						{
 							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
 
+                            ObjectUtils.cast(ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
+
 							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.added,R.color.white,R.color.limegreen );
 						}
 						else
@@ -115,6 +117,11 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 				}
 			);
 		}
+		else
+		if( requestCode ==1)
+        {
+
+        }
 	}
 
 	private  void  inviteMembers()
