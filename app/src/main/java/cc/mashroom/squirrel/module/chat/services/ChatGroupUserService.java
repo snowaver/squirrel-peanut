@@ -29,7 +29,7 @@ public  interface  ChatGroupUserService
 {
 	@POST(   value="/chat/group/user" )
 	@FormUrlEncoded
-	public  Call<Map<String,List<Map<String,Object>>>>  add( @Field(value="chatGroupId")  long  chatGroupId,@Field(value="inviteeIds") String  inviteeIds );
+	public  Call<Map<String,List<Map<String,Object>>>>  add( @Field(value="chatGroupId")  long  chatGroupId,@Field(value="inviteeIds")  String  inviteeIds );
 
 	@DELETE( value="/chat/group/user" )
 	public  Call<Map<String,List<Map<String,Object>>>>  secede( @Query(value="chatGroupId")  long  chatGroupId,@Query(value="chatGroupUserId")  long  chatGroupUserId );

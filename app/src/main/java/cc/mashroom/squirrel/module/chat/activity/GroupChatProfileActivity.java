@@ -34,6 +34,7 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
 import  cc.mashroom.squirrel.module.chat.adapters.GroupChatProfileMemberGridviewAdapter;
+import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
@@ -118,9 +119,34 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 			);
 		}
 		else
-		if( requestCode ==1)
+		if( requestCode ==1 )
         {
+			RetrofitRegistry.get(ChatGroupService.class).update( chatGroup.getLong("ID")                 ,data.getStringExtra( "EDIT_CONTENT" ) ).enqueue
+			(
+				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				{
+					@SneakyThrows
+					public  void  onResponse( Call<Map<String,List<Map<String,Object>>>>  call,Response<Map<String,List<Map<String,Object>>>>  response )
+					{
+						super.onResponse( call, response );
 
+						if( response.code() == 200 )
+						{
+							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
+
+                            setChatGroup( ChatGroup.dao.getOne("SELECT  *  FROM  "+ ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?" , new  Object[]{chatGroup.getLong("ID")}) );
+
+                            ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.name),StyleableEditView.class).setText(    chatGroup.getString("NAME") );
+
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.added,R.color.white,R.color.limegreen );
+						}
+						else
+						{
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
+						}
+					}
+				}
+			);
         }
 	}
 

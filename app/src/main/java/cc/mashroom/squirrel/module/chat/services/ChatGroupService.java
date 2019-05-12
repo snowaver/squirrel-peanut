@@ -24,14 +24,18 @@ import  retrofit2.http.Field;
 import  retrofit2.http.FormUrlEncoded;
 import  retrofit2.http.GET;
 import  retrofit2.http.POST;
+import retrofit2.http.PUT;
 import  retrofit2.http.Query;
 
 public  interface  ChatGroupService
 {
 	@FormUrlEncoded
 	@POST( value="/chat/group" )
-	public  Call<Map<String,List<Map<String,Object>>>>  add(@Field(value = "userId") long userId, @Field(value = "name") String name);
+	public  Call<Map<String,List<Map<String,Object>>>>  add( @Field(value="name")  String  name );
+
+	@PUT(  value="/chat/group" )
+	public  Call<Map<String,List<Map<String,Object>>>>  update( @Field(value="id")  long  chatGroupId,@Field(value="name")  String  name );
 
 	@GET(  value="/chat/group/search" )
-	public  Call<List<ChatGroup>>  search(@Query(value = "action") int action, @Query(value = "keyword") String keyword, @Query(value = "extras", encoded = true) String extras);
+	public  Call<List<ChatGroup>>  search( @Query(value="action")  int  action,@Query(value="keyword")  String  keyword,@Query(value="extras",encoded=true)  String  extras );
 }
