@@ -26,6 +26,8 @@ import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
 import  androidx.core.content.res.ResourcesCompat;
+
+import  cc.mashroom.hedgehog.module.common.activity.EditorActivity;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
@@ -73,6 +75,8 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( this.chatGroup.getString( "NAME" ) );
 
+		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> ActivityCompat.startActivityForResult(this,new  Intent(this,EditorActivity.class).putExtra("EDIT_CONTENT",chatGroup.getString("NAME")).putExtra("TITLE",super.getString(R.string.name)),1,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+
 	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener( (inviteContactButton)  -> inviteMembers() );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_members_button),TextView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
@@ -91,6 +95,11 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 	protected  void  onActivityResult( int  requestCode, int  resultCode, Intent  data )
 	{
+		if( data    != null )
+		{
+			return;
+		}
+
 		if( requestCode ==0 )
 		{
 			RetrofitRegistry.get(ChatGroupUserService.class).add(chatGroup.getLong("ID"),StringUtils.join((Set<Long>)data.getSerializableExtra("SELECTED_CONTACT_IDS"), ",")).enqueue

@@ -153,7 +153,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 		if( StringUtils.isNotBlank( createdGroupName) )
 		{
-			RetrofitRegistry.get(ChatGroupService.class).add( super.application().getUserMetadata().getLong("ID" ) , createdGroupName ).enqueue
+			RetrofitRegistry.get(ChatGroupService.class).add(createdGroupName).enqueue
 			(
 				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(), ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{

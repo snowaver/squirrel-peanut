@@ -65,7 +65,7 @@ public  class  ChatGroupFragment  extends  AbstractFragment  implements  DialogI
 		{
 			contentView = inflater.inflate( R.layout.fragment_contact_chat_group,container,false );
 
-			ObjectUtils.cast(contentView.findViewById(R.id.chat_group_list),ListView.class).setAdapter( new  ChatGroupAdapter(this) );
+			ObjectUtils.cast(contentView.findViewById(R.id.chat_group_list),ListView.class).setAdapter( new  ChatGroupAdapter(this ) );
 
 			ObjectUtils.cast(contentView.findViewById(R.id.chat_group_list),ListView.class).setOnItemClickListener( (parent,view,position,id) -> ActivityCompat.startActivity(super.getActivity(),new  Intent(this.getActivity(),GroupChatActivity.class).putExtra("CHAT_GROUP_ID",ObjectUtils.cast(parent.getAdapter().getItem(position),ChatGroup.class).getLong("ID")),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle()) );
 
@@ -95,7 +95,7 @@ public  class  ChatGroupFragment  extends  AbstractFragment  implements  DialogI
 
 		if( StringUtils.isNotBlank(addingGroupName) )
 		{
-			RetrofitRegistry.get(ChatGroupService.class).add( application().getUserMetadata().getLong("ID") , addingGroupName).enqueue
+			RetrofitRegistry.get(ChatGroupService.class).add(/*application().getUserMetadata().getLong("ID"),*/addingGroupName).enqueue
 			(
 				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>(super.getActivity() )
 				{
