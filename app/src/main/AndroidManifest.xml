@@ -19,7 +19,6 @@
         <activity  android:name=".module.system.activity.LoadingActivity"    android:screenOrientation="portrait">
             <intent-filter><action  android:name="android.intent.action.MAIN"/><category   android:name="android.intent.category.LAUNCHER"/></intent-filter>
         </activity>
-        <service   android:name=".push.ProcessKeeper"  android:permission="android.permission.BIND_JOB_SERVICE"  android:exported="true"></service>
         <service   android:name=".push.PushService"></service>
         <receiver  android:name=".push.RunningNotificationClickedReceiver"><intent-filter><action  android:name="cc.mashroom.squirrel.RUNNING_NOTIFICATION_CLICKED"></action></intent-filter></receiver>
         <activity  android:name=".module.system.activity.LoginActivity"  android:screenOrientation="portrait"  android:windowSoftInputMode="stateHidden|adjustResize"></activity>
@@ -30,6 +29,7 @@
         <activity  android:name=".module.chat.activity.AudioCallActivity"   android:screenOrientation="portrait"/>
         <activity  android:name=".module.home.activity.SubscribeActivity"   android:screenOrientation="portrait"  android:windowSoftInputMode="stateHidden|adjustResize"></activity>
         <activity  android:name=".module.home.activity.ContactProfileActivity"    android:screenOrientation="portrait"/>
+        <activity  android:name=".module.home.activity.ContactProfileEditActivity"  android:screenOrientation="portrait"  android:windowSoftInputMode="stateHidden|adjustResize"></activity>
         <activity  android:name=".module.home.activity.SystemSettingsActivity"    android:screenOrientation="portrait"/>
         <activity  android:name=".module.chat.activity.VideoCallActivity"   android:screenOrientation="portrait"/>
         <activity  android:name=".module.chat.activity.GroupChatActivity"  android:screenOrientation="portrait"  android:windowSoftInputMode="stateHidden"/>
