@@ -75,7 +75,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( this.chatGroup.getString( "NAME" ) );
 
-		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> ActivityCompat.startActivityForResult(this,new  Intent(this,EditorActivity.class).putExtra("EDIT_CONTENT",chatGroup.getString("NAME")).putExtra("TITLE",super.getString(R.string.name)),1,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> ActivityCompat.startActivityForResult(this,new  Intent(this,EditorActivity.class).putExtra("EDIT_CONTENT",chatGroup.getString("NAME")).putExtra("TITLE",super.getString(R.string.name)).putExtra("LIMITATION",16),1,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
 	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener( (inviteContactButton)  -> inviteMembers() );
 
@@ -95,14 +95,14 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 	protected  void  onActivityResult( int  requestCode, int  resultCode, Intent  data )
 	{
-		if( data    != null )
+		if( data    == null )
 		{
 			return;
 		}
 
 		if( requestCode ==0 )
 		{
-			RetrofitRegistry.get(ChatGroupUserService.class).add(chatGroup.getLong("ID"),StringUtils.join((Set<Long>)data.getSerializableExtra("SELECTED_CONTACT_IDS"), ",")).enqueue
+			RetrofitRegistry.get(ChatGroupUserService.class).add(chatGroup.getLong("ID"),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"), ",")).enqueue
 			(
 				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
@@ -117,7 +117,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
                             ObjectUtils.cast(ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
 
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.added,R.color.white,R.color.limegreen );
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,  R.string.added,R.color.white,R.color.limegreen );
 						}
 						else
 						{
@@ -143,11 +143,13 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 						{
 							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
 
-                            setChatGroup( ChatGroup.dao.getOne("SELECT  *  FROM  "+ ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?" , new  Object[]{chatGroup.getLong("ID")}) );
+                            setChatGroup( ChatGroup.dao.getOne("SELECT  *  FROM  "+ ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?"    , new  Object[]{chatGroup.getLong("ID")}) );
 
-                            ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.name),StyleableEditView.class).setText(    chatGroup.getString("NAME") );
+                            ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.name),StyleableEditView.class).setText(  chatGroup.getString( "NAME" ) );
 
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.added,R.color.white,R.color.limegreen );
+							ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.header_bar),HeaderBar.class).setTitle(   chatGroup.getString( "NAME" ) );
+
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen );
 						}
 						else
 						{

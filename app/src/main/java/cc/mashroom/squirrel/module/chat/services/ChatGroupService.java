@@ -24,7 +24,7 @@ import  retrofit2.http.Field;
 import  retrofit2.http.FormUrlEncoded;
 import  retrofit2.http.GET;
 import  retrofit2.http.POST;
-import retrofit2.http.PUT;
+import  retrofit2.http.PUT;
 import  retrofit2.http.Query;
 
 public  interface  ChatGroupService
@@ -33,6 +33,7 @@ public  interface  ChatGroupService
 	@POST( value="/chat/group" )
 	public  Call<Map<String,List<Map<String,Object>>>>  add( @Field(value="name")  String  name );
 
+	@FormUrlEncoded
 	@PUT(  value="/chat/group" )
 	public  Call<Map<String,List<Map<String,Object>>>>  update( @Field(value="id")  long  chatGroupId,@Field(value="name")  String  name );
 

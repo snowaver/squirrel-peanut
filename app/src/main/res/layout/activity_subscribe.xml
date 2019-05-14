@@ -29,9 +29,9 @@
 
                 <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/nickname"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:background="@color/white"  android:textAlignment="viewEnd"  android:title="@string/nickname"  android:textColor="@color/darkgray"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/remark"    android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:background="@color/white"  android:textAlignment="viewEnd"  android:title="@string/remark"    app:mode="EXTERNAL"  app:showRightArrow="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
+                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/remark"    android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:background="@color/white"  android:textAlignment="viewEnd"  android:title="@string/remark"    android:textColor="@color/darkgray"  app:mode="EXTERNAL"  app:showRightArrow="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
-                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/group"     android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:background="@color/white"  android:textAlignment="viewEnd"  android:title="@string/grouping"  app:mode="EXTERNAL"  app:showRightArrow="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
+                <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/group"     android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:background="@color/white"  android:textAlignment="viewEnd"  android:title="@string/grouping"  android:textColor="@color/darkgray"  app:mode="EXTERNAL"  app:showRightArrow="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
             </LinearLayout>
 

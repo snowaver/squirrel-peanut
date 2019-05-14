@@ -22,6 +22,8 @@ import  android.os.Bundle;
 import  com.google.android.material.appbar.AppBarLayout;
 import  com.google.android.material.bottomsheet.BottomSheetBehavior;
 import  com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import  androidx.annotation.Nullable;
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 import  android.view.LayoutInflater;
@@ -42,6 +44,8 @@ import  net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import  net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import  androidx.core.content.res.ResourcesCompat;
+
+import  cc.mashroom.hedgehog.module.common.activity.EditorActivity;
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
@@ -127,7 +131,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
         Contact  contact       = Contact.dao.getContactDirect().get(  this.getUser().getLong( "ID" ) );
         //  press  enter  key  to  update  remark,  but  actually  group  is  updated  also.
-		ObjectUtils.cast(super.findViewById(R.id.remark).findViewById(R.id.edit_inputor),EditText.class).setOnEditorActionListener( (edit,actionId,event) -> { if( actionId == EditorInfo.IME_ACTION_DONE ){  onCheckedChanged(null,true); }  return  false;} );
+		ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setOnClickListener( (v) -> ActivityCompat.startActivityForResult(this,new  Intent(this,EditorActivity.class).putExtra("EDIT_CONTENT",user.getString(StringUtils.isBlank(user.getString("REMARK")) ? "NICKNAME" : "REMARK")).putExtra("TITLE",super.getString(R.string.remark)).putExtra("LIMITATION",16),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
 
@@ -284,11 +288,26 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		}
 	}
 
+	protected  void  onActivityResult(    int  requestCode , int  resultCode, @Nullable  Intent  data )
+	{
+		super.onActivityResult(requestCode,resultCode,data);
+
+		if( data == null )
+		{
+			return;
+		}
+
+		if( requestCode  == 0 )
+		{
+			this.onCheckedChanged( null,true );
+		}
+	}
+
 	public  void  onVisibilityChanged(    boolean  isSoftinputVisible )
 	{
 		ObjectUtils.cast(super.findViewById(R.id.collapsing_bar_layout),AppBarLayout.class).setExpanded(!isSoftinputVisible,true );
 	}
-	
+
 	public  void  onCheckedChanged(       SmoothCheckBox  smoothCheckbox , boolean  isNewGroupChecked )
 	{
 		if( isNewGroupChecked )
