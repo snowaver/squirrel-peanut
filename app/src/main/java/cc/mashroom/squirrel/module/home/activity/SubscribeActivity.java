@@ -91,7 +91,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 		this.setUser(   ObjectUtils.cast( new  User().addEntries( ObjectUtils.cast( super.getIntent().getSerializableExtra("USER"),new  TypeReference<java.util.Map>(){}) ) ) );
 
-		super.findViewById(R.id.group).findViewById(R.id.edit_inputor ).setOnClickListener( (groupInputor) -> bottomSheet.show() );
+		super.findViewById(R.id.grouping).findViewById(R.id.edit_inputor ).setOnClickListener( (groupInputor) -> bottomSheet.show() );
 
 		ObjectUtils.cast(super.findViewById(R.id.details_portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+user.getLong("ID")+"/portrait").build().toString()) );
 
@@ -110,7 +110,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		{
 			ObjectUtils.cast(super.findViewById(R.id.remark), StyleableEditView.class).setVisibility( View.INVISIBLE );
 
-			ObjectUtils.cast(super.findViewById(R.id.group ), StyleableEditView.class).setVisibility( View.INVISIBLE );
+			ObjectUtils.cast(super.findViewById(R.id.grouping), StyleableEditView.class).setVisibility( View.INVISIBLE );
 
 			ObjectUtils.cast(super.findViewById(R.id.subscribe_button) , Button.class).setVisibility( View.INVISIBLE );
 
@@ -133,7 +133,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
         //  press  enter  key  to  update  remark,  but  actually  group  is  updated  also.
 		ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setOnClickListener( (v) -> ActivityCompat.startActivityForResult(this,new  Intent(this,EditorActivity.class).putExtra("EDIT_CONTENT",user.getString(StringUtils.isBlank(user.getString("REMARK")) ? "NICKNAME" : "REMARK")).putExtra("TITLE",super.getString(R.string.remark)).putExtra("LIMITATION",16),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
-		ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
+		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
 
         if( contact   != null )
 		{
@@ -208,13 +208,13 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 				else
 				if( contact.getInteger(  "SUBSCRIBE_STATUS" )    == 1 )
 				{
-				    if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group), StyleableEditView.class).getText().toString().trim()) )
+				    if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping), StyleableEditView.class).getText().toString().trim()) )
                     {
 						showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.subscribe_form_error,R.color.white,R.color.red );
                     }
                     else
                     {
-                        RetrofitRegistry.get(ContactService.class).changeSubscribeStatus(7,user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue
+                        RetrofitRegistry.get(ContactService.class).changeSubscribeStatus(7,user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
 							new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 							{
@@ -225,7 +225,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 									if( response.code()==200)
 									{
-										PacketEventDispatcher.sent( new  SubscribeAckPacket(user.getLong("ID"),SubscribeAckPacket.ACK_ACCEPT,new  HashMap<String,Object>().addEntry("GROUP",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).addEntry("USERNAME",user.get("USERNAME")).addEntry("NICKNAME",user.getString("NICKNAME"))),TransportState.SENT );
+										PacketEventDispatcher.sent( new  SubscribeAckPacket(user.getLong("ID"),SubscribeAckPacket.ACK_ACCEPT,new  HashMap<String,Object>().addEntry("GROUP",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).addEntry("USERNAME",user.get("USERNAME")).addEntry("NICKNAME",user.getString("NICKNAME"))),TransportState.SENT );
 
 										ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.subscribe_button),Button.class).setText(  R.string.message );
 
@@ -252,9 +252,9 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 				ContextUtils.hideSoftinput(   SubscribeActivity.this );
 				{
-                    if( StringUtils.isNoneBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()) )
+                    if( StringUtils.isNoneBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()) )
                     {
-						RetrofitRegistry.get(ContactService.class).subscribe( user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(), ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue
+						RetrofitRegistry.get(ContactService.class).subscribe( user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(), ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
 							new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 							{
@@ -265,7 +265,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 									if( response.code()==200)
 									{
-										PacketEventDispatcher.sent(new  SubscribePacket(user.getLong("ID"),new  HashMap<String,Object>().addEntry("REMARK",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim()).addEntry("USERNAME",user.getString("USERNAME")).addEntry("NICKNAME",user.getString("NICKNAME")).addEntry("GROUP",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim())),TransportState.SENT );
+										PacketEventDispatcher.sent(new  SubscribePacket(user.getLong("ID"),new  HashMap<String,Object>().addEntry("REMARK",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim()).addEntry("USERNAME",user.getString("USERNAME")).addEntry("NICKNAME",user.getString("NICKNAME")).addEntry("GROUP",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim())),TransportState.SENT );
 
 										ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor( SubscribeActivity.super.getResources().getColor(R.color.gainsboro) );
 
@@ -318,7 +318,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 
 			ObjectUtils.cast( super.findViewById(R.id.remark) , StyleableEditView.class ).clearFocus();
 
-			ObjectUtils.cast( super.findViewById(R.id.group),StyleableEditView.class).setText( group );
+			ObjectUtils.cast( super.findViewById(R.id.grouping),StyleableEditView.class).setText( group );
 
 			ContextUtils.hideSoftinput( this );
 
@@ -328,7 +328,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 			{
 				if( !contact.getString("REMARK").equals(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class ).getText().toString().trim())      || ! group.equals( contact.getString("GROUP_NAME") ) )
 				{
-					RetrofitRegistry.get(ContactService.class).update(user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.group),StyleableEditView.class).getText().toString().trim()).enqueue( new  AbstractRetrofit2Callback<Void>(this){public  void  onResponse(Call<Void>  call,Response<Void>  response){ if(response.code() == 200){showSneakerWindow(Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen);  Contact.dao.update("UPDATE  "+Contact.dao.getDataSourceBind().table()+"  SET  REMARK = ?,GROUP_NAME = ?  WHERE  ID = ?",new  Object[]{ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),group,user.getLong("ID")});  Contact.dao.getContactDirect().get(user.getLong("ID")).addEntry("REMARK",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim()).addEntry("GROUP_NAME",group);}}} );
+					RetrofitRegistry.get(ContactService.class).update(user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue( new  AbstractRetrofit2Callback<Void>(this){public  void  onResponse(Call<Void>  call,Response<Void>  response){ if(response.code() == 200){showSneakerWindow(Sneaker.with(SubscribeActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen);  Contact.dao.update("UPDATE  "+Contact.dao.getDataSourceBind().table()+"  SET  REMARK = ?,GROUP_NAME = ?  WHERE  ID = ?",new  Object[]{ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),group,user.getLong("ID")});  Contact.dao.getContactDirect().get(user.getLong("ID")).addEntry("REMARK",ObjectUtils.cast(SubscribeActivity.this.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim()).addEntry("GROUP_NAME",group);}}} );
 				}
 			}
 		}

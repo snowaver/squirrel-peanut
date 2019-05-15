@@ -42,6 +42,7 @@ import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.user.User;
+import cc.mashroom.squirrel.module.home.activity.ContactProfileActivity;
 import  cc.mashroom.squirrel.module.home.activity.SubscribeActivity;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.parent.AbstractFragment;
@@ -66,7 +67,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextVi
 		{
 			contentView = inflater.inflate( R.layout.fragment_discovery,container,false );
 
-			ObjectUtils.cast(contentView.findViewById(R.id.discovery_list),ListView.class).setOnItemClickListener( (parent,view,position,id) -> {User  user = ObjectUtils.cast(parent.getAdapter().getItem(position),User.class);  ActivityCompat.startActivity(super.getActivity(),new  Intent(super.getActivity(),SubscribeActivity.class).putExtra("USER",user),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle());} );
+			ObjectUtils.cast(contentView.findViewById(R.id.discovery_list),ListView.class).setOnItemClickListener( (parent,view,position,id) -> {User  user = ObjectUtils.cast(parent.getAdapter().getItem(position),User.class);  ActivityCompat.startActivity(super.getActivity(),new  Intent(super.getActivity(),ContactProfileActivity.class).putExtra("USER",user),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle());} );
 
 			ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor).findViewById(R.id.edit_inputor),EditText.class).setOnEditorActionListener( this );
 		}
