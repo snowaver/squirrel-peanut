@@ -185,7 +185,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		}
 		else
 		{
-			showSneakerWindow( new  Sneaker(this),com.irozon.sneaker.R.drawable.ic_warning,StringUtils.isBlank(name) ? R.string.content_empty_error : R.string.contact_group_exist,R.color.white,R.color.red );
+			showSneakerWindow( new  Sneaker(this),com.irozon.sneaker.R.drawable.ic_warning,StringUtils.isBlank(name) ? R.string.content_empty : R.string.contact_group_exist,R.color.white,R.color.red );
 		}
 	}
 

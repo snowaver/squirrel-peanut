@@ -123,7 +123,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextVi
 			}
 			else
 			{
-				ObjectUtils.cast(this.getActivity(),AbstractActivity.class).showSneakerWindow( Sneaker.with(this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,R.string.content_empty_error,R.color.white,R.color.red );
+				ObjectUtils.cast(this.getActivity(),AbstractActivity.class).showSneakerWindow( Sneaker.with(this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,R.string.content_empty,R.color.white,R.color.red );
 			}
 		}
 
