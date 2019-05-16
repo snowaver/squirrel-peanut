@@ -15,19 +15,29 @@
  */
 package cc.mashroom.squirrel.module.home.activity;
 
+import  android.content.DialogInterface;
 import  android.content.Intent;
 import  android.os.Bundle;
+import  android.view.LayoutInflater;
 import  android.widget.Button;
+import  android.widget.EditText;
+import  android.widget.ListView;
+import  android.widget.TextView;
 
 import  androidx.annotation.Nullable;
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
+import  androidx.core.content.res.ResourcesCompat;
 
+import  com.aries.ui.widget.alert.UIAlertDialog;
 import  com.fasterxml.jackson.core.type.TypeReference;
+import  com.google.android.material.bottomsheet.BottomSheetBehavior;
+import  com.google.android.material.bottomsheet.BottomSheetDialog;
 import  com.google.common.collect.Lists;
 import  com.irozon.sneaker.Sneaker;
 
 import  cc.mashroom.hedgehog.module.common.activity.EditorActivity;
+import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
@@ -35,21 +45,26 @@ import  cc.mashroom.squirrel.client.storage.model.user.User;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.common.services.ContactService;
+import  cc.mashroom.squirrel.module.home.adapters.ContactGroupAdapter;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
 import  cc.mashroom.util.collection.map.Map;
+import  cn.refactor.library.SmoothCheckBox;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
-public  class  ContactProfileEditActivity     extends  AbstractActivity
+public  class  ContactProfileEditActivity     extends  AbstractActivity   implements     DialogInterface.OnClickListener,SmoothCheckBox.OnCheckedChangeListener
 {
-	@Accessors( chain = true )
-	@Setter
-	private  User  user;
+    @Accessors( chain = true )
+    @Setter
+	private  BottomSheetDialog   bottomSheet;
+    @Accessors( chain = true )
+    @Setter
+    private  User  user;
 
 	private cc.mashroom.util.collection.map.Map<Integer,Integer> buttonTexts = new HashMap<Integer,Integer>().addEntry(0,R.string.subscribe_add_contact).addEntry(1,R.string.subscribe_accept_request).addEntry(6,R.string.message).addEntry( 7,R.string.message );
 
@@ -65,6 +80,8 @@ public  class  ContactProfileEditActivity     extends  AbstractActivity
 
 		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : "" );
 
+        ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setOnClickListener( (button) -> this.bottomSheet.show() );
+
 		if( contact  != null )
 		{
 			if( contact.getInteger("SUBSCRIBE_STATUS") == 0 )
@@ -74,6 +91,8 @@ public  class  ContactProfileEditActivity     extends  AbstractActivity
 
 			ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText(buttonTexts.get(contact.getInteger("SUBSCRIBE_STATUS")) );
 		}
+
+        this.addBottomSheet();
 
 		ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setText( user.getString(StringUtils.isBlank(user.getString("REMARK")) ? "NICKNAME" : "REMARK") );
 
@@ -127,4 +146,52 @@ public  class  ContactProfileEditActivity     extends  AbstractActivity
 			}
 		}
 	}
+
+    public  void  onCheckedChanged( SmoothCheckBox  smoothCheckbox , boolean  isNewGroupChecked )
+    {
+        if( isNewGroupChecked)
+        {
+            this.bottomSheet.hide();
+
+            this.onActivityResult( 1,0,new  Intent().putExtra("GROUP_NAME",ObjectUtils.cast(ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getChoiceListener().getChecked().get()) );
+        }
+    }
+
+    public  void  onClick( DialogInterface  dialog , int  i )
+    {
+        String  name = ObjectUtils.cast(ObjectUtils.cast(dialog,UIAlertDialog.class).getContentView().findViewById(R.id.edit_inputor), EditText.class).getText().toString().trim();
+
+        if( StringUtils.isNotBlank(name) && !ObjectUtils.cast(ObjectUtils.cast(bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getGroups().contains(name) )
+        {
+            ObjectUtils.cast(ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).addNewGroup(name,true).notifyDataSetChanged();
+
+            this.onActivityResult( 1,0,new  Intent().putExtra("GROUP_NAME", name) );
+        }
+        else
+        {
+            super.showSneakerWindow( new  Sneaker(this),com.irozon.sneaker.R.drawable.ic_warning , StringUtils.isBlank(name) ? R.string.content_empty : R.string.contact_group_exist,R.color.white,R.color.red );
+        }
+    }
+
+    private  void   addGroup()
+    {
+        ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.contact_add_to_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(dialog,which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.finish,this).create().setWidth((int)  (ContactProfileEditActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)), ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
+    }
+
+	private  void   addBottomSheet()
+    {
+        Contact  contact = Contact.dao.getContactDirect().get( user.getLong("ID") );
+
+        (this.bottomSheet = new  BottomSheetDialog(this)).setContentView(   LayoutInflater.from(this).inflate(R.layout.activity_switch_contact_group, null ) );
+        //  swiping  down  event  on  bottom  sheet  dialog  is  conflict  with  sliding  down  event  on  listview,  so  set  bottom  sheet  dialog's  behavior  as  non-hideable.
+        BottomSheetBehavior.from(this.bottomSheet.findViewById( R.id.design_bottom_sheet )).setHideable( false );
+
+        ObjectUtils.cast(this.bottomSheet.findViewById(R.id.add_to_new_group_button),TextView.class).setOnClickListener(   (addNewGroupButton) -> addGroup() );
+
+        ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).setAdapter( new  ContactGroupAdapter(this,this) );
+
+        ObjectUtils.cast(ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getChoiceListener().getChecked().set( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
+
+        ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).setOnItemClickListener( (parent,view,position,id ) -> ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( true ) );
+    }
 }

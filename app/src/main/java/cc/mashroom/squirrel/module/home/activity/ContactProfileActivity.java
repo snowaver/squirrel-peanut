@@ -125,17 +125,6 @@ public  class ContactProfileActivity extends  AbstractPacketListenerActivity  im
 		/*
 		super.findViewById(R.id.grouping).setOnClickListener( (groupSelector)-> bottomSheet.show() );
 
-		this.setBottomSheet(new  BottomSheetDialog(this)).getBottomSheet().setContentView( LayoutInflater.from( this ).inflate(R.layout.activity_switch_contact_group, null ) );
-		//  swiping  down  event  on  bottom  sheet  dialog  is  conflict  with  sliding  down  event  on  listview,   so  set  bottom  sheet  dialog's  behavior  non-hideable.
-		BottomSheetBehavior.from(this.getBottomSheet().findViewById( R.id.design_bottom_sheet )).setHideable(  false );
-
-		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.add_to_new_group_button),TextView.class).setOnClickListener( (addGroupButton) -> addGroup() );
-
-		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setAdapter( new  ContactGroupAdapter(this,this) );
-
-		ObjectUtils.cast(ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getChoiceListener().getChecked().set( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
-
-		ObjectUtils.cast(this.getBottomSheet().findViewById(R.id.contact_groups),ListView.class).setOnItemClickListener( ( parent, view, position, id ) -> ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( true ) );
 		*/
         if( contact   != null )
 		{

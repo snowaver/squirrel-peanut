@@ -45,7 +45,7 @@ public  class        ContactGroupAdapter  extends  BaseAdapter
 
         Stream.forEach( Contact.dao.search("SELECT  DISTINCT(GROUP_NAME)  AS  GROUP_NAME  FROM  "+Contact.dao.getDataSourceBind().table()+"  WHERE  (GROUP_NAME  !=  ''  AND  GROUP_NAME  IS  NOT  NULL)"),(contact) -> super.items.add(contact.getString("GROUP_NAME")) );
 
-        this.setContext(context).setChoiceListener(new  SinglechoiceListener<String>(this,listener)).getChoiceListener().getChecked().set( ObjectUtils.cast(super.items.get(0)) );
+        this.setContext(context).setChoiceListener(new  SinglechoiceListener<String>(this,listener)).getChoiceListener().getChecked().set( super.items.isEmpty() ? "" : ObjectUtils.cast(super.items.get(0)) );
     }
 
     public  ContactGroupAdapter  addNewGroup(     String  groupName , boolean  checked )
@@ -82,6 +82,8 @@ public  class        ContactGroupAdapter  extends  BaseAdapter
 
         ObjectUtils.cast(convertView.findViewById(R.id.checkbox),SmoothCheckBox.class).setTag( super.getItem(position) );
 
-        ObjectUtils.cast(convertView.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( ObjectUtils.cast(super.getItem(position),String.class).equals(choiceListener.getChecked().get().toString()) );  return  convertView;
+        ObjectUtils.cast(convertView.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked( ObjectUtils.cast(super.getItem(position),String.class).equals(choiceListener.getChecked().get().toString()) );
+
+        convertView.setBackgroundColor( context.getResources().getColor(ObjectUtils.cast(convertView.findViewById(R.id.checkbox),SmoothCheckBox.class).isChecked() ? R.color.lightgray : R.color.white) );  return  convertView;
     }
 }
