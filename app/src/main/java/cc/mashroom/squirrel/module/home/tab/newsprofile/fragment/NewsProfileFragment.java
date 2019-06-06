@@ -33,6 +33,8 @@ import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.client.storage.model.user.User;
+import cc.mashroom.squirrel.module.home.activity.ContactProfileActivity;
+import cc.mashroom.squirrel.module.home.activity.ContactProfileEditActivity;
 import  cc.mashroom.squirrel.module.home.activity.SubscribeActivity;
 import  cc.mashroom.squirrel.parent.AbstractPacketListenerFragment;
 import  cc.mashroom.squirrel.module.chat.activity.ChatActivity;
@@ -84,14 +86,14 @@ public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  imp
 		{
 			Contact  contact = Contact.dao.getContactDirect().get( newsProfile.getLong( "CONTACT_ID" ) );
 
-            ActivityCompat.startActivity( this.getActivity(),new  Intent(this.getActivity(),SubscribeActivity.class).putExtra("USER",new  User().addEntry("ID",newsProfile.getLong("CONTACT_ID")).addEntry("USERNAME",contact.getString("USERNAME")).addEntry("NICKNAME",contact.getString("REMARK"))),ActivityOptionsCompat.makeCustomAnimation(this.getActivity(),R.anim.right_in,R.anim.left_out).toBundle() );
+            ActivityCompat.startActivity( this.getActivity(),new  Intent(this.getActivity(),ContactProfileEditActivity.class).putExtra("USER",new  User().addEntry("ID",newsProfile.getLong("CONTACT_ID")).addEntry("USERNAME",contact.getString("USERNAME")).addEntry("NICKNAME",contact.getString("REMARK"))),ActivityOptionsCompat.makeCustomAnimation(this.getActivity(),R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 		else
 		if( PAIPPacketType.valueOf(newsProfile.getShort("PACKET_TYPE")) == PAIPPacketType.SUBSCRIBE && Integer.parseInt(newsProfile.getString("CONTENT")) == 0 )
 		{
 			Contact  contact = Contact.dao.getContactDirect().get( newsProfile.getLong( "CONTACT_ID" ) );
 
-			ActivityCompat.startActivity( this.getActivity(),new  Intent(this.getActivity(),SubscribeActivity.class).putExtra("USER",new  User().addEntry("ID",newsProfile.getLong("CONTACT_ID")).addEntry("USERNAME",contact.getString("USERNAME")).addEntry("REMARK"  ,contact.getString("REMARK"))),ActivityOptionsCompat.makeCustomAnimation(this.getActivity(),R.anim.right_in,R.anim.left_out).toBundle() );
+			ActivityCompat.startActivity( this.getActivity(),new  Intent(this.getActivity(),ContactProfileEditActivity.class).putExtra("USER",new  User().addEntry("ID",newsProfile.getLong("CONTACT_ID")).addEntry("USERNAME",contact.getString("USERNAME")).addEntry("REMARK"  ,contact.getString("REMARK"))),ActivityOptionsCompat.makeCustomAnimation(this.getActivity(),R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 	}
 

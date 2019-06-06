@@ -44,7 +44,7 @@ import  net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventLis
 
 import  androidx.core.content.res.ResourcesCompat;
 
-import java.io.Serializable;
+import  java.io.Serializable;
 
 import  cc.mashroom.hedgehog.module.common.activity.EditorActivity;
 import  cc.mashroom.hedgehog.util.ContextUtils;
@@ -122,10 +122,7 @@ public  class ContactProfileActivity extends  AbstractPacketListenerActivity  im
 		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button), Button.class).setOnClickListener(   this );
 
 		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
-		/*
-		super.findViewById(R.id.grouping).setOnClickListener( (groupSelector)-> bottomSheet.show() );
 
-		*/
         if( contact   != null )
 		{
 			ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText(buttonTexts.get(contact.getInteger("SUBSCRIBE_STATUS")) );
@@ -156,12 +153,7 @@ public  class ContactProfileActivity extends  AbstractPacketListenerActivity  im
         	application().getMainLooperHandler().post( () ->{ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setBackgroundColor( super.getResources().getColor( R.color.limegreen ) );       ObjectUtils.cast(super.findViewById(R.id.subscribe_button),Button.class).setText(super.getResources().getText(R.string.message));} );
         }
     }
-	/*
-	private  void    addGroup()
-	{
-		ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(ContactProfileActivity.this).setBackgroundRadius(15).setTitle(R.string.contact_add_to_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(dialog, which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (ContactProfileActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
-	}
-	*/
+
 	public  void  onClick( DialogInterface  dialog , int  i )
 	{
 		String  name=ObjectUtils.cast(ObjectUtils.cast(dialog,UIAlertDialog.class).getContentView().findViewById(R.id.edit_inputor),EditText.class).getText().toString().trim();

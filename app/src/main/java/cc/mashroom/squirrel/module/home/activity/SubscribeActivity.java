@@ -194,7 +194,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 		if( clickedView.getId() == R.id.subscribe_button    )
 		{
 			Contact  contact     = Contact.dao.getContactDirect().get(  this.getUser().getLong("ID") );
-
+			/*
 			if( contact!=null )
 			{
 				ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).clearFocus();
@@ -285,6 +285,7 @@ public  class  SubscribeActivity  extends  AbstractPacketListenerActivity  imple
 					}
 				}
 			}
+			*/
 		}
 	}
 

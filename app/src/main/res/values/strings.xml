@@ -93,9 +93,9 @@
     <string  name="start_to_chat">START TO CHAT</string>
     <string  name="subscribe_add_contact">ADD AS CONTACT</string>
     <string  name="subscribe_contact_added">CONTACT ADDED, START TO CHAT</string>
-    <string  name="subscribe_form_error">REMARK OR GROUP EMPTY</string>
+    <string  name="subscribe_form_error">REMARK OR GROUP IS EMPTY</string>
     <string  name="subscribe_received_a_adding_contact_request">REQUESTING TO ADD YOU AS CONTACT</string>
-    <string  name="subscribe_request_sent">SUBSCRIBE REQUEST SENT</string>
+    <string  name="subscribe_request_sent">SUBSCRIBE REQUEST HAS BEEN SENT</string>
     <string  name="subscribe_accept_request">ACCEPT REQUEST</string>
     <string  name="system_settings">SYSTEM SETTINGS</string>
     <string  name="unknown_error">UNKNOWN ERROR</string>

@@ -34,11 +34,11 @@ public  interface  ContactService
 
 	@FormUrlEncoded
 	@POST( value="/contact/status" )
-	public  Call<Void>  subscribe( @Field(value="subscribeeId")  long  subscribeeId,@Field(value="remark")  String  remark,@Field(value = "group") String group);
+	public  Call<Contact>  subscribe( @Field(value="subscribeeId")  long  subscribeeId,@Field(value="remark")  String  remark,@Field(value = "group")  String  group );
 
 	@FormUrlEncoded
 	@PUT(  value="/contact/status" )
-	public  Call<Void>  changeSubscribeStatus( @Field(value="status")  int  status,@Field(value="subscriberId")  long  subscriberId,@Field(value="remark")  String  remark,@Field(value="group")  String  group );
+	public  Call<Contact>  changeSubscribeStatus( @Field(value="status")  int  status,@Field(value="subscriberId")  long  subscriberId,@Field(value="remark")  String  remark,@Field(value="group")  String  group );
 
 	@DELETE(  value="/contact/status" )
 	public  Call<Void>  unsubscribe( @Field(value="unsubscribeeId")  long  unsubscribeeId );
