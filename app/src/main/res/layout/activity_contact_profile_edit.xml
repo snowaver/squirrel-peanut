@@ -3,7 +3,9 @@
 
     <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  app:backText="@string/goback"  android:title="@string/edit"  android:background="@color/steelblue"  app:immersive="true"  app:backDrawable="@drawable/lt_all"></cc.mashroom.hedgehog.widget.HeaderBar>
 
-    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/username"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:background="@color/white"  android:textAlignment="viewEnd"  android:title="@string/username"  android:textColor="@color/darkgray"  app:mode="EXTERNAL"  app:showRightArrow="true"  app:rightArrowDirection="left"></cc.mashroom.hedgehog.widget.StyleableEditView>
+    <TextView  android:layout_width="match_parent"  android:layout_height="30dp"  android:layout_marginTop="1px"  android:textColor="@color/darkgray"  android:textSize="14dp"  android:text="@string/contact_edit_note"  android:gravity="center"/>
+
+    <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/username"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/white"  android:textAlignment="viewEnd"  android:title="@string/username"  android:textColor="@color/darkgray"  app:mode="EXTERNAL"  app:showRightArrow="true"  app:rightArrowDirection="left"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
     <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/nickname"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:background="@color/white"  android:textAlignment="viewEnd"  android:title="@string/nickname"  android:textColor="@color/darkgray"  app:mode="EXTERNAL"  app:showRightArrow="true"  app:rightArrowDirection="left"></cc.mashroom.hedgehog.widget.StyleableEditView>
 

@@ -37,6 +37,7 @@
     <string  name="connectionless">无连接</string>
     <string  name="contact">联系人</string>
     <string  name="contact_add_to_new_group">添加到新分组</string>
+    <string  name="contact_edit_note">可编辑备注或分组</string>
     <string  name="contact_group_default_name">默认分组</string>
     <string  name="contact_group_exist">分组已存在</string>
     <string  name="contact_list">联系人列表</string>

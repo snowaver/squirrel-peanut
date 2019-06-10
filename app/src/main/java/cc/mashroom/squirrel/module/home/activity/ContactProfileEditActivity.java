@@ -203,7 +203,7 @@ public  class  ContactProfileEditActivity  extends  AbstractActivity  implements
 
 									if( response.code()==200)
 									{
-										Contact.dao.upsert(ObjectUtils.cast(response.body().valuesToLong(    "ID").valuesToTimestamp("CREATE_TIME","LAST_MODIFY_TIME")) ,   true );
+										Contact.dao.upsert( ObjectUtils.cast(contact.addEntries(response.body()).valuesToLong("ID").valuesToTimestamp("LAST_MODIFY_TIME")), true );
 
 										ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button).setBackgroundColor(        ContactProfileEditActivity.this.getResources().getColor(R.color.gainsboro) );
 
@@ -235,7 +235,7 @@ public  class  ContactProfileEditActivity  extends  AbstractActivity  implements
 
 									if( response.code()==200)
 									{
-										Contact.dao.upsert(ObjectUtils.cast(response.body().valuesToLong(    "ID").valuesToTimestamp("CREATE_TIME","LAST_MODIFY_TIME")) ,   true );
+										Contact.dao.upsert(ObjectUtils.cast(response.body().valuesToLong(    "ID").valuesToTimestamp(   "CREATE_TIME","LAST_MODIFY_TIME")), true );
 
 										ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(   ContactProfileEditActivity.this.getResources().getColor(R.color.gainsboro) );
 

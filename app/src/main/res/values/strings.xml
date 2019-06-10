@@ -37,6 +37,7 @@
     <string  name="connectionless">NO CONNECT</string>
     <string  name="contact">CONTACT</string>
     <string  name="contact_add_to_new_group">ADD TO NEW GROUP</string>
+    <string  name="contact_edit_note">REMARK/GROUPING IS EDITABLE</string>
     <string  name="contact_group_default_name">DEFAULTS</string>
     <string  name="contact_group_exist">GROUP EXIST</string>
     <string  name="contact_list">CONTACTS</string>

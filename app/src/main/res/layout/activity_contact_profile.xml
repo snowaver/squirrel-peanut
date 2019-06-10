@@ -3,7 +3,7 @@
 
     <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  app:backText="@string/goback"  android:title="@string/profile"  android:background="@color/steelblue"  app:immersive="true"  app:backDrawable="@drawable/lt_all"  app:additionalDrawable="@drawable/plus"></cc.mashroom.hedgehog.widget.HeaderBar>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout  android:layout_width="match_parent"  android:layout_height="0dp"      android:layout_weight="1"  android:background="@color/lightgray">
+    <androidx.coordinatorlayout.widget.CoordinatorLayout  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"  android:layout_marginTop="1px"  android:background="@color/lightgray">
 
         <com.google.android.material.appbar.AppBarLayout  android:id="@+id/collapsing_bar_layout"  android:layout_width="match_parent"  android:layout_height="wrap_content">
 
@@ -19,7 +19,7 @@
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-        </com.google.android.material.appbar.AppBarLayout >
+        </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.core.widget.NestedScrollView  android:layout_width="match_parent"  android:layout_height="match_parent"  app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
