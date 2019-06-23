@@ -103,7 +103,7 @@ public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter
 		else
 		if( ChatContentType.valueOf(message.getInteger("CONTENT_TYPE")) == ChatContentType.AUDIO )
 		{
-			ObjectUtils.cast(contentSwitcher.setDisplayedChild(2).getDisplayedChild().findViewById(R.id.voice_duration),TextView.class).setText( new  DateTime(Long.parseLong(message.getString("CONTENT")),DateTimeZone.UTC).toString( "ss" ) );
+			ObjectUtils.cast(contentSwitcher.setDisplayedChild(2).getDisplayedChild().findViewById(R.id.content),TextView.class).setText( new  DateTime(Long.parseLong(message.getString("CONTENT")),DateTimeZone.UTC).toString( "ss" ) );
 
 			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> { try{ new  MediaPlayer().play(new  File(context.application().getCacheDir(), "file/"+message.getString("MD5")).getPath(),null,null); }catch( IOException  ie ){} } );
 		}

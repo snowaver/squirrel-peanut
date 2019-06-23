@@ -1,7 +1,7 @@
 <?xml  version="1.0"  encoding="utf-8"?>
 <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"  android:background="@color/lightgray"  android:fitsSystemWindows="true">
 
-    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  app:backText="@string/goback"  android:title="@string/profile"  android:background="@color/steelblue"  app:immersive="true"  app:backDrawable="@drawable/lt_all"  app:additionalDrawable="@drawable/plus"></cc.mashroom.hedgehog.widget.HeaderBar>
+    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:title="@string/profile"  android:background="@color/steelblue"  app:immersive="true"  app:backDrawable="@drawable/lt_all"  app:additionalDrawable="@drawable/plus"></cc.mashroom.hedgehog.widget.HeaderBar>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"  android:layout_marginTop="1px"  android:background="@color/lightgray">
 

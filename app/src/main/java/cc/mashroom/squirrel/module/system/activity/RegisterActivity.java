@@ -28,7 +28,6 @@ import  android.widget.Button;
 
 import  com.aries.ui.widget.BasisDialog;
 import  com.aries.ui.widget.action.sheet.UIActionSheetDialog;
-import  com.aries.ui.widget.alert.UIAlertDialog;
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.fasterxml.jackson.core.type.TypeReference;
 import  com.irozon.sneaker.Sneaker;
@@ -40,6 +39,8 @@ import  java.io.File;
 import  java.util.List;
 
 import  androidx.core.content.res.ResourcesCompat;
+
+import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
@@ -98,7 +99,7 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 				{
 					public  void  onResponse(   Call<Void>  call,Response<Void>  response )
 					{
-						super.onResponse(        call , response );
+						super.onResponse(       call , response );
 
 						if( response.code() != 200 )
 						{
@@ -106,7 +107,7 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 						}
 						else
 						{
-							ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(RegisterActivity.this).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.register_registered).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog,which) -> putResultDataAndFinish(RegisterActivity.this,0,new  Intent().putExtra("USERNAME",ObjectUtils.cast(RegisterActivity.this.findViewById(R.id.username),StyleableEditView.class).getText().toString().trim()))).create().setWidth((int)  (RegisterActivity.this.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(RegisterActivity.this,R.font.droid_sans_mono)).show();
+							showSneakerWindow(Sneaker.with(RegisterActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(RegisterActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success       ,R.string.register_registered,R.color.white,R.color.limegreen );
 						}
 					}
 				}

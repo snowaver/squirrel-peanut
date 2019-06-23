@@ -51,7 +51,6 @@ import  cc.mashroom.squirrel.module.chat.activity.VideoCallActivity;
 import  cc.mashroom.squirrel.module.system.activity.LoadingActivity;
 import  cc.mashroom.squirrel.module.system.activity.LoginActivity;
 import  cc.mashroom.squirrel.module.system.activity.RegisterActivity;
-import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.squirrel.paip.message.call.CallContentType;
 import  cc.mashroom.squirrel.paip.message.chat.ChatContentType;
 import  cc.mashroom.squirrel.paip.message.connect.DisconnectAckPacket;
@@ -69,11 +68,9 @@ import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.call.CallPacket;
 import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
-import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.NoopHostnameVerifier;
 import  cc.mashroom.util.NoopX509TrustManager;
 import  cc.mashroom.util.ObjectUtils;
-import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
 import  cc.mashroom.util.collection.map.Map;
 import  cc.mashroom.util.stream.Stream;
@@ -94,7 +91,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  static  List<String>  BALANCING_PROXY_BACKUP_ADDRESSES       = Lists.newArrayList( "118.24.16.67", "118.24.19.163","118.25.216.217" );
 
-    public  static  final  Map<String,Integer>  PLACEHOLDER_PROFILES = new  HashMap<String,Integer>().addEntry(ChatContentType.IMAGE.getPlaceholder(),R.string.chat_image_message).addEntry(ChatContentType.AUDIO.getPlaceholder(),R.string.chat_audio_message).addEntry(ChatContentType.VIDEO.getPlaceholder(),R.string.chat_video_message).addEntry( "$(0707)",R.string.subscribe_contact_added );
+    public  static  final  Map<String,Integer>  NEWS_PROFILE_PLACEHOLDERS = new  HashMap<String,Integer>().addEntry(ChatContentType.IMAGE.getPlaceholder(),R.string.chat_image_message).addEntry(ChatContentType.AUDIO.getPlaceholder(),R.string.chat_audio_message).addEntry(ChatContentType.VIDEO.getPlaceholder(),R.string.chat_video_message).addEntry("$(0707)",R.string.subscribe_contact_added).addEntry("$(0e00)",R.string.audio_call).addEntry( "$(0e01)",R.string.video_call );
 
     @SneakyThrows
 	public  void  onCreate()
@@ -271,7 +268,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		else
 		if( receivedPacket instanceof   ChatPacket )
 		{
-			PushServiceNotifier.INSTANCE.notify( ObjectUtils.cast(new  NewsProfile().addEntry("CONTACT_ID",ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId()).addEntry("CREATE_TIME",DateTime.now().toString("yyyy-MM-dd HH:mm:ss")).addEntry("CONTENT",((ChatPacket) receivedPacket).getContentType() == ChatContentType.WORDS ? new  String(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContent()) : super.getString(PLACEHOLDER_PROFILES.get("&"+StringUtils.leftPad(Integer.toHexString(PAIPPacketType.CHAT.getValue()),2,"0")+StringUtils.leftPad(Integer.toHexString(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType().getValue()),2,"0")+";")))) );
+			PushServiceNotifier.INSTANCE.notify( ObjectUtils.cast(new  NewsProfile().addEntry("CONTACT_ID",ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId()).addEntry("CREATE_TIME",DateTime.now().toString("yyyy-MM-dd HH:mm:ss")).addEntry("CONTENT",ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType() == ChatContentType.WORDS ? new  String(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContent()) : super.getString(NEWS_PROFILE_PLACEHOLDERS.get(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType().getPlaceholder())))) );
 		}
 	}
 }

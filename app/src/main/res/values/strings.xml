@@ -7,12 +7,12 @@
     <string  name="call_calling">IN CALLING</string>
     <string  name="call_canceled">CANCELED</string>
     <string  name="call_closed">CLOSED</string>
-    <string  name="call_no_response">NO RESPOSNE</string>
-    <string  name="call_peer_canceled">PEER CANCELED</string>
+    <string  name="call_no_response">NO PEER\'S RESPONSE</string>
+    <string  name="call_peer_canceled">PEER CANCELED CALL</string>
     <string  name="call_peer_closed">CLOSED</string>
     <string  name="call_peer_demand_a_audio_call_with_you">REQUESTING A VOICE CALL</string>
     <string  name="call_peer_demand_a_video_call_with_you">REQUESTING A VIDEO CALL</string>
-    <string  name="call_peer_rejected">PEER REJECTED</string>
+    <string  name="call_peer_rejected">PEER REJECTED CALL</string>
     <string  name="call_rejected">REJECTED</string>
     <string  name="call_room_not_found">ROOM NOT FOUND</string>
     <string  name="call_state_error">STATE ERROR</string>
@@ -75,14 +75,15 @@
     <string  name="notification_received_a_new_message">RECEIVED A NEW MESSAGE</string>
     <string  name="password">PASSWORD</string>
     <string  name="password_confirm">PASSWORD CONFIRM</string>
-    <string  name="portrait_hidden">PORTRAIT HIDE, VIEW BY DRAG</string>
+    <string  name="portrait_hidden">DROPDOWN TO VIEW PORTRAIT</string>
     <string  name="profile">PROFILE</string>
     <string  name="program_running">PROGRAM IS RUNNING</string>
+    <string  name="recall">RECALL</string>
     <string  name="register">REGISTER</string>
     <string  name="register_form_error">NOTICE: ANY INPUT EMPTY OR TWO INPUT PASSWORDS NOT CONSISTENT</string>
     <string  name="register_register_if_no_account">NO ACCOUNT? REGISTER A NEW ONE</string>
-    <string  name="register_registered">REGISTERD AND RETURN</string>
-    <string  name="register_username_registered">USERNAME REGISTERED</string>
+    <string  name="register_registered">REGISTERD SUCCESSFULLY, RETURNING</string>
+    <string  name="register_username_registered">USERNAME HAS BEEN REGISTERED</string>
     <string  name="remark">REMARK</string>
     <string  name="resend">RESEND</string>
     <string  name="scan">SCAN</string>
@@ -105,7 +106,6 @@
     <string  name="video_call">VIDEO CALL</string>
     <string  name="waiting">WAITING</string>
     <string  name="warning">WARNING</string>
-    <string  name="withdraw">WITHDRAW</string>
     <string-array  name="group_chat_details_list">
         <item>MEMBER</item><item>INVITE</item>
     </string-array>

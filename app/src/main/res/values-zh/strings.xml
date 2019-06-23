@@ -78,6 +78,7 @@
     <string  name="portrait_hidden">注：若头像隐藏，可滑动查看</string>
     <string  name="profile">详情</string>
     <string  name="program_running">程序正在运行，点击打开应用。。。</string>
+    <string  name="recall">撤回</string>
     <string  name="register">注册</string>
     <string  name="register_form_error">账号，昵称以及密码不得为空，并且两次输入密码必须相同</string>
     <string  name="register_register_if_no_account">您还没有账号的话，点此注册一个吧</string>
@@ -105,7 +106,6 @@
     <string  name="video_call">视频通话</string>
     <string  name="waiting">请您稍等。。。</string>
     <string  name="warning">警告</string>
-    <string  name="withdraw">撤回</string>
     <string-array  name="group_chat_details_list">
         <item>查看成员</item><item>邀请好友</item>
     </string-array>

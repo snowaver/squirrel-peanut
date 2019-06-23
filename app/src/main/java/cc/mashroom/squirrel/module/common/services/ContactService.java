@@ -41,10 +41,10 @@ public  interface  ContactService
 	public  Call<Contact>  changeSubscribeStatus( @Field(value="status")  int  status,@Field(value="subscriberId")  long  subscriberId,@Field(value="remark")  String  remark,@Field(value="group")  String  group );
 
 	@DELETE(  value="/contact/status" )
-	public  Call<Void>  unsubscribe( @Field(value="unsubscribeeId")  long  unsubscribeeId );
+	public  Call<Contact>  unsubscribe( @Field(value="unsubscribeeId")  long  unsubscribeeId );
 
 	@FormUrlEncoded
 	@PUT( value="/contact" )
-	public  Call<Void>  update( @Field(value="contactId")  long  contactId,@Field(value="remark")  String  remark,@Field(value="group")  String  group );
+	public  Call<Contact>  update( @Field(value="contactId")  long  contactId,@Field(value="remark")  String  remark,@Field(value="group")  String  group );
 
 }

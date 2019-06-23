@@ -5,7 +5,7 @@
 
         <LinearLayout  android:tag="content"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical">
 
-            <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  app:immersive="true"  app:additionalText="@string/option"></cc.mashroom.hedgehog.widget.HeaderBar>
+            <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  app:immersive="true"  app:additionalDrawable="@drawable/plus"></cc.mashroom.hedgehog.widget.HeaderBar>
 
             <cc.mashroom.hedgehog.widget.NoTouchFlipViewPager  android:id="@+id/tab_content"  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"  android:background="@color/lightgray"></cc.mashroom.hedgehog.widget.NoTouchFlipViewPager>
 

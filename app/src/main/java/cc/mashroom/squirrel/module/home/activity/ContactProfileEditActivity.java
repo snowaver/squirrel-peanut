@@ -112,24 +112,24 @@ public  class  ContactProfileEditActivity  extends  AbstractActivity  implements
 
         this.addBottomSheet();
 
-		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setOnClickListener( (button) -> this.bottomSheet.show() );
+		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setOnClickListener(   (button) -> this.bottomSheet.show()  );
 
 		ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setText( user.getString(StringUtils.isBlank(user.getString("REMARK")) ? "NICKNAME" : "REMARK") );
 
-		this.remarkBottomSheetEditor = new  BottomSheetEditor(this,16).withText(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText()).setOnEditCompleteListener( (remark) -> ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setText(remark) );
+		this.remarkBottomSheetEditor = new  BottomSheetEditor(this,16).withText(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText()).setOnEditCompleteListener( (remark) -> onActivityResult(0,0,new  Intent().putExtra("EDIT_CONTENT", remark.toString())) );
 
 		this.newGroupBottomSheetEditor = new  BottomSheetEditor(this,16).withText("").setOnEditCompleteListener( (group)-> onNewGroupAdded(group.toString()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setOnClickListener( (editorView) -> this.remarkBottomSheetEditor.withText(ObjectUtils.cast(editorView,StyleableEditView.class).getText()).show() );
 	}
 
-	public  void  responsed( Response<Void>  response,Contact  contact,Map<String,Object>  data )
+	public  void  responsed( Response<Contact>  response,Contact  old )
 	{
 		if( response.code() == 200 )
 		{
-			super.showSneakerWindow( Sneaker.with(this),           com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen );
+			Contact.dao.upsert(      ObjectUtils.cast(new  Contact().addEntries(old).addEntries(response.body()).valuesToLong("ID").valuesToTimestamp("LAST_MODIFY_TIME")) ,true );
 
-			Contact.dao.upsert(    ObjectUtils.cast(new  Contact().addEntries(contact).addEntries(data)) , true );
+			super.showSneakerWindow( Sneaker.with(this),           com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen );
 		}
 		else
 		{
@@ -145,9 +145,9 @@ public  class  ContactProfileEditActivity  extends  AbstractActivity  implements
 		{
 			return;
 		}
-
+		/*
 		Map<String,Object>  upsertData = new  HashMap<String,Object>();
-
+		*/
 		Contact  contact = Contact.dao.getContactDirect().get( user.getLong("ID") );
 
 		if( requestCode == 0 )
@@ -159,14 +159,14 @@ public  class  ContactProfileEditActivity  extends  AbstractActivity  implements
 		{
 			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( data.getStringExtra("GROUP_NAME") );
 		}
-
+		/*
 		upsertData.addEntry("ID",user.getLong("ID")).addEntry("REMARK",ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText()).addEntry( "GROUP_NAME",ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText() );
-
+		*/
 		if( contact  != null )
 		{
 			if( !ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim().equals(contact.getString("REMARK")) || !ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().equals(contact.getString("GROUP_NAME")) )
 			{
-				RetrofitRegistry.get(ContactService.class).update(user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue(new  AbstractRetrofit2Callback<Void>(this){public  void  onResponse(Call<Void>  call,Response<Void>  response){ responsed(response,contact,upsertData); }} );
+				RetrofitRegistry.get(ContactService.class).update(user.getLong("ID"),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue(new  AbstractRetrofit2Callback<Contact>(this){public  void  onResponse(Call<Contact>  call,Response<Contact>  response){ responsed(response,contact); }} );
 			}
 		}
 	}
@@ -205,7 +205,9 @@ public  class  ContactProfileEditActivity  extends  AbstractActivity  implements
 									{
 										Contact.dao.upsert( ObjectUtils.cast(contact.addEntries(response.body()).valuesToLong("ID").valuesToTimestamp("LAST_MODIFY_TIME")), true );
 
-										ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button).setBackgroundColor(        ContactProfileEditActivity.this.getResources().getColor(R.color.gainsboro) );
+										ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button).setBackgroundColor(       ContactProfileEditActivity.this.getResources().getColor(R.color.limegreen) );
+
+										ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button),Button.class).setText(buttonTexts.get(Contact.dao.getContactDirect().get(user.getLong("ID")).getInteger("SUBSCRIBE_STATUS")));
 
 										ContactProfileEditActivity.this.showSneakerWindow( Sneaker.with(ContactProfileEditActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(ContactProfileEditActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success ,R.string.subscribe_contact_added,R.color.white,R.color.limegreen );
 									}

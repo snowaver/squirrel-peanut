@@ -27,11 +27,16 @@ import  android.widget.TextView;
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import  java.util.Locale;
 
 import  androidx.core.app.ActivityCompat;
+import  androidx.core.app.ActivityOptionsCompat;
 import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
+import cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
@@ -62,15 +67,17 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 			{
 				public  void  onResponse( Call<Void>  call,  Response<Void>  response )
 				{
-					super.onResponse(    call , response );
+					super.onResponse(     call, response );
 
 					application().getSquirrelClient().disconnect();
-					//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  login  activity.
-					Stream.forEach( AbstractActivity.STACK,  (Activity  activity) -> activity.finish() );
-
-					ActivityCompat.startActivity( SystemSettingsActivity.this,new Intent(SystemSettingsActivity.this,LoginActivity.class).putExtra("USERNAME",SystemSettingsActivity.this.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",0).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),null );
 
 					SystemSettingsActivity.this.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().clear().commit();
+					//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  login  activity.  the  other  activities  should  be  finished.
+					List<Activity>  stackActivities = new  ArrayList<Activity>( AbstractActivity.STACK );
+
+					ActivityCompat.startActivity( SystemSettingsActivity.this,new Intent(SystemSettingsActivity.this,LoginActivity.class).putExtra("USERNAME",SystemSettingsActivity.this.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",0),ActivityOptionsCompat.makeCustomAnimation(SystemSettingsActivity.this,R.anim.left_in,R.anim.right_out).toBundle() );
+
+					Stream.forEach( stackActivities,(Activity  stackActivity) -> ContextUtils.finish(stackActivity) );
 				}
 			}
 		);
@@ -85,7 +92,7 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 	{
 		Locale  locale = ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString().trim().equals("ENGLISH") ? Locale.ENGLISH : Locale.CHINESE;
 
-		LocaleUtils.change( this ,locale.toLanguageTag() );
+		LocaleUtils.change( this, locale.toLanguageTag() );
 
 		this.languagesBottomSheetDialog.hide();
 
@@ -101,17 +108,15 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 
 	public  void  onChange(    Locale  locale )
 	{
-		ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.back_text),TextView.class).setText( R.string.goback );
+		ObjectUtils.cast(super.findViewById(R.id.language_selector).findViewById(cc.mashroom.hedgehog.R.id.title),TextView.class).setText(    R.string.language );
 
-		ObjectUtils.cast(super.findViewById(R.id.language_selector).findViewById(cc.mashroom.hedgehog.R.id.title),TextView.class).setText( R.string.language );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.title),TextView.class).setText( R.string.settings );
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.title),TextView.class).setText(   R.string.settings );
-
-		ObjectUtils.cast(super.findViewById(R.id.change_password_button),Button.class).setText( R.string.password );
+		ObjectUtils.cast(super.findViewById(R.id.change_password_button).findViewById(R.id.title),TextView.class).setText( super.getString( R.string.password ) );
 
 		ObjectUtils.cast(super.findViewById(R.id.logout_button),Button.class).setText( R.string.logout );
 
-		ObjectUtils.cast(this.getLanguagesBottomSheetDialog().findViewById(R.id.title) ,    TextView.class).setText( R.string.language );
+		ObjectUtils.cast(this.languagesBottomSheetDialog.findViewById(R.id.title),TextView.class).setText( R.string.language );
 	}
 
 	protected  void  onDestroy()
@@ -131,15 +136,15 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 
 		super.findViewById(R.id.logout_button).setOnClickListener( (view)-> logout() );
 
-		this.setLanguagesBottomSheetDialog(new  BottomSheetDialog(this)).getLanguagesBottomSheetDialog().setContentView( R.layout.activity_system_settings_language_bottomsheet );
+		(this.languagesBottomSheetDialog = new  BottomSheetDialog(this)).setContentView(       R.layout.activity_system_settings_language_bottomsheet );
 
-		this.getLanguagesBottomSheetDialog().setCanceledOnTouchOutside( true );
+		this.languagesBottomSheetDialog.setCanceledOnTouchOutside( true );
 
-		ObjectUtils.cast(super.findViewById(R.id.language_selector),StyleableEditView.class).findViewById(R.id.edit_inputor).setOnClickListener( ( selector ) -> languagesBottomSheetDialog.show() );
+		ObjectUtils.cast(super.findViewById(R.id.language_selector),StyleableEditView.class).setOnClickListener( (selector) -> this.languagesBottomSheetDialog.show() );
 
-		ObjectUtils.cast(this.getLanguagesBottomSheetDialog().findViewById(R.id.languages),ListView.class).setAdapter( new  SystemSettingsLanguageAdapter( this, this ) );
+		ObjectUtils.cast(languagesBottomSheetDialog.findViewById(R.id.languages),ListView.class).setOnItemClickListener(this );
 
-		ObjectUtils.cast(this.getLanguagesBottomSheetDialog().findViewById(R.id.languages),ListView.class).setOnItemClickListener(this );
+		ObjectUtils.cast(this.languagesBottomSheetDialog.findViewById(R.id.languages),ListView.class).setAdapter( new  SystemSettingsLanguageAdapter(this,this) );
 
 		ObjectUtils.cast(super.findViewById(R.id.language_selector),StyleableEditView.class).setText( ObjectUtils.cast(ObjectUtils.cast(this.languagesBottomSheetDialog.findViewById(R.id.languages),ListView.class).getAdapter(),SystemSettingsLanguageAdapter.class).getListener().getChecked().get() );
 	}

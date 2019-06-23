@@ -17,11 +17,11 @@
 
         </RelativeLayout>
 
-        <com.aries.ui.view.radius.RadiusRelativeLayout  android:layout_width="160dp"  android:layout_height="40dp"  android:visibility="gone"  android:paddingLeft="5dp"  android:paddingRight="0dp"  android:paddingTop="5dp"  android:paddingBottom="5dp"  app:rv_radiusHalfHeightEnable="true"  app:rv_strokeWidth="1dp"  app:rv_strokeColor="@color/gainsboro">
+        <com.aries.ui.view.radius.RadiusRelativeLayout  android:layout_width="match_parent"  android:layout_height="40dp"  android:visibility="gone"  android:paddingLeft="5dp"  android:paddingRight="0dp"  android:paddingTop="5dp"  android:paddingBottom="5dp"  app:rv_radiusHalfHeightEnable="true"  app:rv_strokeWidth="1dp"  app:rv_strokeColor="@color/gainsboro">
 
-            <ImageView  android:layout_width="30dp"  android:layout_height="30dp"  android:src="@drawable/voice_recorder"/>
+            <ImageView  android:id="@+id/icon"  android:layout_width="30dp"  android:layout_height="30dp"  android:src="@drawable/voice_recorder"/>
 
-            <TextView  android:id="@+id/voice_duration"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_centerInParent="true"  android:textColor="@color/darkgray"  android:textSize="14dp"/>
+            <TextView  android:id="@+id/content"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:layout_centerInParent="true"  android:textColor="@color/darkgray"  android:textSize="14dp"/>
 
         </com.aries.ui.view.radius.RadiusRelativeLayout>
 

@@ -32,6 +32,7 @@ import  com.irozon.sneaker.Sneaker;
 
 import  java.io.Serializable;
 
+import cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
@@ -80,6 +81,8 @@ public  class  ContactProfileActivity  extends         AbstractPacketListenerAct
 		}
 
 		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button), Button.class).setOnClickListener(   this );
+
+	    ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).findViewById(R.id.additional_switcher).setOnClickListener( (button) -> ActivityCompat.startActivity(this,new  Intent(this,ContactProfileEditActivity.class).putExtra("USER",user),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in ,R.anim.left_out).toBundle()) );
 	}
 
 	private  Map<Integer,Integer>  buttonTexts = new  HashMap<Integer,Integer>().addEntry(0 , R.string.subscribe_add_contact).addEntry(1, R.string.subscribe_accept_request).addEntry(6, R.string.message).addEntry( 7 , R.string.message );
@@ -98,29 +101,18 @@ public  class  ContactProfileActivity  extends         AbstractPacketListenerAct
 
 		Contact  contact = Contact.dao.getContactDirect().get(this.user.getLong("ID") );
 
-		if( super.application().getUserMetadata().getLong("ID").longValue()  == user.getLong("ID") || contact == null )
+		if( super.application().getUserMetadata().getLong("ID").longValue()   == user.getLong("ID") ||contact == null )
 		{
-			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setVisibility(View.INVISIBLE );
-
-			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setVisibility(View.INVISIBLE );
+			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setVisibility(View.INVISIBLE );  ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setVisibility(View.INVISIBLE );
 
 			if( super.application().getUserMetadata().getLong("ID").longValue()== user.getLong("ID") )
 			{
 				ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setVisibility(   View.INVISIBLE );
 
-				return;
+				return ;
 			}
 		}
 		else
-		{
-			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setVisibility(  View.VISIBLE );
-
-			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setVisibility(  View.VISIBLE );
-		}
-
-		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getString("GROUP_NAME")) ? contact.getString("GROUP_NAME") : super.getString(R.string.contact_group_default_name) );
-
-		if( contact   != null )
 		{
 			ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText(buttonTexts.get(contact.getInteger("SUBSCRIBE_STATUS")) );
 
@@ -128,9 +120,15 @@ public  class  ContactProfileActivity  extends         AbstractPacketListenerAct
 			{
 				ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(super.getResources().getColor(R.color.gainsboro) );
 			}
-		}
 
-		ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setText( this.user.getString(StringUtils.isBlank(this.user.getString("REMARK")) ? "NICKNAME" : "REMARK") );
+			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setVisibility(  View.VISIBLE );
+
+			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setText(     contact.getString("REMARK") );
+
+			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setVisibility(  View.VISIBLE );
+
+			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( contact.getString("GROUP_NAME") );
+		}
 	}
 
 	public  void  received(    Packet  packet )       throws  Exception

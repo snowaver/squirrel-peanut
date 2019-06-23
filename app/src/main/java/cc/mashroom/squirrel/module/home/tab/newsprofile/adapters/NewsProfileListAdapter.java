@@ -69,7 +69,7 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 		}
 		else
 		{
-			return  Application.PLACEHOLDER_PROFILES.containsKey(content) ? context.getString(Application.PLACEHOLDER_PROFILES.get(content)) : content;
+			return  Application.NEWS_PROFILE_PLACEHOLDERS.containsKey(content) ? context.getString(Application.NEWS_PROFILE_PLACEHOLDERS.get(content)):content;
 		}
 	}
 	@SneakyThrows
@@ -91,7 +91,7 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 			}
 			else
 			{
-				ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( ChatGroupUser.dao.getOne("SELECT  VCARD  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?",new  Object[]{newsProfile.getLong("CONTACT_ID")}).getString("VCARD")+context.getContext().getString(R.string.colon)+(Application.PLACEHOLDER_PROFILES.containsKey(newsProfile.getString("CONTENT")) ? context.getString(Application.PLACEHOLDER_PROFILES.get(newsProfile.getString("CONTENT"))) : newsProfile.getString("CONTENT")) );
+				ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( ChatGroupUser.dao.getOne("SELECT  VCARD  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?",new  Object[]{newsProfile.getLong("CONTACT_ID")}).getString("VCARD")+context.getContext().getString(R.string.colon)+(Application.NEWS_PROFILE_PLACEHOLDERS.containsKey(newsProfile.getString("CONTENT")) ? context.getString(Application.NEWS_PROFILE_PLACEHOLDERS.get(newsProfile.getString("CONTENT"))) : newsProfile.getString("CONTENT")) );
 			}
 		}
 		else
