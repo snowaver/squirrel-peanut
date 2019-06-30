@@ -18,6 +18,7 @@ package cc.mashroom.squirrel.parent;
 import  android.content.Context;
 import  android.content.Intent;
 import  android.content.SharedPreferences;
+import  android.graphics.Typeface;
 import  android.location.Location;
 import  android.net.ConnectivityManager;
 import  android.net.NetworkRequest;
@@ -104,7 +105,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		/*
 		LocaleUtils.change( this , null );
 		*/
-		Toasty.Config.getInstance().setTextSize(14).apply();
+		Toasty.Config.getInstance().setTextSize(14).setToastTypeface(Typeface.createFromAsset(super.getResources().getAssets(),"font/droid_sans_mono.ttf")).apply();
 
 		PushServiceNotifier.INSTANCE.install(this );
 

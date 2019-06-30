@@ -19,4 +19,5 @@
     <color  name="transparent">#00000000</color>
     <color  name="halftransparentwhite">#50ffffff</color>
     <color  name="halftransparentlimegreen">#5032cd32</color>
+    <color  name="halftransparentpink">#50FFC0CB</color>
 </resources>

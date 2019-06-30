@@ -15,9 +15,9 @@
  */
 package cc.mashroom.squirrel.module.chat.activity;
 
-import  android.net.Uri;
 import  android.opengl.GLSurfaceView;
 import  android.os.Bundle;
+import  android.os.SystemClock;
 import  android.view.View;
 import  android.view.ViewGroup;
 import  android.widget.TextView;
@@ -27,6 +27,7 @@ import  com.facebook.drawee.view.SimpleDraweeView;
 
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.ImageUtils;
+import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.hedgehog.widget.ViewSwitcher;
 import  cc.mashroom.squirrel.client.connect.call.Call;
 import  cc.mashroom.squirrel.client.connect.call.CallState;
@@ -90,11 +91,13 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 		statusBarlayoutParams.height   = ContextUtils.getStatusBarHeight( this );
 
-        ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+contactId+"/portrait").build().toString()) );
-
 		super.findViewById(R.id.status_bar_hint).setLayoutParams( statusBarlayoutParams );
 
-        ObjectUtils.cast(super.findViewById(R.id.nickname),TextView.class).setText( Contact.dao.getContactDirect().get(contactId).getString("REMARK") );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( Contact.dao.getContactDirect().get(contactId).getString("REMARK") );
+
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setAdditionalText(         "00:00:00" );
+
+		ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).setOnChronometerTickListener( (chronometer) -> ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setAdditionalText(new  DateTime(SystemClock.elapsedRealtime()-chronometer.getBase(),DateTimeZone.UTC).toString(chronometer.getFormat())) );
 
         if( !getIntent().getBooleanExtra("CALLED" , true) )
         {
@@ -135,13 +138,15 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 		ObjectUtils.cast(super.findViewById(R.id.cancel_button),SimpleDraweeView.class).setOnClickListener( (cancelButton) -> call.close() );
 
+		super.findViewById(R.id.header_bar).findViewById(R.id.back_switcher).setOnClickListener( (v)-> call.close() );
+
 		if( !  getIntent().getBooleanExtra("CALLED",true) )
 		{
             application().getSquirrelClient().newCall(-1,this.contactId,callContentType );
 		}
 		else
 		{
-			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(74-(int)  (((double)  DensityUtils.px(this,10)/super.getResources().getDisplayMetrics().widthPixels)*100),(int)  ((((double)  ContextUtils.getStatusBarHeight(this)+DensityUtils.px(this,5))/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) );
+			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75-(int)  (((double)  DensityUtils.px(this,10)/super.getResources().getDisplayMetrics().widthPixels)*100),(int)  ((((double)  ContextUtils.getStatusBarHeight(this)+DensityUtils.px(this,50))/super.getResources().getDisplayMetrics().heightPixels)*100)+1,24,24),"opus",1,Application.ICE_SERVERS) );
 
 			application().getMainLooperHandler().post( () -> ObjectUtils.cast(super.findViewById(R.id.control_switcher),ViewSwitcher.class).setDisplayedChild(1) );
 
@@ -162,7 +167,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 	{
 		if( this.callContentType == CallContentType.VIDEO )
 		{
-			this.application().getMainLooperHandler().post(        () -> {super.findViewById(R.id.chronometer).setVisibility( View.VISIBLE );  super.findViewById(R.id.glsurface_view).setVisibility(View.VISIBLE);  super.findViewById(R.id.call_details).setVisibility(View.GONE);} );
+			this.application().getMainLooperHandler().post( () -> {super.findViewById(R.id.glsurface_view).setVisibility(View.VISIBLE);  super.findViewById(R.id.prompt_message).setVisibility(View.INVISIBLE);} );
 		}
 
 		this.application().getMainLooperHandler().post( () -> { ObjectUtils.cast(super.findViewById(R.id.prompt_message) , TextView.class).setText(  R.string.call_calling );  ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).start("HH:mm:ss");} );
@@ -171,7 +176,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 	public  void  onRoomCreated(     Call  call )
 	{
 		{
-			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(74-(int)  (((double)  DensityUtils.px(this,10)/super.getResources().getDisplayMetrics().widthPixels)*100),(int)  ((((double)  ContextUtils.getStatusBarHeight(this)+DensityUtils.px(this,5))/super.getResources().getDisplayMetrics().heightPixels)*100)+1,25,25),"opus",1,Application.ICE_SERVERS) ).demand();
+			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75-(int)  (((double)  DensityUtils.px(this,10)/super.getResources().getDisplayMetrics().widthPixels)*100),(int)  ((((double)  ContextUtils.getStatusBarHeight(this)+DensityUtils.px(this,50))/super.getResources().getDisplayMetrics().heightPixels)*100)+1,24,24),"opus",1,Application.ICE_SERVERS) ).demand();
 		}
 	}
 
@@ -190,7 +195,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		{
 			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,call.getContentType() == CallContentType.AUDIO ? "$(0e00)" : "$(0e01)",0} );
 
-			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION)  VALUES  (?,?,?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),reason.getPlaceholder(),TransportState.SENT.getValue(),true,"{\"TYPE\":"+(call.getContentType() == CallContentType.AUDIO ? 0 : 1)+",\"REASON_PLACEHOLDER\":\""+reason.getPlaceholder()+"\",\"IS_PROACTIVELY\":"+proactively+",\"CONTENT\":\""+ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).getText()+"\"}"} );
+			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION)  VALUES  (?,?,?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),reason.getPlaceholder(),TransportState.SENT.getValue(),true,"{\"TYPE\":"+(call.getContentType() == CallContentType.AUDIO ? 0 : 1)+",\"REASON_PLACEHOLDER\":\""+reason.getPlaceholder()+"\",\"IS_PROACTIVELY\":"+proactively+",\"CONTENT\":\""+ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(R.id.additional_text),TextView.class).getText()+"\"}"} );
 		}
 		else
 		if( reason ==   CloseCallReason.TIMEOUT )

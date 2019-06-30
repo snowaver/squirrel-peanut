@@ -10,13 +10,13 @@
     <string  name="call_no_response">NO PEER\'S RESPONSE</string>
     <string  name="call_peer_canceled">PEER CANCELED CALL</string>
     <string  name="call_peer_closed">CLOSED</string>
-    <string  name="call_peer_demand_a_audio_call_with_you">REQUESTING A VOICE CALL</string>
-    <string  name="call_peer_demand_a_video_call_with_you">REQUESTING A VIDEO CALL</string>
+    <string  name="call_peer_demand_a_audio_call_with_you">REQUESTING YOU A VOICE CALL</string>
+    <string  name="call_peer_demand_a_video_call_with_you">REQUESTING YOU A VIDEO CALL</string>
     <string  name="call_peer_rejected">PEER REJECTED CALL</string>
     <string  name="call_rejected">REJECTED</string>
     <string  name="call_room_not_found">ROOM NOT FOUND</string>
     <string  name="call_state_error">STATE ERROR</string>
-    <string  name="call_waiting_for_response">WAITING FOR RESPONSE</string>
+    <string  name="call_waiting_for_response">WAITING FOR PEER\'S RESPONSE</string>
     <string  name="change">CHANGE</string>
     <string  name="chat">CHAT</string>
     <string  name="chat_audio_message">VOICE MESSAGE</string>
