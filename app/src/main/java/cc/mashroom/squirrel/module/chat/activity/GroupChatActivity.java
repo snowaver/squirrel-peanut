@@ -44,8 +44,8 @@ import  cc.mashroom.db.common.Db;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.PacketListener;
-import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
-import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
+import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
+import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.chat.adapters.GroupChatMessageListviewAdapter;
@@ -83,11 +83,11 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 		setGroupId(super.getIntent().getLongExtra("CHAT_GROUP_ID",0));
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle(    ChatGroup.dao.getOne("SELECT  NAME  FROM  "+ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{groupId}).getString("NAME") );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( ChatGroupRepository.DAO.lookupOne(String.class,"SELECT  NAME  FROM  "+ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{groupId}) );
 
 		ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).setOnKeyListener(  this );
 
-		ObjectUtils.cast(super.findViewById(R.id.switch_to_voice_recording_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.editor_switcher),ViewSwitcher.class).setDisplayedChild(1) );
+		ObjectUtils.cast(super.findViewById(R.id.switch_to_voice_recording_button),ImageView.class).setOnClickListener( (imageView) -> ObjectUtils.cast(super.findViewById(R.id.editor_switcher), ViewSwitcher.class).setDisplayedChild( 1 ) );
 
 		ObjectUtils.cast(super.findViewById(R.id.voice_recording_button),Button.class).setOnTouchListener( new  AudioTouchRecoder(this,application().getCacheDir(),(audioFile) -> send(audioFile)) );
 
@@ -97,7 +97,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setVisibility(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getVisibility() == View.GONE ? View.VISIBLE : View.GONE) );
 
-		ObjectUtils.cast(super.findViewById(R.id.switch_to_words_inputting_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.editor_switcher),ViewSwitcher.class).setDisplayedChild(0) );
+		ObjectUtils.cast(super.findViewById(R.id.switch_to_words_inputting_button),ImageView.class).setOnClickListener( (imageView) -> ObjectUtils.cast(super.findViewById(R.id.editor_switcher), ViewSwitcher.class).setDisplayedChild( 0 ) );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setAdapter( new  MoreInputsAdapter(this,groupId,Lists.newArrayList(new  HashMap<String,Integer>().addEntry("image",R.drawable.camera),new  HashMap<String,Integer>().addEntry("image",R.drawable.album))) );
 
@@ -115,7 +115,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 		if( voiceDuration >= 200 )
 		{
-			application().getSquirrelClient().asynchronousSend( new  GroupChatPacket(application().getUserMetadata().getLong("ID"), groupId, audioFile.getName(), ChatContentType.AUDIO,String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
+			application().getSquirrelClient().asynchronousSend( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(), this.groupId, audioFile.getName(), ChatContentType.AUDIO,     String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}
 		else
 		{
@@ -151,13 +151,13 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 			if( ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{
-				if( RetrofitRegistry.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )
+				if( RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )
 				{
 					return  false;
 				}
 			}
 			else
-			if( ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.AUDIO && RetrofitRegistry.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()))))).execute().code() != 200 )
+			if( ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.AUDIO && RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()))))).execute().code() != 200 )
 			{
 				{
 					return  false;
@@ -174,7 +174,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 		{
 			if( StringUtils.isNotBlank(ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim()) )
 			{
-				application().getSquirrelClient().send( new  GroupChatPacket(application().getUserMetadata().getLong("ID"),groupId,"",ChatContentType.WORDS,ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim().getBytes()) );
+				application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),this.groupId,"",ChatContentType.WORDS,ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim().getBytes()) );
 
 				ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().clear();
 			}
@@ -195,21 +195,20 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getAdapter(),MoreInputsAdapter.class).notifyDataSetChanged();
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( ChatGroup.dao.getOne("SELECT  NAME  FROM  "+ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{groupId}).getString("NAME") );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( ChatGroupRepository.DAO.lookupOne(String.class,"SELECT  NAME  FROM  "+ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{groupId}) );
 	}
 
 	protected  void  onActivityResult(    int  requestCode , int  resultCode , Intent  resultData )
 	{
+		super.onActivityResult( requestCode, resultCode, resultData );
+
 		if( resultData != null )
 		{
-			/*
-			long  now  = DateTime.now(DateTimeZone.UTC).getMillis()-1;
-			*/
 			for( Media  choosedMedia : ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS"),new  TypeReference<List<Media>>(){}) )
 			{
-				File  cachedFile = application().cache( choosedMedia.getId(),new  File(choosedMedia.getPath()),choosedMedia.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
+				File  cachedFile = application().cache( choosedMedia.getId(),new  File(choosedMedia.getPath()),choosedMedia.getType()  == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
 
-				application().getSquirrelClient().asynchronousSend( new  GroupChatPacket(application().getUserMetadata().getLong("ID"),groupId,cachedFile.getName(),choosedMedia.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
+				application().getSquirrelClient().asynchronousSend( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),groupId,cachedFile.getName(),choosedMedia.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
 			}
 		}
 	}
@@ -219,7 +218,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 	{
 		super.onPause(  );
 
-		Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfile.dao.clearBadgeCount(groupId,PAIPPacketType.GROUP_CHAT.getValue()) );
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
 	}
 
 	@SneakyThrows
@@ -229,6 +228,6 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 		PacketEventDispatcher.removeListener( this );
 
-		Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfile.dao.clearBadgeCount(groupId,PAIPPacketType.GROUP_CHAT.getValue()) );
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
 	}
 }

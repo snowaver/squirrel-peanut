@@ -31,12 +31,10 @@ import  com.fasterxml.jackson.core.type.TypeReference;
 import  com.google.common.collect.Lists;
 import  com.irozon.sneaker.Sneaker;
 
-import  cc.mashroom.hedgehog.util.ContextUtils;
-import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.MultimediaUtils;
 import  cc.mashroom.db.common.Db;
-import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
-import  cc.mashroom.squirrel.client.storage.model.user.Contact;
+import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
+import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.module.chat.adapters.MoreInputsAdapter;
 import  cc.mashroom.squirrel.module.chat.listener.AudioTouchRecoder;
 import  cc.mashroom.squirrel.paip.message.TransportState;
@@ -81,7 +79,7 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 
 		setContactId(super.getIntent().getLongExtra("CONTACT_ID",0) );
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( Contact.dao.getContactDirect().get(contactId).getString("REMARK") );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( ContactRepository.DAO.getContactDirect().get(contactId).getRemark() );
 
 		ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).setOnKeyListener(  this );
 
@@ -147,7 +145,7 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 
 			if( ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{
-				if( RetrofitRegistry.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )
+				if( RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )
 				{
 					return  false;
 				}
@@ -155,7 +153,7 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 			else
 			if( ObjectUtils.cast(packet,ChatPacket.class).getContentType()==ChatContentType.AUDIO )
 			{
-				if( RetrofitRegistry.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))))).execute().code() != 200 )
+				if( RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))))).execute().code() != 200 )
 				{
 					return  false;
 				}
@@ -198,7 +196,7 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 	{
 		super.onPause(  );
 
-		Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfile.dao.clearBadgeCount(contactId,  PAIPPacketType.CHAT.getValue()) );
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
 	}
 
 	@SneakyThrows
@@ -208,16 +206,15 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 
 		PacketEventDispatcher.removeListener( this );
 
-		Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfile.dao.clearBadgeCount(contactId,  PAIPPacketType.CHAT.getValue()) );
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
 	}
 
 	protected  void  onActivityResult(    int  requestCode , int  resultCode , Intent  resultData )
 	{
+		super.onActivityResult( requestCode, resultCode, resultData );
+
 		if( resultData != null )
 		{
-		    /*
-			long  now  = DateTime.now(DateTimeZone.UTC).getMillis()-1;
-            */
 			for( Media  choosedMedia : ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS"),new  TypeReference<List<Media>>(){}) )
 			{
 				File  cachedFile = application().cache(choosedMedia.getId(),new  File(choosedMedia.getPath()),choosedMedia.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );

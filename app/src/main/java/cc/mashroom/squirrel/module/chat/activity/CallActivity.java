@@ -32,9 +32,9 @@ import  cc.mashroom.hedgehog.widget.ViewSwitcher;
 import  cc.mashroom.squirrel.client.connect.call.Call;
 import  cc.mashroom.squirrel.client.connect.call.CallState;
 import  cc.mashroom.squirrel.client.connect.call.webrtc.PeerConnectionParameters;
-import  cc.mashroom.squirrel.client.storage.model.chat.ChatMessage;
-import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
-import  cc.mashroom.squirrel.client.storage.model.user.Contact;
+import  cc.mashroom.squirrel.client.storage.repository.chat.ChatMessageRepository;
+import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
+import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.paip.message.call.CloseCallReason;
 import  cc.mashroom.squirrel.parent.Application;
 import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
@@ -93,7 +93,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 		super.findViewById(R.id.status_bar_hint).setLayoutParams( statusBarlayoutParams );
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( Contact.dao.getContactDirect().get(contactId).getString("REMARK") );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( ContactRepository.DAO.getContactDirect().get(this.contactId).getRemark() );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setAdditionalText(         "00:00:00" );
 
@@ -193,22 +193,22 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 		if( reason ==   CloseCallReason.BY_USER )
 		{
-			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,call.getContentType() == CallContentType.AUDIO ? "$(0e00)" : "$(0e01)",0} );
+			NewsProfileRepository.DAO.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfileRepository.DAO.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,call.getContentType() == CallContentType.AUDIO ? "$(0e00)" : "$(0e01)",0} );
 
-			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION)  VALUES  (?,?,?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),reason.getPlaceholder(),TransportState.SENT.getValue(),true,"{\"TYPE\":"+(call.getContentType() == CallContentType.AUDIO ? 0 : 1)+",\"REASON_PLACEHOLDER\":\""+reason.getPlaceholder()+"\",\"IS_PROACTIVELY\":"+proactively+",\"CONTENT\":\""+ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(R.id.additional_text),TextView.class).getText()+"\"}"} );
+			ChatMessageRepository.DAO.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION)  VALUES  (?,?,?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),reason.getPlaceholder(),TransportState.SENT.getValue(),true,"{\"TYPE\":"+(call.getContentType() == CallContentType.AUDIO ? 0 : 1)+",\"REASON_PLACEHOLDER\":\""+reason.getPlaceholder()+"\",\"IS_PROACTIVELY\":"+proactively+",\"CONTENT\":\""+ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(R.id.additional_text),TextView.class).getText()+"\"}"} );
 		}
 		else
 		if( reason ==   CloseCallReason.TIMEOUT )
 		{
-			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,call.getContentType() == CallContentType.AUDIO ? "$(0e00)" : "$(0e01)",0} );
+			NewsProfileRepository.DAO.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfileRepository.DAO.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,call.getContentType() == CallContentType.AUDIO ? "$(0e00)" : "$(0e01)",0} );
 
-			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION)  VALUES  (?,?,?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),reason.getPlaceholder(),TransportState.SENT.getValue(),true,"{\"TYPE\":"+(call.getContentType() == CallContentType.AUDIO ? 0 : 1)+",\"REASON_PLACEHOLDER\":\""+reason.getPlaceholder()+"\",\"IS_PROACTIVELY\":"+(call.getState() == CallState.REQUESTING)+"}"} );
+			ChatMessageRepository.DAO.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION)  VALUES  (?,?,?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),reason.getPlaceholder(),TransportState.SENT.getValue(),true,"{\"TYPE\":"+(call.getContentType() == CallContentType.AUDIO ? 0 : 1)+",\"REASON_PLACEHOLDER\":\""+reason.getPlaceholder()+"\",\"IS_PROACTIVELY\":"+(call.getState() == CallState.REQUESTING)+"}"} );
 		}
 		else
 		{
-			NewsProfile.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfile.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,call.getContentType() == CallContentType.AUDIO ? "$(0e00)" : "$(0e01)",0} );
+			NewsProfileRepository.DAO.insert( new  Reference<Object>(),"MERGE  INTO  "+NewsProfileRepository.DAO.getDataSourceBind().table()+"  (ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT)  VALUES  (?,?,?,?,?,?)",new  Object[]{contactId,new  Timestamp(now.getMillis()),PAIPPacketType.CHAT.getValue(),contactId,call.getContentType() == CallContentType.AUDIO ? "$(0e00)" : "$(0e01)",0} );
 
-			ChatMessage.dao.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessage.dao.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION)  VALUES  (?,?,?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),reason.getPlaceholder(),TransportState.SENT.getValue(),true,"{\"TYPE\":"+(call.getContentType() == CallContentType.AUDIO ? 0 : 1)+",\"REASON_PLACEHOLDER\":\""+reason.getPlaceholder()+"\",\"IS_PROACTIVELY\":"+proactively+"}"} );
+			ChatMessageRepository.DAO.insert( new  Reference<Object>(),"MERGE  INTO  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  (ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION)  VALUES  (?,?,?,?,?,?,?,?,?)",new  Object[]{now.getMillis(),new  Timestamp(now.getMillis()),contactId,null,ChatContentType.WORDS.getValue(),reason.getPlaceholder(),TransportState.SENT.getValue(),true,"{\"TYPE\":"+(call.getContentType() == CallContentType.AUDIO ? 0 : 1)+",\"REASON_PLACEHOLDER\":\""+reason.getPlaceholder()+"\",\"IS_PROACTIVELY\":"+proactively+"}"} );
 		}
 
 		application().getMainLooperHandler().post( () -> {Toasty.warning( this,super.getString(R.string.call_closed),Toast.LENGTH_LONG,false ).show();  ContextUtils.finish(this);  super.overridePendingTransition(R.anim.fade_in,R.anim.fade_out);} );

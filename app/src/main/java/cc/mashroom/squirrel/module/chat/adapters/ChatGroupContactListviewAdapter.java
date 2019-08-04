@@ -25,6 +25,7 @@ import  com.facebook.drawee.view.SimpleDraweeView;
 
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
+import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupUserRepository;
 import  cc.mashroom.squirrel.module.chat.activity.ChatGroupContactActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  lombok.AccessLevel;
@@ -46,22 +47,22 @@ public  class  ChatGroupContactListviewAdapter  extends  cc.mashroom.hedgehog.pa
 	@SneakyThrows
 	public  int   getCount()
 	{
-		return  ChatGroupUser.dao.getOne("SELECT  COUNT(ID)  AS  COUNT  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{chatGroupId}).getLong("COUNT").intValue();
+		return  ChatGroupUserRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(ID)  AS  COUNT  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{this.chatGroupId}).intValue();
 	}
 	@SneakyThrows
 	public  ChatGroupUser  getItem(int  position )
 	{
-		return  ChatGroupUser.dao.getOne("SELECT  ID,CREATE_TIME,LAST_MODIFY_TIME,CONTACT_ID,VCARD  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE  ORDER  BY  ID  ASC  LIMIT  1  OFFSET  ?",new  Object[]{chatGroupId,position});
+		return  ChatGroupUserRepository.DAO.lookupOne(ChatGroupUser.class,"SELECT  ID,CREATE_TIME,LAST_MODIFY_TIME,CONTACT_ID,VCARD  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE  ORDER  BY  ID  ASC  LIMIT  1  OFFSET  ?",new  Object[]{chatGroupId,position});
 	}
 
 	public  View  getView( int  position,View  convertView,ViewGroup  parent )
 	{
 		convertView = convertView != null ? convertView : LayoutInflater.from(context).inflate( R.layout.activity_chat_group_contact_item,parent,false );
 
-		ChatGroupUser  chatGroupUser = getItem( position );
+		ChatGroupUser  chatGroupUser = this.getItem( position );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.name),TextView.class).setText( chatGroupUser.getString("VCARD") );
+		ObjectUtils.cast(convertView.findViewById(R.id.name),TextView.class).setText( chatGroupUser.getVcard() );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI(Uri.parse(context.application().baseUrl().addPathSegments("user/"+chatGroupUser.getLong("CONTACT_ID")+"/portrait").build().toString()) );   return  convertView;
+		ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI(Uri.parse(context.application().baseUrl().addPathSegments("user/"+chatGroupUser.getContactId()+"/portrait").build().toString()) );       return  convertView;
 	}
 }

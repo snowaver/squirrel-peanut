@@ -33,8 +33,11 @@ import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
+import  cc.mashroom.squirrel.client.storage.model.Offline;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
+import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
+import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupUserRepository;
 import  cc.mashroom.squirrel.module.chat.adapters.GroupChatProfileMemberGridviewAdapter;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
@@ -44,7 +47,6 @@ import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
-import  cc.mashroom.util.collection.map.Map;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  lombok.Setter;
 import  lombok.SneakyThrows;
@@ -61,29 +63,29 @@ import  java.util.Set;
 public  class  GroupChatProfileActivity     extends  AbstractActivity
 {
 	@SneakyThrows
-	protected  void  onCreate( Bundle  savedInstanceState )
+	protected  void  onCreate( Bundle   savedInstanceState )
 	{
 		super.onCreate(        savedInstanceState );
 
 		super.setContentView( R.layout.activity_group_chat_profile );
 
-		this.setChatGroup( ChatGroup.dao.getOne("SELECT  *  FROM  "+ ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{ super.getIntent().getLongExtra("CHAT_GROUP_ID", 0) }) );
+		this.setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{ super.getIntent().getLongExtra("CHAT_GROUP_ID", 0) }) );
 
-		this.setChatGroupUser( ChatGroupUser.dao.getOne("SELECT  *  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?",new  Object[]{this.chatGroup.getLong("ID") , application().getUserMetadata().get("ID")}) );
+		this.setChatGroupUser( ChatGroupUserRepository.DAO.lookupOne(ChatGroupUser.class,"SELECT  *  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?",new  Object[]{this.chatGroup.getId(),application().getSquirrelClient().getUserMetadata().getId()}) );
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle(    this.chatGroup.getString( "NAME" ) );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle(    chatGroup.getName() );
 
-		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( this.chatGroup.getString( "NAME" ) );
+		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( chatGroup.getName() );
 
-		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> ActivityCompat.startActivityForResult(this,new  Intent(this,EditorActivity.class).putExtra("EDIT_CONTENT",chatGroup.getString("NAME")).putExtra("TITLE",super.getString(R.string.name)).putExtra("LIMITATION",16),1,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> ActivityCompat.startActivityForResult(this,new  Intent(this,EditorActivity.class).putExtra("EDIT_CONTENT",chatGroup.getName()).putExtra("TITLE",super.getString(R.string.name)).putExtra("LIMITATION",16),1,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
-	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener( (inviteContactButton)  -> inviteMembers() );
+	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener(    (inviteContactButton) -> inviteMembers() );
 
-		ObjectUtils.cast(super.findViewById(R.id.more_members_button),TextView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getLong("ID")),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+		ObjectUtils.cast(super.findViewById(R.id.more_members_button),TextView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
-		super.findViewById(R.id.leave_or_delete_button).setOnClickListener((leaveButton) ->  leaveOrDelete() );
+		super.findViewById(R.id.leave_or_delete_button).setOnClickListener((leaveButton)   ->  leaveOrDelete() );
 
-        ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).setAdapter( new  GroupChatProfileMemberGridviewAdapter(this,this.chatGroup.getLong("ID")) );
+        ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).setAdapter( new  GroupChatProfileMemberGridviewAdapter(this,chatGroup.getId()) );
     }
 
 	@Accessors( chain= true )
@@ -93,8 +95,10 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 	@Setter
 	private  ChatGroupUser  chatGroupUser;
 
-	protected  void  onActivityResult( int  requestCode, int  resultCode, Intent  data )
+	protected  void  onActivityResult(        int  requestCode, int  resultCode, Intent  data )
 	{
+		super.onActivityResult(requestCode,resultCode,data);
+
 		if( data    == null )
 		{
 			return;
@@ -102,22 +106,22 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 		if( requestCode ==0 )
 		{
-			RetrofitRegistry.get(ChatGroupUserService.class).add(chatGroup.getLong("ID"),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"), ",")).enqueue
+			RetrofitRegistry.INSTANCE.get(ChatGroupUserService.class).add(chatGroup.getId(),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"),",")).enqueue
 			(
-				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<Offline>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					@SneakyThrows
-					public  void  onResponse( Call<Map<String,List<Map<String,Object>>>>  call,Response<Map<String,List<Map<String,Object>>>>  response )
+					public  void  onResponse( Call<Offline>  call,Response<Offline>  response )
 					{
-						super.onResponse( call, response );
+						super.onResponse( call,  response );
 
 						if( response.code() == 200 )
 						{
-							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
+							Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body()) );
 
-                            ObjectUtils.cast(ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
+                            ObjectUtils.cast(ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.members),GridView.class).getAdapter(),   GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
 
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,  R.string.added,R.color.white,R.color.limegreen );
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,    R.string.added,R.color.white,R.color.limegreen );
 						}
 						else
 						{
@@ -130,24 +134,24 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 		else
 		if( requestCode ==1 )
         {
-			RetrofitRegistry.get(ChatGroupService.class).update( chatGroup.getLong("ID")                 ,data.getStringExtra( "EDIT_CONTENT" ) ).enqueue
+			RetrofitRegistry.INSTANCE.get(ChatGroupService.class).update(chatGroup.getId(),data.getStringExtra("EDIT_CONTENT")).enqueue
 			(
-				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<Offline>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					@SneakyThrows
-					public  void  onResponse( Call<Map<String,List<Map<String,Object>>>>  call,Response<Map<String,List<Map<String,Object>>>>  response )
+					public  void  onResponse( Call<Offline>  call,Response<Offline>  response )
 					{
-						super.onResponse( call, response );
+						super.onResponse( call,  response );
 
 						if( response.code() == 200 )
 						{
-							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
+							Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body()) );
 
-                            setChatGroup( ChatGroup.dao.getOne("SELECT  *  FROM  "+ ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?"    , new  Object[]{chatGroup.getLong("ID")}) );
+                            setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{chatGroup.getId()}) );
 
-                            ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.name),StyleableEditView.class).setText(  chatGroup.getString( "NAME" ) );
+                            ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.name),StyleableEditView.class).setText( chatGroup.getName() );
 
-							ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.header_bar),HeaderBar.class).setTitle(   chatGroup.getString( "NAME" ) );
+							ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.header_bar),HeaderBar.class).setTitle(  chatGroup.getName() );
 
 							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen );
 						}
@@ -163,11 +167,11 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 	private  void  inviteMembers()
 	{
-		Set<Long>  invitedContactIds =new  HashSet<Long>();
+		Set<Long>  invitedContactIds = new  HashSet<Long>();
 
-		for( ChatGroupUser  chatGroupUser : ChatGroupUser.dao.search("SELECT  CONTACT_ID  AS  INVITED_CONTACT_ID  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{chatGroup.getLong("ID")}) )
+		for( ChatGroupUser  chatGroupUser : ChatGroupUserRepository.DAO.lookup(ChatGroupUser.class,"SELECT  CONTACT_ID  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{chatGroup.getId()}) )
 		{
-			invitedContactIds.add(  chatGroupUser.getLong( "INVITED_CONTACT_ID" ) );
+			invitedContactIds.add(    chatGroupUser.getContactId() );
 		}
 
 		ActivityCompat.startActivityForResult( this,new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS",ObjectUtils.cast(invitedContactIds,Serializable.class)),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
@@ -176,18 +180,18 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 	private  void  leaveOrDelete()
     {
 		{
-			RetrofitRegistry.get(ChatGroupUserService.class).secede(chatGroup.getLong("ID"),chatGroupUser.getLong("ID")).enqueue
+			RetrofitRegistry.INSTANCE.get(ChatGroupUserService.class).secede(this.chatGroup.getId(),this.chatGroupUser.getId()).enqueue
 			(
-				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<Offline>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					@SneakyThrows
-					public  void  onResponse( Call<Map<String,List<Map<String,Object>>>>  call,Response<Map<String,List<Map<String,Object>>>>  response )
+					public  void  onResponse( Call<Offline>  call,Response<Offline>  response )
 					{
-						super.onResponse( call, response );
+						super.onResponse( call,  response );
 
 						if( response.code() == 200 )
 						{
-							Db.tx( String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
+							Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body()) );
 
 							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> {STACK.get(STACK.size()-2).finish();  GroupChatProfileActivity.this.finish();},500)),com.irozon.sneaker.R.drawable.ic_success,R.string.chat_group_left_or_deleted,R.color.white,R.color.limegreen );
 						}

@@ -26,6 +26,8 @@ import  cc.mashroom.util.NoopHostnameVerifier;
 import  cc.mashroom.util.NoopX509TrustManager;
 import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.Map;
+import  lombok.AccessLevel;
+import  lombok.NoArgsConstructor;
 import  okhttp3.OkHttpClient;
 import  retrofit2.Retrofit;
 import  retrofit2.converter.jackson.JacksonConverterFactory;
@@ -33,24 +35,27 @@ import  retrofit2.converter.jackson.JacksonConverterFactory;
 /**
  *  retrofit  service  registry,  which  cache  all  retrofit  service  used.  http  file  uploading  is  a  heavily  time-consuming  io  operation,  so  seperate  it  from  other  data  request  to  avoid  blocking  data  interaction  by  uploading  file  operations  (long-term  occupancy  of  connections  in  okhttp  connection  pool).
  */
+@NoArgsConstructor( access=AccessLevel.PRIVATE )
 public  class  RetrofitRegistry
 {
-	private  final  static  Map<Class<?>,Object>  services = new  ConcurrentHashMap<Class<?>,Object>();
+	private  Retrofit  fileUploadRetrofit;
 
-	public  static  void  install( Application  application )
+	private  Retrofit     defaultRetrofit;
+
+	private  Map<Class<?>,Object>  services = new  ConcurrentHashMap<Class<?>,Object>();
+
+	public   final  static  RetrofitRegistry  INSTANCE = new  RetrofitRegistry();
+
+	public  void  initialize( Application  application )
 	{
 		//  set  http  write  timeout  of  120  seconds  while  considering  uploading  files  and  file  size  should  be  considered  anyway.
-		RetrofitRegistry.FILE_UPLOAD_RETROFIT = new  Retrofit.Builder().client(new  OkHttpClient.Builder().hostnameVerifier(new  NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new  NoopX509TrustManager()).connectTimeout(2,TimeUnit.SECONDS).writeTimeout(120,TimeUnit.SECONDS).readTimeout(8,TimeUnit.SECONDS).addInterceptor((chain) -> chain.proceed(chain.request().newBuilder().header("SECRET_KEY",application.getSquirrelClient().getUserMetadata().getString("SECRET_KEY") == null ? "" : application.getSquirrelClient().getUserMetadata().getString("SECRET_KEY")).build())).build()).baseUrl(application.baseUrl().toString()).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
+		this.fileUploadRetrofit = new  Retrofit.Builder().client(new  OkHttpClient.Builder().hostnameVerifier(new  NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new  NoopX509TrustManager()).connectTimeout(2,TimeUnit.SECONDS).writeTimeout(120,TimeUnit.SECONDS).readTimeout(8,TimeUnit.SECONDS).addInterceptor((chain) -> chain.proceed(chain.request().newBuilder().header("SECRET_KEY",application.getSquirrelClient().getUserMetadata().getSecretKey() == null ? "" : application.getSquirrelClient().getUserMetadata().getSecretKey()).build())).build()).baseUrl(application.baseUrl().toString()).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
 
-		RetrofitRegistry.COMMON_RETROFIT = new  Retrofit.Builder().client(new  OkHttpClient.Builder().hostnameVerifier(new  NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new  NoopX509TrustManager()).connectTimeout(2,TimeUnit.SECONDS).writeTimeout(2,TimeUnit.SECONDS).readTimeout(8,TimeUnit.SECONDS).addInterceptor((chain) -> chain.proceed(chain.request().newBuilder().header("SECRET_KEY",application.getSquirrelClient().getUserMetadata().getString("SECRET_KEY") == null ? "" : application.getSquirrelClient().getUserMetadata().getString("SECRET_KEY")).build())).build()).baseUrl(application.baseUrl().toString()).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
+		this.defaultRetrofit = new  Retrofit.Builder().client(new  OkHttpClient.Builder().hostnameVerifier(new  NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new  NoopX509TrustManager()).connectTimeout(2,TimeUnit.SECONDS).writeTimeout(2,TimeUnit.SECONDS).readTimeout(8,TimeUnit.SECONDS).addInterceptor((chain) -> chain.proceed(chain.request().newBuilder().header("SECRET_KEY",application.getSquirrelClient().getUserMetadata().getSecretKey() == null ? "" : application.getSquirrelClient().getUserMetadata().getSecretKey()).build())).build()).baseUrl(application.baseUrl().toString()).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
 	}
 
-	private  static  Retrofit  FILE_UPLOAD_RETROFIT;
-
-	private  static  Retrofit  COMMON_RETROFIT;
-
-	public  static  <T>  T  get( Class< T >  clazz )
+	public  <T>  T  get( Class<T>  clazz )
 	{
-		return  (T)  services.computeIfLackof( clazz,(key) -> clazz == FileService.class ? FILE_UPLOAD_RETROFIT.create(clazz) : COMMON_RETROFIT.create(clazz) );
+		return  (T)  services.computeIfLackof( clazz,(key) -> clazz == FileService.class ? fileUploadRetrofit.create(clazz) : defaultRetrofit.create(clazz) );
 	}
 }

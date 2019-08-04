@@ -22,9 +22,12 @@ import  android.content.Intent;
 import  androidx.core.app.NotificationCompat;
 import  android.widget.RemoteViews;
 
+import java.text.SimpleDateFormat;
+
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
+import cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.module.system.activity.LoadingActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.hedgehog.util.ContextUtils;
@@ -33,7 +36,7 @@ import  lombok.NoArgsConstructor;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
 
-@NoArgsConstructor( access = AccessLevel.PRIVATE )
+@NoArgsConstructor( access=AccessLevel.PRIVATE )
 
 public  class  PushServiceNotifier
 {
@@ -41,7 +44,9 @@ public  class  PushServiceNotifier
 	@Setter
 	private  Context  context;
 
-	public  void  install( Context  context )
+	private  SimpleDateFormat  format = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+
+	public  void  initialize( Context  context )
 	{
 		this.context= context;
 	}
@@ -50,17 +55,17 @@ public  class  PushServiceNotifier
 
 	public  NewsProfile  notify( NewsProfile  newsProfile )
 	{
-		if( ContextUtils.isApplicationRunningBackground(context) )
+		if( ContextUtils.isApplicationRunningBackground(this.context) )
 		{
-			NotificationManager  notificationManager = ObjectUtils.cast( context.getSystemService(Context.NOTIFICATION_SERVICE) );
+			NotificationManager  notificationManager = ObjectUtils.cast( this.context.getSystemService(Context.NOTIFICATION_SERVICE) );
 
-			RemoteViews  notification = new  RemoteViews( context.getPackageName(),R.layout.notification_push );
+			RemoteViews  notification = new  RemoteViews( this.context.getPackageName(),R.layout.notification_push );
 
-			Contact  contact = Contact.dao.getContactDirect().get( newsProfile.getLong("CONTACT_ID") );
+			Contact  contact   = ContactRepository.DAO.getContactDirect().get( newsProfile.getContactId() );
 
-			notification.setTextViewText( R.id.content,contact.getString("REMARK")+context.getString(R.string.colon)+newsProfile.getString("CONTENT") );
+			notification.setTextViewText( R.id.content,contact.getRemark()+this.context.getString(R.string.colon)+newsProfile.getContent() );
 
-			notification.setTextViewText( R.id.time,newsProfile.get("CREATE_TIME").toString() );
+			notification.setTextViewText( R.id.time,format.format(newsProfile.getCreateTime()).toString() );
 
 			notificationManager.notify( 0,new  NotificationCompat.Builder(context,"default").setSmallIcon(R.drawable.app).setTicker(context.getString(R.string.notification_received_a_new_message)).setPriority(NotificationCompat.PRIORITY_DEFAULT).setContent(notification).setContentIntent(PendingIntent.getActivity(context,0,new  Intent(context,LoadingActivity.class),PendingIntent.FLAG_UPDATE_CURRENT)).build() );
 		}

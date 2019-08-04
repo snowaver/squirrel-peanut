@@ -15,6 +15,7 @@
  */
 package cc.mashroom.squirrel.parent;
 
+import  android.app.Activity;
 import  android.content.Context;
 import  android.content.Intent;
 import  android.content.SharedPreferences;
@@ -43,22 +44,22 @@ import  cc.mashroom.squirrel.client.LifecycleListener;
 import  cc.mashroom.squirrel.client.SquirrelClient;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.PacketListener;
-import  cc.mashroom.squirrel.client.storage.Storage;
+import  cc.mashroom.squirrel.client.storage.model.Offline;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
-import  cc.mashroom.squirrel.client.storage.model.user.User;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.chat.activity.AudioCallActivity;
 import  cc.mashroom.squirrel.module.chat.activity.VideoCallActivity;
 import  cc.mashroom.squirrel.module.system.activity.LoadingActivity;
 import  cc.mashroom.squirrel.module.system.activity.LoginActivity;
 import  cc.mashroom.squirrel.module.system.activity.RegisterActivity;
+import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.squirrel.paip.message.call.CallContentType;
 import  cc.mashroom.squirrel.paip.message.chat.ChatContentType;
 import  cc.mashroom.squirrel.paip.message.connect.DisconnectAckPacket;
-import  cc.mashroom.squirrel.push.PushService;
 import  cc.mashroom.squirrel.push.PushServiceNotifier;
 
 import  java.net.URL;
+import  java.sql.Timestamp;
 import  java.util.List;
 import  java.util.Set;
 import  java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -74,7 +75,6 @@ import  cc.mashroom.util.NoopX509TrustManager;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.collection.map.HashMap;
 import  cc.mashroom.util.collection.map.Map;
-import  cc.mashroom.util.stream.Stream;
 import  es.dmoral.toasty.Toasty;
 import  io.netty.util.concurrent.DefaultThreadFactory;
 import  lombok.Getter;
@@ -105,9 +105,9 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		/*
 		LocaleUtils.change( this , null );
 		*/
-		Toasty.Config.getInstance().setTextSize(14).setToastTypeface(Typeface.createFromAsset(super.getResources().getAssets(),"font/droid_sans_mono.ttf")).apply();
+		Toasty.Config.getInstance().allowQueue(  false).setTextSize(14).setToastTypeface(Typeface.createFromAsset(super.getResources().getAssets(),"font/droid_sans_mono.ttf")).apply();
 
-		PushServiceNotifier.INSTANCE.install(this );
+		PushServiceNotifier.INSTANCE.initialize(    Application.this );
 
 		Long  userId = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0);
 
@@ -115,11 +115,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		{
 			//  scheduler  job  will  not  be  executed  on  xiaomi  (4a)  and   vivo  (y66)  after  pushing  off  the  application,  so  the  proposal  using  scheduler  job  is  not  available  to  keep  application  alive.  give  up.
 
-			super.startService(  new  Intent(this,PushService.class) );
-
 			SharedPreferences  networkSharedPreference = super.getSharedPreferences( "LATEST_NETWORK_ROUTE",MODE_PRIVATE );
-
-			Storage.INSTANCE.initialize( squirrelClient, true, null, getCacheDir(), new  HashMap().addEntry("ID",userId) );
 
 			squirrelClient.route( networkSharedPreference.getString("HOST",null),networkSharedPreference.getInt("PORT",8012),networkSharedPreference.getInt("HTTPPORT",8011) );
 		}
@@ -130,9 +126,9 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 			squirrelClient.route( balancingProxyUrl.getHost(),  8012, balancingProxyUrl.getPort() );
 		}
 
-		RetrofitRegistry.install( Application.this);
+		RetrofitRegistry.INSTANCE.initialize(this );
 
-		Fresco.initialize( this,OkHttpImagePipelineConfigFactory.newBuilder(this,new  OkHttpClient.Builder().hostnameVerifier(new  NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new  NoopX509TrustManager()).connectTimeout(2,TimeUnit.SECONDS).writeTimeout(2,TimeUnit.SECONDS).readTimeout(8,TimeUnit.SECONDS).addInterceptor((chain) -> chain.proceed(chain.request().newBuilder().header("SECRET_KEY",squirrelClient.getUserMetadata().getString("SECRET_KEY") == null ? "" : squirrelClient.getUserMetadata().getString("SECRET_KEY")).build())).build()).build() );
+		Fresco.initialize( this,OkHttpImagePipelineConfigFactory.newBuilder(this,new  OkHttpClient.Builder().hostnameVerifier(new  NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new  NoopX509TrustManager()).connectTimeout(2,TimeUnit.SECONDS).writeTimeout(2,TimeUnit.SECONDS).readTimeout(8,TimeUnit.SECONDS).addInterceptor((chain) -> chain.proceed(chain.request().newBuilder().header("SECRET_KEY",squirrelClient.getUserMetadata().getSecretKey() == null ? "" : squirrelClient.getUserMetadata().getSecretKey()).build())).build()).build() );
 
 		squirrelClient.route( new  DefaultBalancingProxyFactory(new  URL(BALANCING_PROXY_URL),BALANCING_PROXY_BACKUP_ADDRESSES,SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS),this );
 
@@ -148,11 +144,6 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	private  SquirrelClient  squirrelClient  = null;
 	@Getter
 	private  ScheduledThreadPoolExecutor  scheduler = new  ScheduledThreadPoolExecutor( 1 , new  DefaultThreadFactory("DEFAULT-TASK-SCHEDULER") );
-
-	public   Map<String,Object>    getUserMetadata()
-	{
-		return  !squirrelClient.getUserMetadata().isEmpty() ? squirrelClient.getUserMetadata() : (super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0) <= 0 ? null : User.dao.getOne("SELECT  ID,USERNAME,NAME,NICKNAME  FROM  "+User.dao.getDataSourceBind().table()+"  ORDER  BY  LAST_ACCESS_TIME  DESC  LIMIT  1  OFFSET  0",new  Object[]{}));
-	}
 
 	public  void  onTerminate()
 	{
@@ -182,9 +173,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		else
 		if( returnCode == 200 )
 		{
-			super.startService(  new  Intent(this,PushService.class) );
-
-			super.getSharedPreferences("LATEST_LOGIN_FORM", MODE_PRIVATE).edit().putLong("ID",getUserMetadata().getLong("ID")).putString("USERNAME",getUserMetadata().getString("USERNAME")).putString("NAME",getUserMetadata().getString("NAME")).putString("NICKNAME",getUserMetadata().getString("NICKNAME")).commit();
+			super.getSharedPreferences("LATEST_LOGIN_FORM", MODE_PRIVATE).edit().putLong("ID",squirrelClient.getUserMetadata().getId()).putString("USERNAME",squirrelClient.getUserMetadata().getUsername()).putString("NAME", squirrelClient.getUserMetadata().getName()).putString("NICKNAME", squirrelClient.getUserMetadata().getNickname()).commit();
 		}
 	}
 
@@ -200,7 +189,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	}
 
 	@SneakyThrows
-	public  void  connect( Long  id , Location  geometryLoc , LifecycleListener  lifecycleListener )
+	public  void  connect( Long  id , Location  geometryLoc,  LifecycleListener  lifecycleListener )
 	{
 		if( !NetworkUtils.isNetworkAvailable(this) )
 		{
@@ -212,14 +201,9 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  void  clearStackActivitiesAndStart( Intent  intent , Bundle  bundle )
 	{
-		Stream.forEach( AbstractActivity.STACK,(activity) -> activity.finish() );
+		for(   Activity  activity : AbstractActivity.STACK )   activity.finish();
 
 		ActivityCompat.startActivity( this, intent,bundle );
-	}
-
-	public  void  onReceivedOfflineData( Map<String,List<Map<String,Object>>>  receivedOfflineData )
-	{
-
 	}
 
 	public  void  onDisconnected( int  closeReason )
@@ -231,6 +215,11 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 			super.getSharedPreferences( "LATEST_LOGIN_FORM", MODE_PRIVATE ).edit().clear().commit();
 		}
+	}
+
+	public  void  onReceivedOfflineData(  Offline  offline )
+	{
+
 	}
 
 	public  boolean  beforeSend(    Packet  packet )  throws  Exception
@@ -245,7 +234,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  void  onBalanceComplete( int  code , Throwable  throwable )
 	{
-		RetrofitRegistry.install(Application.this );
+		RetrofitRegistry.INSTANCE.initialize(this );
 
 		if( code == 200 )
 		{
@@ -269,7 +258,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		else
 		if( receivedPacket instanceof   ChatPacket )
 		{
-			PushServiceNotifier.INSTANCE.notify( ObjectUtils.cast(new  NewsProfile().addEntry("CONTACT_ID",ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId()).addEntry("CREATE_TIME",DateTime.now().toString("yyyy-MM-dd HH:mm:ss")).addEntry("CONTENT",ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType() == ChatContentType.WORDS ? new  String(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContent()) : super.getString(NEWS_PROFILE_PLACEHOLDERS.get(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType().getPlaceholder())))) );
+			PushServiceNotifier.INSTANCE.notify( new  NewsProfile(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId(),new  Timestamp(DateTime.now().getMillis()),PAIPPacketType.CHAT.getValue(),ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId(),ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType() == ChatContentType.WORDS ? new  String(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContent()) : super.getString(NEWS_PROFILE_PLACEHOLDERS.get(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType().getPlaceholder())),0) );
 		}
 	}
 }
