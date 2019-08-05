@@ -32,6 +32,7 @@ import  org.joda.time.DateTimeZone;
 
 import  cc.mashroom.hedgehog.parent.BaseAdapter;
 import  cc.mashroom.squirrel.client.storage.model.chat.GroupChatMessage;
+import  cc.mashroom.squirrel.client.storage.repository.chat.GroupChatMessageRepository;
 import  cc.mashroom.squirrel.module.chat.activity.GroupChatActivity;
 import  cc.mashroom.hedgehog.module.common.activity.ImagePreviewActivity;
 import  cc.mashroom.hedgehog.module.common.activity.VideoPreviewActivity;
@@ -64,12 +65,12 @@ public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter
 	@SneakyThrows
 	public  GroupChatMessage  getItem(   int  position )
 	{
-		return  GroupChatMessage.dao.getOne("SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessage.dao.getDataSourceBind().table()+"  WHERE  GROUP_ID = ?  ORDER  BY  CREATE_TIME  ASC  LIMIT  1  OFFSET  ?",new  Object[]{groupId,position});
+		return  GroupChatMessageRepository.DAO.lookupOne(GroupChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  GROUP_ID = ?  ORDER  BY  CREATE_TIME  ASC  LIMIT  1  OFFSET  ?",new  Object[]{groupId,position} );
 	}
 	@SneakyThrows
 	public  int   getCount()
 	{
-		return  GroupChatMessage.dao.getOne("SELECT  COUNT(ID)  AS  COUNT  FROM  "+GroupChatMessage.dao.getDataSourceBind().table()+"  WHERE  GROUP_ID = ?",new  Object[]{groupId}).getLong("COUNT").intValue();
+		return  GroupChatMessageRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(ID)  AS  COUNT  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  GROUP_ID = ?",new  Object[]{ groupId}).intValue();
 	}
 
 	public  View  getView( final  int  position,View  convertView,ViewGroup  parent )
@@ -78,40 +79,40 @@ public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter
 
 		GroupChatMessage  message = getItem( position );
 
-		ObjectUtils.cast(convertView.findViewById(TransportState.valueOf(message.getInteger("TRANSPORT_STATE")) == TransportState.RECEIVED ? R.id.other_portrait : R.id.owner_portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+(TransportState.valueOf(message.getInteger("TRANSPORT_STATE")) == TransportState.RECEIVED ? message.getLong("CONTACT_ID") : context.application().getUserMetadata().getLong("ID"))+"/portrait").build().toString()) );
+		ObjectUtils.cast(convertView.findViewById(TransportState.valueOf(message.getTransportState()) == TransportState.RECEIVED ? R.id.other_portrait : R.id.owner_portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+(TransportState.valueOf(message.getTransportState()) == TransportState.RECEIVED ? message.getContactId() : context.application().getSquirrelClient().getUserMetadata().getId())+"/portrait").build().toString()) );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.message_vest_to_switcher),ViewSwitcher.class).setDisplayedChild( TransportState.valueOf(message.getInteger("TRANSPORT_STATE")) == TransportState.RECEIVED ? 0 : 1 );
+		ObjectUtils.cast(convertView.findViewById(R.id.message_vest_to_switcher),ViewSwitcher.class).setDisplayedChild( TransportState.valueOf(message.getTransportState()) == TransportState.RECEIVED ? 0 : 1 );
 
 		View  contentFrame = ObjectUtils.cast(convertView.findViewById(R.id.message_vest_to_switcher),ViewSwitcher.class).getDisplayedChild();
 
-		ObjectUtils.cast(contentFrame.findViewById(R.id.send_failed_warning_image),ImageView.class).setVisibility( TransportState.valueOf(message.getInteger("TRANSPORT_STATE")) == TransportState.SEND_FAILED ? View.VISIBLE : View.GONE );
+		ObjectUtils.cast(contentFrame.findViewById(R.id.send_failed_warning_image),ImageView.class).setVisibility( TransportState.valueOf(message.getTransportState()) == TransportState.SEND_FAILED ? View.VISIBLE : View.GONE );
 
 		ViewSwitcher  contentSwitcher = ObjectUtils.cast( contentFrame.findViewById(R.id.message_content_switcher) );
 
-		if( ChatContentType.valueOf(message.getInteger("CONTENT_TYPE")) == ChatContentType.IMAGE || ChatContentType.valueOf(message.getInteger("CONTENT_TYPE")) == ChatContentType.VIDEO )
+		if( ChatContentType.valueOf(message.getContentType()) == ChatContentType.IMAGE || ChatContentType.valueOf(message.getContentType()) == ChatContentType.VIDEO )
 		{
-			File  screenshotFile = new  File( context.application().getCacheDir(),"file/"+message.getString("MD5")+"$TMB" );
+			File  screenshotFile = new  File( context.application().getCacheDir(), "file/"+message.getMd5()+"$TMB" );
 
-			ObjectUtils.cast(contentSwitcher.setDisplayedChild(1).findViewById(R.id.screenshot),FlexibleSimpleDraweeView.class).setImageURI( screenshotFile.exists() ? Uri.parse(screenshotFile.toURI().toString()) : Uri.parse(context.application().baseUrl().addPathSegments("file/"+message.getString("MD5")+"$TMB").addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().getUserMetadata().getString("SECRET_KEY")).build().toString()) );
+			ObjectUtils.cast(contentSwitcher.setDisplayedChild(1).findViewById(R.id.screenshot),FlexibleSimpleDraweeView.class).setImageURI( screenshotFile.exists() ? Uri.parse(screenshotFile.toURI().toString()) : Uri.parse(context.application().baseUrl().addPathSegments("file/"+message.getMd5()+"$TMB").addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().getUserMetadata().getSecretKey()).build().toString()) );
 
-			contentSwitcher.findViewById(R.id.upload_progress_bar).setVisibility( TransportState.valueOf( message.getInteger("TRANSPORT_STATE") ) == TransportState.SENDING ? View.VISIBLE : View.GONE );
+			contentSwitcher.findViewById(R.id.upload_progress_bar).setVisibility( TransportState.valueOf(message.getTransportState()) == TransportState.SENDING ? View.VISIBLE : View.GONE );
 
-			ObjectUtils.cast(contentSwitcher.findViewById(R.id.play_button),ImageView.class).setVisibility( TransportState.valueOf(message.getInteger("TRANSPORT_STATE")) == TransportState.SENDING || ChatContentType.valueOf(message.getInteger("CONTENT_TYPE")) == ChatContentType.IMAGE ? View.GONE : View.VISIBLE );
+			ObjectUtils.cast(contentSwitcher.findViewById(R.id.play_button),ImageView.class).setVisibility( TransportState.valueOf(message.getTransportState()) == TransportState.SENDING || ChatContentType.valueOf(message.getContentType()) == ChatContentType.IMAGE ? View.GONE : View.VISIBLE );
 
-			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> ActivityCompat.startActivity(context,new  Intent(context,ChatContentType.valueOf(message.getInteger("CONTENT_TYPE")) == ChatContentType.IMAGE ? ImagePreviewActivity.class : VideoPreviewActivity.class).putExtra("PATH",new  File(context.application().getCacheDir(),"file/"+message.getString("MD5")).getPath()).putExtra("URL",context.application().baseUrl().addPathSegments("file/"+message.getString("MD5")).addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().getUserMetadata().getString("SECRET_KEY")).build().toString()),ActivityOptionsCompat.makeCustomAnimation(context,R.anim.right_in,R.anim.left_out).toBundle()) );
+			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> ActivityCompat.startActivity(context,new  Intent(context,ChatContentType.valueOf(message.getContentType()) == ChatContentType.IMAGE ? ImagePreviewActivity.class : VideoPreviewActivity.class).putExtra("PATH",new  File(context.application().getCacheDir(),"file/"+message.getMd5()).getPath()).putExtra("URL",context.application().baseUrl().addPathSegments("file/"+message.getMd5()).addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().getUserMetadata().getSecretKey()).build().toString()),ActivityOptionsCompat.makeCustomAnimation(context,R.anim.right_in,R.anim.left_out).toBundle()) );
 		}
 		else
-		if( ChatContentType.valueOf(message.getInteger("CONTENT_TYPE")) == ChatContentType.AUDIO )
+		if( ChatContentType.valueOf(message.getContentType()) == ChatContentType.AUDIO )
 		{
-			ObjectUtils.cast(contentSwitcher.setDisplayedChild(2).getDisplayedChild().findViewById(R.id.content),TextView.class).setText( new  DateTime(Long.parseLong(message.getString("CONTENT")),DateTimeZone.UTC).toString( "ss" ) );
+			ObjectUtils.cast(contentSwitcher.setDisplayedChild(2).getDisplayedChild().findViewById(R.id.content),TextView.class).setText(   new  DateTime(Long.parseLong(message.getContent()),DateTimeZone.UTC).toString("ss") );
 
-			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> { try{ new  MediaPlayer().play(new  File(context.application().getCacheDir(), "file/"+message.getString("MD5")).getPath(),null,null); }catch( IOException  ie ){} } );
+			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> { try{ new  MediaPlayer().play(new  File(context.application().getCacheDir(), "file/"+message.getMd5()).getPath(),null,null); }catch(IOException  e){} } );
 		}
 		else
 		{
-			ObjectUtils.cast(contentSwitcher.setDisplayedChild(0).getDisplayedChild().findViewById(R.id.message),TextView.class).setText( message.getString("CONTENT") );
+			ObjectUtils.cast(contentSwitcher.setDisplayedChild(0).getDisplayedChild().findViewById(R.id.message),TextView.class).setText( message.getContent());
 		}
 
-		ObjectUtils.cast(convertView.findViewById(TransportState.valueOf(message.getInteger("TRANSPORT_STATE")) == TransportState.RECEIVED ? R.id.owner_portrait : R.id.other_portrait),SimpleDraweeView.class).setImageResource(   R.color.white );  return  convertView;
+		ObjectUtils.cast(convertView.findViewById(TransportState.valueOf(message.getTransportState()) == TransportState.RECEIVED ? R.id.owner_portrait : R.id.other_portrait), SimpleDraweeView.class).setImageResource( R.color.white );  return  convertView;
 	}
 }

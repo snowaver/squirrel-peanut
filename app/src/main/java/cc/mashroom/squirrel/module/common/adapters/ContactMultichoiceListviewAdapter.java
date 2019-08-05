@@ -26,6 +26,7 @@ import  com.facebook.drawee.view.SimpleDraweeView;
 import  cc.mashroom.hedgehog.parent.BaseAdapter;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
+import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cn.refactor.library.SmoothCheckBox;
@@ -47,7 +48,7 @@ public  class  ContactMultichoiceListviewAdapter  extends  BaseAdapter<Contact>
 
 		setContext(context).setItems( contacts );
 
-		for( java.util.Map.Entry<Long,Contact>  entry : Contact.dao.getContactDirect().entrySet() )
+		for( java.util.Map.Entry<Long,Contact>  entry : ContactRepository.DAO.getContactDirect().entrySet() )
 		{
 			if( !excludeContactIds.contains(entry.getKey()) )
 			{
@@ -70,13 +71,13 @@ public  class  ContactMultichoiceListviewAdapter  extends  BaseAdapter<Contact>
 
 		Contact  contact   = getItem( position );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.choice_checkbox),SmoothCheckBox.class).setOnCheckedChangeListener( (button, isChecked) -> {boolean  removed = isChecked ? contactIds.add(contact.getLong("ID")) : contactIds.remove(contact.getLong("CONTACT_ID"));} );
+		ObjectUtils.cast(convertView.findViewById(R.id.choice_checkbox),SmoothCheckBox.class).setOnCheckedChangeListener( (button, isChecked) -> {boolean  removed = isChecked ? contactIds.add(contact.getId()) : contactIds.remove(contact.getId());} );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.choice_checkbox),SmoothCheckBox.class).setChecked( contactIds.contains(contact.getLong("CONTACT_ID")) );
+		ObjectUtils.cast(convertView.findViewById(R.id.choice_checkbox),SmoothCheckBox.class).setChecked( contactIds.contains(contact.getId()) );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.name),TextView.class).setText( contact.getString("REMARK") );
+		ObjectUtils.cast(convertView.findViewById(R.id.name),TextView.class).setText( contact.getRemark() );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+contact.getLong("ID")+"/portrait").build().toString()) );
+		ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+contact.getId()+"/portrait").build().toString()) );
 
 		return  convertView;
 	}
