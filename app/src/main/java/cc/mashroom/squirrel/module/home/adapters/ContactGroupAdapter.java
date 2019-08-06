@@ -29,7 +29,7 @@ import  java.util.List;
 import  cc.mashroom.hedgehog.module.common.listener.SinglechoiceListener;
 import  cc.mashroom.hedgehog.parent.BaseAdapter;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.client.storage.model.user.Contact;
+import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.stream.Stream;
 import  cn.refactor.library.SmoothCheckBox;
@@ -43,9 +43,9 @@ public  class        ContactGroupAdapter  extends  BaseAdapter
     {
         super(    new  ArrayList() );
 
-        Stream.forEach( Contact.dao.search("SELECT  DISTINCT(GROUP_NAME)  AS  GROUP_NAME  FROM  "+Contact.dao.getDataSourceBind().table()+"  WHERE  (GROUP_NAME  !=  ''  AND  GROUP_NAME  IS  NOT  NULL)"),(contact) -> super.items.add(contact.getString("GROUP_NAME")) );
+        Stream.forEach( ContactRepository.DAO.lookup(String.class,"SELECT  DISTINCT(GROUP_NAME)  AS  GROUP_NAME  FROM  "+ContactRepository.DAO.getDataSourceBind().table()+"  WHERE  (GROUP_NAME  !=  ''  AND  GROUP_NAME  IS  NOT  NULL)"),(groupName) -> super.items.add(groupName) );
 
-        this.setContext(context).setChoiceListener(new  SinglechoiceListener<String>(this,listener)).getChoiceListener().getChecked().set( super.items.isEmpty() ? "" : ObjectUtils.cast(super.items.get(0)) );
+        this.setContext(context).setChoiceListener(new  SinglechoiceListener<String>(this, listener)).getChoiceListener().getChecked().set( super.items.isEmpty() ? "" : ObjectUtils.cast(super.items.get(0)) );
     }
 
     public  ContactGroupAdapter  addNewGroup(     String  groupName , boolean  checked )

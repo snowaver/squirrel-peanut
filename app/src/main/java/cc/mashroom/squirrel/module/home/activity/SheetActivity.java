@@ -49,7 +49,8 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.ClientConnectEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.ClientConnectListener;
 import  cc.mashroom.squirrel.client.connect.ConnectState;
-import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
+import  cc.mashroom.squirrel.client.storage.model.OoIData;
+import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
@@ -89,7 +90,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 		connectStateChanged(    application().getSquirrelClient().getConnectState() );
 
-		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setAdapter( new  SheetPagerAdapter( super.getSupportFragmentManager() ) );
+		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setAdapter( new  SheetPagerAdapter(super.getSupportFragmentManager()) );
 
 		List<Map<String,Object>>  sidebarDatas = new  ArrayList<Map<String,Object>>();
 
@@ -106,14 +107,14 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.title),TextView.class).setText( bottomTabResources.getInteger("title") );
 
-			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.icon),ImageView.class).setImageResource( bottomTabResources.getInteger( "icon" ) );
+			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.icon),ImageView.class).setImageResource( bottomTabResources.getInteger("icon") );
 
 			ObjectUtils.cast(super.findViewById(R.id.tab_layout),      TabLayout.class).addTab( newTab );
 		}
 
 		ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).setOnClickListener( (logoutButton) -> ActivityCompat.startActivity(this,new  Intent(this,SystemSettingsActivity.class),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
-		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+application().getUserMetadata().get("ID")+"/portrait").build().toString()) );
+		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+application().getSquirrelClient().getUserMetadata().getId()+"/portrait").build().toString()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).addDropdownItem(R.string.chat_create_new_group,R.color.white,18,super.getResources().getDisplayMetrics().widthPixels/2,DensityUtils.px(this,50)).setOnItemClickListener( this );
 	}
@@ -153,26 +154,26 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 		if( StringUtils.isNotBlank( createdGroupName) )
 		{
-			RetrofitRegistry.get(ChatGroupService.class).add(createdGroupName).enqueue
+			RetrofitRegistry.INSTANCE.get(         ChatGroupService.class ).add(createdGroupName).enqueue
 			(
-				new  AbstractRetrofit2Callback<Map<String,List<Map<String,Object>>>>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(), ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<OoIData>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(), ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					@SneakyThrows
-					public  void  onResponse( Call<Map<String,List<Map<String,Object>>>>  call,Response<Map<String,List<Map<String,Object>>>>  response )
+					public  void  onResponse(      Call<OoIData>  call    , Response<OoIData>  response )
 					{
 						super.onResponse( call , response );
 
 						if( response.code()    == 200 )
 						{
-							response.body().get("CHAT_GROUP_USERS").get(0).addEntry( "VCARD" , application().getUserMetadata().getString( "NICKNAME" ) );
+							response.body().getChatGroupUsers().get(0).setVcard(   application().getSquirrelClient().getUserMetadata().getNickname() );
 
-							Db.tx(String.valueOf(application().getUserMetadata().getLong("ID")),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroup.dao.attach(application().getSquirrelClient(),response.body()) );
+							Db.tx(String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body()) );
 
 							ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(SheetActivity.this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().get("news_profile").get("fragment.instance"),NewsProfileFragment.class).getContentView().findViewById(R.id.profile_list),ListView.class).getAdapter(),NewsProfileListAdapter.class).notifyDataSetChanged();
 						}
 						else
 						{
-							showSneakerWindow( Sneaker.with(SheetActivity.this),com.irozon.sneaker.R.drawable.ic_error,response.code() == 601 ? R.string.chat_group_exist : R.string.network_or_internal_server_error,R.color.white,R.color.red );
+							showSneakerWindow( Sneaker.with(SheetActivity.this),com.irozon.sneaker.R.drawable.ic_error,response.code() == 601 ? R.string.chat_group_exist :     R.string.network_or_internal_server_error,R.color.white,R.color.red );
 						}
 					}
 				}

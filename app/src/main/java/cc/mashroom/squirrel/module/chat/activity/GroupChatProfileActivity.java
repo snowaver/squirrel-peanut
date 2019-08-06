@@ -33,7 +33,7 @@ import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.client.storage.model.Offline;
+import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
@@ -108,10 +108,10 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 		{
 			RetrofitRegistry.INSTANCE.get(ChatGroupUserService.class).add(chatGroup.getId(),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"),",")).enqueue
 			(
-				new  AbstractRetrofit2Callback<Offline>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<OoIData>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					@SneakyThrows
-					public  void  onResponse( Call<Offline>  call,Response<Offline>  response )
+					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
 					{
 						super.onResponse( call,  response );
 
@@ -136,10 +136,10 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
         {
 			RetrofitRegistry.INSTANCE.get(ChatGroupService.class).update(chatGroup.getId(),data.getStringExtra("EDIT_CONTENT")).enqueue
 			(
-				new  AbstractRetrofit2Callback<Offline>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<OoIData>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					@SneakyThrows
-					public  void  onResponse( Call<Offline>  call,Response<Offline>  response )
+					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
 					{
 						super.onResponse( call,  response );
 
@@ -182,10 +182,10 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 		{
 			RetrofitRegistry.INSTANCE.get(ChatGroupUserService.class).secede(this.chatGroup.getId(),this.chatGroupUser.getId()).enqueue
 			(
-				new  AbstractRetrofit2Callback<Offline>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<OoIData>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					@SneakyThrows
-					public  void  onResponse( Call<Offline>  call,Response<Offline>  response )
+					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
 					{
 						super.onResponse( call,  response );
 

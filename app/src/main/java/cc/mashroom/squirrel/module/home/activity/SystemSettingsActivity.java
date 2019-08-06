@@ -27,16 +27,15 @@ import  android.widget.TextView;
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.google.android.material.bottomsheet.BottomSheetDialog;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import  java.util.ArrayList;
+import  java.util.List;
 import  java.util.Locale;
 
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
-import cc.mashroom.hedgehog.util.ContextUtils;
+import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
@@ -61,7 +60,7 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 {
 	private   void  logout()
 	{
-		RetrofitRegistry.get(UserService.class).logout(application().getSquirrelClient().getId()).enqueue
+		RetrofitRegistry.INSTANCE.get(UserService.class).logout(    application().getSquirrelClient().getId()).enqueue
 		(
 			new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 			{

@@ -26,6 +26,7 @@ import  cc.mashroom.hedgehog.parent.BaseAdapter;
 import  cc.mashroom.hedgehog.util.ImageUtils;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
+import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.module.home.tab.contact.fragment.ChatGroupFragment;
 import  cc.mashroom.util.ObjectUtils;
 import  lombok.AllArgsConstructor;
@@ -40,20 +41,20 @@ public  class  ChatGroupAdapter  extends  BaseAdapter
 	@SneakyThrows
 	public  ChatGroup  getItem( int  position )
 	{
-		return  ChatGroup.dao.getOne("SELECT  ID,CREATE_TIME,LAST_MODIFY_TIME,NAME  FROM  "+ChatGroup.dao.getDataSourceBind().table()+"  ORDER  BY  NAME  ASC  LIMIT  1  OFFSET  ?",new  Object[]{position});
+		return  ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  ID,CREATE_TIME,LAST_MODIFY_TIME,NAME  FROM  "+ChatGroupRepository.DAO.getDataSourceBind().table()+"  ORDER  BY  NAME  ASC  LIMIT  1  OFFSET  ?",new  Object[]{position});
 	}
 	@SneakyThrows
 	public  int  getCount()
 	{
-		return  ChatGroup.dao.getOne("SELECT  COUNT(ID)  AS  COUNT  FROM  "+ChatGroup.dao.getDataSourceBind().table(),new  Object[]{}).getLong("COUNT").intValue();
+		return  ChatGroupRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(ID)  AS  COUNT  FROM  "+ChatGroupRepository.DAO.getDataSourceBind().table(),new  Object[]{}).intValue();
 	}
 
 	public  View  getView( int  position,View  convertView,ViewGroup  parent )
 	{
 		convertView = convertView != null ? convertView : LayoutInflater.from(context.getContext()).inflate( R.layout.fragment_contact_chat_group_item,parent,false );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( ImageUtils.toUri(context.getActivity(),R.drawable.lightgray_placeholder) );
+		ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI(    ImageUtils.toUri(context.getActivity(),R.drawable.lightgray_placeholder) );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.name),TextView.class).setText( getItem(position).getString("NAME") );  return  convertView;
+		ObjectUtils.cast(convertView.findViewById(R.id.name),TextView.class).setText( getItem(position).getName() );  return  convertView;
 	}
 }

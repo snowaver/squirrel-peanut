@@ -15,7 +15,7 @@
  */
 package cc.mashroom.squirrel.module.chat.services;
 
-import  cc.mashroom.squirrel.client.storage.model.Offline;
+import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  retrofit2.Call;
 import  retrofit2.http.DELETE;
 import  retrofit2.http.Field;
@@ -27,8 +27,8 @@ public  interface  ChatGroupUserService
 {
 	@POST(   value="/chat/group/user" )
 	@FormUrlEncoded
-	public  Call<Offline>  add(@Field(value="chatGroupId")  long  chatGroupId, @Field(value="inviteeIds")  String  inviteeIds );
+	public  Call<OoIData>  add(@Field(value="chatGroupId")  long  chatGroupId, @Field(value="inviteeIds")  String  inviteeIds );
 
 	@DELETE( value="/chat/group/user" )
-	public  Call<Offline>  secede( @Query(value="chatGroupId")  long  chatGroupId,@Query(value="chatGroupUserId")  long  chatGroupUserId );
+	public  Call<OoIData>  secede( @Query(value="chatGroupId")  long  chatGroupId,@Query(value="chatGroupUserId")  long  chatGroupUserId );
 }
