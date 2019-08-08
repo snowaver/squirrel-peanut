@@ -32,7 +32,7 @@ import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
-import cc.mashroom.squirrel.util.LocaleUtils;
+import  cc.mashroom.squirrel.util.LocaleUtils;
 
 public  class  LoadingActivity  extends  AbstractActivity  implements  Runnable
 {
@@ -60,7 +60,7 @@ public  class  LoadingActivity  extends  AbstractActivity  implements  Runnable
         else
 		if( !super.isFinishing() )
 		{
-			ActivityCompat.startActivity( this,new  Intent(LoadingActivity.this,application().getUserMetadata() == null ? LoginActivity.class : SheetActivity.class),ActivityOptionsCompat.makeCustomAnimation(LoadingActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
+			ActivityCompat.startActivity( this,new  Intent(LoadingActivity.this,application().getSquirrelClient().getUserMetadata() == null ? LoginActivity.class : SheetActivity.class),ActivityOptionsCompat.makeCustomAnimation(LoadingActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
 		}
 	}
 }

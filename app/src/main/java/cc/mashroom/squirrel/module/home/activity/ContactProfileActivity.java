@@ -55,7 +55,7 @@ import  lombok.experimental.Accessors;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
-public  class  ContactProfileActivity  extends         AbstractPacketListenerActivity  implements  View.OnClickListener
+public  class  ContactProfileActivity  extends          AbstractPacketListenerActivity  implements  View.OnClickListener
 {
 	protected  void  onCreate( Bundle  savedInstanceState   )
 	{
@@ -65,24 +65,26 @@ public  class  ContactProfileActivity  extends         AbstractPacketListenerAct
 
 		super.setContentView(      R.layout.activity_contact_profile );
 
-		this.setUser( ObjectUtils.cast( super.getIntent().getSerializableExtra("USER"),User.class ) );
+		this.contact  = ObjectUtils.cast(   super.getIntent().getSerializableExtra("CONTACT") );
 
-		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+user.getId()+"/portrait").build().toString()) );
+		this.nickname = super.getIntent().getStringExtra( "NICKNAME" );
 
-		ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).setText( this.user.getUsername() );
+		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+contact.getId()+"/portrait").build().toString()) );
 
-		if( StringUtils.isBlank( user.getName() ) )
+		ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).setText(    contact.getUsername() );
+
+		if( StringUtils.isBlank(   nickname) )
 		{
-		    RetrofitRegistry.INSTANCE.get(UserService.class).get(user.getId()).enqueue( new  AbstractRetrofit2Callback<User>(this){public  void  onResponse(Call<User>  call,Response<User>  response){ObjectUtils.cast(ContactProfileActivity.this.findViewById(R.id.nickname),StyleableEditView.class).setText(user.setNickname(response.body().getNickname()).getNickname());}} );
+		    RetrofitRegistry.INSTANCE.get(UserService.class).get(contact.getId()).enqueue( new  AbstractRetrofit2Callback<User>(this){public  void  onResponse(Call<User>  call,Response<User>  response){ObjectUtils.cast(ContactProfileActivity.this.findViewById(R.id.nickname),StyleableEditView.class).setText(setNickname(response.body().getNickname()).getNickname());}} );
 		}
 		else
 		{
-			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText(  user.getUsername() );
+			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText(contact.getUsername() );
 		}
 
-		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button), Button.class).setOnClickListener(   this );
+		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button), Button.class).setOnClickListener(    this );
 
-	    ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).findViewById(R.id.additional_switcher).setOnClickListener( (button) -> ActivityCompat.startActivity(this,new  Intent(this,ContactProfileEditActivity.class).putExtra("USER",user),  ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in , R.anim.left_out).toBundle()));
+	    ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).findViewById(R.id.additional_switcher).setOnClickListener( (button) -> ActivityCompat.startActivity(this,new  Intent(this,ContactProfileEditActivity.class).putExtra("CONTACT",contact),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 	}
 
 	private  Map<Integer,Integer>  buttonTexts = new  HashMap<Integer,Integer>().addEntry(0,R.string.subscribe_add_contact).addEntry(1,R.string.subscribe_accept_request).addEntry(6,R.string.message).addEntry( 7,R.string.message );
@@ -93,19 +95,23 @@ public  class  ContactProfileActivity  extends         AbstractPacketListenerAct
 	@Accessors(  chain = true )
 	@Setter
     @Getter
-	private  User  user;
+	private  Contact   contact;
+	@Accessors(  chain = true )
+	@Setter
+	@Getter
+	private  String   nickname;
 
 	protected   void  onStart()
 	{
 		super.onStart();
 
-		Contact  contact = ContactRepository.DAO.getContactDirect().get(this.user.getId() );
+		Contact  contact = ContactRepository.DAO.getContactDirect().get( this.contact.getId() );
 
-		if( super.application().getSquirrelClient().getUserMetadata().getId().longValue() == this.user.getId() || contact == null )
+		if( super.application().getSquirrelClient().getUserMetadata().getId().longValue() == contact.getId()   || contact == null )
 		{
-			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setVisibility(View.INVISIBLE );  ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setVisibility(View.INVISIBLE );
+			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setVisibility( View.INVISIBLE );  ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setVisibility(View.INVISIBLE );
 
-			if(    super.application().getSquirrelClient().getUserMetadata().getId().longValue() == this.user.getId() )
+			if(    super.application().getSquirrelClient().getUserMetadata().getId().longValue() ==    contact.getId() )
 			{
 				ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setVisibility(   View.INVISIBLE );
 
@@ -121,13 +127,13 @@ public  class  ContactProfileActivity  extends         AbstractPacketListenerAct
 				ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(super.getResources().getColor(R.color.gainsboro) );
 			}
 
-			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setVisibility(  View.VISIBLE );
+			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setVisibility(   View.VISIBLE );
 
-			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setText( contact.getRemark() );
+			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setText(  contact.getRemark() );
 
-			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setVisibility(  View.VISIBLE );
+			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setVisibility(   View.VISIBLE );
 
-			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText(          contact.getGroupName() );
+			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText(  contact.getGroupName()         );
 		}
 	}
 
@@ -148,7 +154,7 @@ public  class  ContactProfileActivity  extends         AbstractPacketListenerAct
 	{
 		if( button.getId() == R.id.chat_or_subscribe_button )
 		{
-			Contact  contact = ContactRepository.DAO.getContactDirect().get( user.getId() );
+			Contact contact=ContactRepository.DAO.getContactDirect().get(this.contact.getId() );
 
 			if( contact != null && (contact.getSubscribeStatus() == 6||            contact.getSubscribeStatus() == 7) )
 			{
@@ -161,7 +167,7 @@ public  class  ContactProfileActivity  extends         AbstractPacketListenerAct
 			}
 			else
 			{
-				ActivityCompat.startActivity( this,new  Intent(this,ContactProfileEditActivity.class).putExtra("USER",ObjectUtils.cast(user,Serializable.class)),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+				ActivityCompat.startActivity( this,new  Intent(this,ContactProfileEditActivity.class).putExtra("CONTACT",ObjectUtils.cast(contact,Serializable.class)),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 			}
 		}
 	}

@@ -33,6 +33,10 @@ import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
+import cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
+import cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
+import cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupUserRepository;
+import cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.parent.Application;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.fragment.NewsProfileFragment;
 import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
@@ -48,9 +52,9 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 	protected  NewsProfileFragment  context;
 
 	@SneakyThrows
-	public  NewsProfile  getItem(  int  position )
+	public  NewsProfile  getItem(   int   position )
 	{
-		return  NewsProfile.dao.getOne( "SELECT  ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT  FROM  "+ NewsProfile.dao.getDataSourceBind().table()+"  ORDER  BY  CREATE_TIME  DESC  LIMIT  1  OFFSET  ?",new  Object[]{position} );
+		return  NewsProfileRepository.DAO.lookupOne( NewsProfile.class,"SELECT  ID,CREATE_TIME,PACKET_TYPE,CONTACT_ID,CONTENT,BADGE_COUNT  FROM  "+ NewsProfileRepository.DAO.getDataSourceBind().table()+"  ORDER  BY  CREATE_TIME  DESC  LIMIT  1  OFFSET  ?",new  Object[]{position} );
 	}
 	public  long  getItemId( int  position )
 	{
@@ -59,53 +63,53 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 	@SneakyThrows
 	public  int  getCount()
 	{
-		return  NewsProfile.dao.getOne("SELECT  COUNT(*)  AS  COUNT  FROM  "+NewsProfile.dao.getDataSourceBind().table(),new  Object[]{}).getLong("COUNT").intValue();
+		return  NewsProfileRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(*)  AS  COUNT  FROM  "+NewsProfileRepository.DAO.getDataSourceBind().table(),new  Object[]{}).getLong("COUNT").intValue();
 	}
-	private  String  getProfileMessage( String  content,PAIPPacketType  type,NewsProfile  newsProfile )
+	private  String  getProfileMessage( String  content,PAIPPacketType  type )
 	{
 		if( type==PAIPPacketType.SUBSCRIBE )
 		{
-			return  context.getString(Integer.valueOf(content) == 0 ? R.string.subscribe_request_sent : R.string.subscribe_received_a_adding_contact_request );
+			return  context.getString( Integer.valueOf(content) == 0 ? R.string.subscribe_request_sent : R.string.subscribe_received_a_adding_contact_request );
 		}
 		else
 		{
-			return  Application.NEWS_PROFILE_PLACEHOLDERS.containsKey(content) ? context.getString(Application.NEWS_PROFILE_PLACEHOLDERS.get(content)):content;
+			return  Application.NEWS_PROFILE_PLACEHOLDERS.containsKey(content) ? context.getString(Application.NEWS_PROFILE_PLACEHOLDERS.get(content)): content;
 		}
 	}
 	@SneakyThrows
 	public  View  getView( int  position,View  convertView,ViewGroup  parent )
 	{
-		convertView       = convertView != null ? convertView : LayoutInflater.from(context.getContext()).inflate( R.layout.fragment_news_profile_item,parent,false );
+		convertView = convertView != null ? convertView : LayoutInflater.from(context.getContext()).inflate( R.layout.fragment_news_profile_item,parent,false );
 
 		NewsProfile  newsProfile = this.getItem( position );
 
-		if( PAIPPacketType.valueOf(newsProfile.getShort("PACKET_TYPE")) == PAIPPacketType.GROUP_CHAT  )
+		if( PAIPPacketType.valueOf(newsProfile.getPacketType()) == PAIPPacketType.GROUP_CHAT  )
 		{
-			ObjectUtils.cast(convertView.findViewById(R.id.nickname),TextView.class).setText( ChatGroup.dao.getOne("SELECT  NAME  FROM  "+ChatGroup.dao.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{newsProfile.getLong("ID")}).getString("NAME") );
+			ObjectUtils.cast(convertView.findViewById(R.id.nickname),TextView.class).setText( ChatGroupRepository.DAO.lookupOne(String.class,"SELECT  NAME  FROM  "+ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{newsProfile.getId()}) );
 
-			ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse("res://"+ context.getContext().getPackageName()+ "/"+ R.drawable.placeholder) );
+			ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse("res://" + context.getContext().getPackageName() + "/" + R.drawable.placeholder) );
 
-			if( newsProfile.getLong("CONTACT_ID") ==  null )
+			if(   newsProfile.getContactId()       == null )
 			{
 				ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( R.string.start_to_chat );
 			}
 			else
 			{
-				ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( ChatGroupUser.dao.getOne("SELECT  VCARD  FROM  "+ChatGroupUser.dao.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?",new  Object[]{newsProfile.getLong("CONTACT_ID")}).getString("VCARD")+context.getContext().getString(R.string.colon)+(Application.NEWS_PROFILE_PLACEHOLDERS.containsKey(newsProfile.getString("CONTENT")) ? context.getString(Application.NEWS_PROFILE_PLACEHOLDERS.get(newsProfile.getString("CONTENT"))) : newsProfile.getString("CONTENT")) );
+				ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( ChatGroupUserRepository.DAO.lookupOne(String.class,"SELECT  VCARD  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?",new  Object[]{newsProfile.getContactId()})+context.getContext().getString(R.string.colon)+(Application.NEWS_PROFILE_PLACEHOLDERS.containsKey(newsProfile.getContent()) ? context.getString(Application.NEWS_PROFILE_PLACEHOLDERS.get(newsProfile.getContent())) : newsProfile.getContent()) );
 			}
 		}
 		else
-		if( PAIPPacketType.valueOf(newsProfile.getShort("PACKET_TYPE")) == PAIPPacketType.CHAT || PAIPPacketType.valueOf(newsProfile.getShort("PACKET_TYPE")) == PAIPPacketType.SUBSCRIBE || PAIPPacketType.valueOf(newsProfile.getShort("PACKET_TYPE"))  == PAIPPacketType.SUBSCRIBE_ACK )
+		if( PAIPPacketType.valueOf(newsProfile.getPacketType()) == PAIPPacketType.CHAT || PAIPPacketType.valueOf(newsProfile.getPacketType()) == PAIPPacketType.SUBSCRIBE || PAIPPacketType.valueOf(newsProfile.getPacketType()) == PAIPPacketType.SUBSCRIBE_ACK )
 		{
-			ObjectUtils.cast(convertView.findViewById(R.id.nickname),TextView.class).setText( Contact.dao.getContactDirect().get(newsProfile.getLong("CONTACT_ID")).getString("REMARK") );
+			ObjectUtils.cast(convertView.findViewById(R.id.nickname),TextView.class).setText( ContactRepository.DAO.getContactDirect().get(newsProfile.getContactId()).getRemark() );
 
-			ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+newsProfile.getLong("CONTACT_ID")+"/portrait").build().toString()) );
+			ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+newsProfile.getContactId()+"/portrait").build().toString()) );
 
-			ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( getProfileMessage(newsProfile.getString("CONTENT"),PAIPPacketType.valueOf(newsProfile.getShort("PACKET_TYPE")),newsProfile) );
+			ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( getProfileMessage(newsProfile.getContent(), PAIPPacketType.valueOf(newsProfile.getPacketType())) );
 		}
 
-		ObjectUtils.cast(convertView.findViewById(R.id.remove_button),RelativeLayout.class).setOnClickListener( (removeButton) -> {ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(context.getActivity()).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.message_whether_to_delete).setMessageTextSize(18).setCancelable(true).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(button,which) ->{}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog, which) -> {NewsProfile.dao.update("DELETE  FROM  "+NewsProfile.dao.getDataSourceBind().table()+"  WHERE  ID = ?  AND  PACKET_TYPE = ?",new  Object[]{newsProfile.getLong("ID"),newsProfile.getShort("PACKET_TYPE")});  NewsProfileListAdapter.this.notifyDataSetChanged();}).create().setWidth((int)  (context.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(context.getActivity(),R.font.droid_sans_mono)).show();} );
+		ObjectUtils.cast(convertView.findViewById(R.id.remove_button),RelativeLayout.class).setOnClickListener( (removeButton) -> {ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(context.getActivity()).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.message_whether_to_delete).setMessageTextSize(18).setCancelable(true).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(button,which) ->{}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog, which) -> {NewsProfileRepository.DAO.update("DELETE  FROM  "+NewsProfileRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  PACKET_TYPE = ?",new  Object[]{newsProfile.getId(),newsProfile.getPacketType()});  NewsProfileListAdapter.this.notifyDataSetChanged();}).create().setWidth((int)  (context.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(context.getActivity(),R.font.droid_sans_mono)).show();} );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.badge),BadgeView.class).setBadge( newsProfile.getInteger( "BADGE_COUNT" ), 0, 99, "." );   return  convertView;
+		ObjectUtils.cast(convertView.findViewById(R.id.badge),BadgeView.class).setBadge( newsProfile.getBadgeCount(),0, 99, "." );          return  convertView;
 	}
 }

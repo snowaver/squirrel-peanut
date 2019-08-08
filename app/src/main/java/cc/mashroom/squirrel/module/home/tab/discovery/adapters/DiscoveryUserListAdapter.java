@@ -53,8 +53,8 @@ public  class  DiscoveryUserListAdapter  extends  BaseAdapter<User>
 
 		User  user  = getItem( position );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.nickname),TextView.class).setText( user.getString("NICKNAME") );
+		ObjectUtils.cast(convertView.findViewById(R.id.nickname),TextView.class).setText( user.getNickname() );
 
-		ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+user.get("ID")+"/portrait").build().toString()) );  return  convertView;
+		ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+user.getId()+"/portrait").build().toString()) );  return  convertView;
 	}
 }

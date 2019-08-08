@@ -31,8 +31,7 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.client.storage.model.user.User;
-import cc.mashroom.squirrel.module.home.activity.ContactProfileActivity;
-import  cc.mashroom.squirrel.module.home.activity.SubscribeActivity;
+import  cc.mashroom.squirrel.module.home.activity.ContactProfileActivity;
 import  cc.mashroom.squirrel.parent.AbstractPacketListenerFragment;
 import  cc.mashroom.squirrel.module.home.tab.contact.adapters.ContactGroupAdapter;
 import  cc.mashroom.squirrel.paip.message.Packet;
@@ -57,7 +56,7 @@ public  class  ContactGroupFragment  extends  AbstractPacketListenerFragment  im
 
 			ObjectUtils.cast(contentView.findViewById(R.id.contact_group),ExpandableListView.class).setOnGroupClickListener( (parent,v,groupPosition,id) -> true );
 
-			ObjectUtils.cast(contentView.findViewById(R.id.contact_group),ExpandableListView.class).setOnChildClickListener( (parent,v,groupPosition,childPosition,id) -> {Contact  contact = ObjectUtils.cast(parent.getExpandableListAdapter().getChild(groupPosition,childPosition));  ActivityCompat.startActivity(super.getActivity(),new  Intent(this.getActivity(),ContactProfileActivity.class).putExtra("USER",new  User().addEntry("ID",contact.getLong("ID")).addEntry("USERNAME",contact.getString("USERNAME")).addEntry("REMARK",contact.getString("REMARK"))),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle());  return  false;} );
+			ObjectUtils.cast(contentView.findViewById(R.id.contact_group),ExpandableListView.class).setOnChildClickListener( (parent,v,groupPosition,childPosition,id) -> {Contact  contact = ObjectUtils.cast(parent.getExpandableListAdapter().getChild(groupPosition,childPosition));  ActivityCompat.startActivity(super.getActivity(),new  Intent(this.getActivity(),ContactProfileActivity.class).putExtra("CONTACT",contact),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle());  return  false;} );
 		}
 
 		return  this.contentView;

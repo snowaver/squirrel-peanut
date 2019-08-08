@@ -41,9 +41,9 @@ import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
+import cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.client.storage.model.user.User;
-import cc.mashroom.squirrel.module.home.activity.ContactProfileActivity;
-import  cc.mashroom.squirrel.module.home.activity.SubscribeActivity;
+import  cc.mashroom.squirrel.module.home.activity.ContactProfileActivity;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.parent.AbstractFragment;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
@@ -52,7 +52,6 @@ import  cc.mashroom.squirrel.module.home.tab.discovery.adapters.DiscoveryUserLis
 import  cc.mashroom.squirrel.module.common.services.UserService;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
-import  cc.mashroom.util.stream.Stream;
 import  es.dmoral.toasty.Toasty;
 import  retrofit2.Call;
 import  retrofit2.Response;
@@ -67,7 +66,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextVi
 		{
 			contentView = inflater.inflate( R.layout.fragment_discovery,container,false );
 
-			ObjectUtils.cast(contentView.findViewById(R.id.discovery_list),ListView.class).setOnItemClickListener( (parent,view,position,id) -> {User  user = ObjectUtils.cast(parent.getAdapter().getItem(position),User.class);  ActivityCompat.startActivity(super.getActivity(),new  Intent(super.getActivity(),ContactProfileActivity.class).putExtra("USER",user),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle());} );
+			ObjectUtils.cast(contentView.findViewById(R.id.discovery_list),ListView.class).setOnItemClickListener( (parent,view,position,id) -> {User  user = ObjectUtils.cast(parent.getAdapter().getItem(position),User.class);  ActivityCompat.startActivity(super.getActivity(),new  Intent(super.getActivity(),ContactProfileActivity.class).putExtra("CONTACT",new  Contact().setId(user.getId()).setUsername(user.getUsername()).setRemark(user.getNickname())),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle());} );
 
 			ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor).findViewById(R.id.edit_inputor),EditText.class).setOnEditorActionListener( this );
 		}
@@ -95,7 +94,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextVi
 		{
 			if( StringUtils.isNotBlank(ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim()) )
 			{
-				RetrofitRegistry.get(UserService.class).search(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim(), "{}").enqueue
+				RetrofitRegistry.INSTANCE.get(UserService.class).search(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim(), "{}").enqueue
 				(
 					new  AbstractRetrofit2Callback<List<User>>( this.getActivity(),ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this.getActivity()).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this.getActivity(),R.font.droid_sans_mono)).setWidth(DensityUtils.px(this.getActivity(),220)).setHeight(DensityUtils.px(this.getActivity(),150)) )
 					{
@@ -113,8 +112,6 @@ public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextVi
                                 {
                                     Toasty.warning(DiscoveryFragment.this.getActivity(),DiscoveryFragment.this.getString(R.string.discovery_searched_nothing),Toast.LENGTH_LONG,false).show();
                                 }
-
-                                Stream.forEach( response.body(),(user) -> user.addEntry("ID",Long.parseLong(user.get("ID").toString())) );
 
                                 ObjectUtils.cast(contentView.findViewById(R.id.discovery_list),ListView.class).setAdapter( new  DiscoveryUserListAdapter(DiscoveryFragment.this,response.body()) );
 							}
