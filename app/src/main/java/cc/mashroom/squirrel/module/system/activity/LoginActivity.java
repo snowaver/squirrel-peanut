@@ -34,7 +34,6 @@ import  com.irozon.sneaker.Sneaker;
 
 import  androidx.core.content.res.ResourcesCompat;
 
-import  java.util.List;
 import  java.util.Locale;
 
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
@@ -46,13 +45,13 @@ import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.LifecycleListener;
+import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
 import  cc.mashroom.squirrel.module.home.adapters.SystemSettingsLanguageAdapter;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
-import  cc.mashroom.util.collection.map.Map;
 import  cn.refactor.library.SmoothCheckBox;
 import  lombok.Getter;
 import  lombok.Setter;
@@ -176,7 +175,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
 
     }
 
-    public  void  onReceivedOfflineData(     Map<String,List<Map<String,Object>>>  receivedOfflineData )
+    public  void  onReceivedOfflineData(OoIData   ooIData )
     {
 
     }
