@@ -139,7 +139,7 @@ public  class  ContactProfileActivity  extends          AbstractPacketListenerAc
 
 	public  void  received(        Packet  packet )   throws  Exception
     {
-        if(            packet instanceof SubscribeAckPacket )
+        if( packet  instanceof SubscribeAckPacket )
         {
         	application().getMainLooperHandler().post( () ->{ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(super.getResources().getColor(R.color.limegreen));  ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText(super.getResources().getText(R.string.message));} );
         }
@@ -150,20 +150,20 @@ public  class  ContactProfileActivity  extends          AbstractPacketListenerAc
 		ObjectUtils.cast(super.findViewById(R.id.collapsing_bar_layout),AppBarLayout.class).setExpanded(!isSoftinputVisible,true );
 	}
 
-	public  void  onClick(       View  button )
+	public  void  onClick(         View    button )
 	{
 		if( button.getId() == R.id.chat_or_subscribe_button )
 		{
 			Contact contact=ContactRepository.DAO.getContactDirect().get(this.contact.getId() );
 
-			if( contact != null && (contact.getSubscribeStatus() == 6||            contact.getSubscribeStatus() == 7) )
-			{
-				ActivityCompat.startActivity( this,new  Intent(this,ChatActivity.class).putExtra("CONTACT_ID",contact.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in ,R.anim.left_out).toBundle() );
-			}
-			else
 			if( contact != null &&  contact.getSubscribeStatus() == 0 )
 			{
 				super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_request_sent,R.color.white,R.color.limegreen );
+			}
+			else
+			if( contact != null && (contact.getSubscribeStatus() == 6||            contact.getSubscribeStatus() == 7) )
+			{
+				ActivityCompat.startActivity( this,new  Intent(this,ChatActivity.class).putExtra("CONTACT_ID",contact.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in ,R.anim.left_out).toBundle() );
 			}
 			else
 			{
