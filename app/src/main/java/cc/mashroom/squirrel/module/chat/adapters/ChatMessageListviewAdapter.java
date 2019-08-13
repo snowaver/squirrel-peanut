@@ -82,7 +82,7 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter
 	@SneakyThrows
 	public  int  getCount()
 	{
-		return  ChatMessageRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(ID)  AS  COUNT  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?",new  Object[]{contactId}).getLong("COUNT").intValue();
+		return  ChatMessageRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(ID)  AS  COUNT  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?",new  Object[]{contactId}).intValue();
 	}
 
 	public  View  getView( int  position,View  convertView,ViewGroup  parent )

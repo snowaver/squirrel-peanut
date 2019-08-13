@@ -63,7 +63,7 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 	@SneakyThrows
 	public  int  getCount()
 	{
-		return  NewsProfileRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(*)  AS  COUNT  FROM  "+NewsProfileRepository.DAO.getDataSourceBind().table(),new  Object[]{}).getLong("COUNT").intValue();
+		return  NewsProfileRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(*)  AS  COUNT  FROM  "+NewsProfileRepository.DAO.getDataSourceBind().table(),new  Object[]{}).intValue();
 	}
 	private  String  getProfileMessage( String  content,PAIPPacketType  type )
 	{
