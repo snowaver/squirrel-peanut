@@ -27,7 +27,7 @@ public  interface  ChatGroupUserService
 {
 	@POST(   value="/chat/group/user" )
 	@FormUrlEncoded
-	public  Call<OoIData>  add(@Field(value="chatGroupId")  long  chatGroupId, @Field(value="inviteeIds")  String  inviteeIds );
+	public  Call<OoIData>  add( @Field(value="chatGroupId")  long  chatGroupId,@Field(value="inviteeIds")  String  inviteeIds );
 
 	@DELETE( value="/chat/group/user" )
 	public  Call<OoIData>  secede( @Query(value="chatGroupId")  long  chatGroupId,@Query(value="chatGroupUserId")  long  chatGroupUserId );

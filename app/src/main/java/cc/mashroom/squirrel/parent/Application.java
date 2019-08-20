@@ -234,8 +234,6 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  void  onBalanceComplete( int  code , Throwable  throwable )
 	{
-		RetrofitRegistry.INSTANCE.initialize(this );
-
 		if( code == 200 )
 		{
 			super.getSharedPreferences("LATEST_NETWORK_ROUTE",MODE_PRIVATE).edit().putString("HOST",squirrelClient.getHost()).putInt("PORT",squirrelClient.getPort()).putInt("HTTPPORT",squirrelClient.getHttpPort()).commit();

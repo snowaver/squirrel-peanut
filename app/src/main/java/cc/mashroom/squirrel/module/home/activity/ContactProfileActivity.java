@@ -79,7 +79,7 @@ public  class  ContactProfileActivity  extends          AbstractPacketListenerAc
 		}
 		else
 		{
-			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText(contact.getUsername() );
+			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText(nickname );
 		}
 
 		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button), Button.class).setOnClickListener(    this );
@@ -107,11 +107,11 @@ public  class  ContactProfileActivity  extends          AbstractPacketListenerAc
 
 		Contact  contact = ContactRepository.DAO.getContactDirect().get( this.contact.getId() );
 
-		if( super.application().getSquirrelClient().getUserMetadata().getId().longValue() == contact.getId()   || contact == null )
+		if( contact == null  ||    super.application().getSquirrelClient().getUserMetadata().getId().longValue()==contact.getId() )
 		{
 			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setVisibility( View.INVISIBLE );  ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setVisibility(View.INVISIBLE );
 
-			if(    super.application().getSquirrelClient().getUserMetadata().getId().longValue() ==    contact.getId() )
+			if( contact != null && super.application().getSquirrelClient().getUserMetadata().getId().longValue()==contact.getId() )
 			{
 				ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setVisibility(   View.INVISIBLE );
 

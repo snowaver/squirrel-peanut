@@ -31,17 +31,17 @@ import  retrofit2.http.Query;
 
 public  interface  UserService
 {
-	@GET(  value="/user/search" )
-	public  Call<List<User>>  search(@Query(value = "action") int action, @Query(value = "keyword") String keyword, @Query(value = "extras") String extras);
+	@GET(  value="/user/lookup" )
+	public  Call<List<User>>  lookup( @Query(value="action")  int  action,@Query(value="keyword")  String  keyword,@Query(value="extras")  String  extras );
 
 	@GET(  value="/user" )
-	public  Call<User>  get(@Query(value = "userId") long userId);
+	public  Call<User>  get( @Query( value="userId")  long  userId );
 
 	@FormUrlEncoded
 	@POST( value="/user/logout" )
-	public  Call<Void>  logout(@Field(value = "userId") String userId);
+	public  Call<Void>  logout( @Field(value="userId")  String  userId );
 
 	@Multipart
 	@POST( value="/user" )
-	public  Call<Void>  register(@Part("user") RequestBody user, @Part MultipartBody.Part portrait);
+	public  Call<Void>  register( @Part("user")  RequestBody  user,@Part  MultipartBody.Part  portrait );
 }

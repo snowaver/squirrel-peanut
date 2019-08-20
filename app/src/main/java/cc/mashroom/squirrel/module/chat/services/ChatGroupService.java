@@ -35,8 +35,8 @@ public  interface  ChatGroupService
 
 	@FormUrlEncoded
 	@PUT(  value="/chat/group" )
-	public  Call<OoIData>  update(@Field(value="id")  long  chatGroupId, @Field(value="name")  String  name );
+	public  Call<OoIData>  update( @Field(value="id")  long  chatGroupId, @Field(value="name")  String  name );
 
-	@GET(  value="/chat/group/search" )
-	public  Call<List<ChatGroup>>  search( @Query(value="action")  int  action,@Query(value="keyword")  String  keyword,@Query(value="extras",encoded=true)  String  extras );
+	@GET(  value="/chat/group/lookup" )
+	public  Call<List<ChatGroup>>  lookup( @Query(value="action")  int  action,@Query(value="keyword")  String  keyword,@Query(value="extras",encoded=true)  String  extras );
 }

@@ -29,8 +29,8 @@ import  retrofit2.http.Query;
 
 public  interface  ContactService
 {
-	@GET(  value="/contact/search" )
-	public  Call<List<Contact>>  search( @Query(value="action")  int  action,@Query(value="keyword")  String  keyword,@Query(value="extras",encoded=true)  String  extras );
+	@GET(  value="/contact/lookup" )
+	public  Call<List<Contact>>  lookup( @Query(value="action")  int  action,@Query(value="keyword")  String  keyword,@Query(value="extras",encoded=true)  String  extras );
 
 	@FormUrlEncoded
 	@POST( value="/contact/status" )
