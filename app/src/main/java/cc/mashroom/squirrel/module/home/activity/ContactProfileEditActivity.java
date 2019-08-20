@@ -82,7 +82,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 	{
 		super.onCreate( savedInstanceState );
 
-		this.setContact(ObjectUtils.cast(super.getIntent().getSerializableExtra("CONTACT"))).setNickname( super.getIntent().getStringExtra("USERNAME") );
+		this.setContact(ObjectUtils.cast(super.getIntent().getSerializableExtra("CONTACT"))).setNickname(super.getIntent().getStringExtra("NICKNAME") );
 
 		super.setContentView( R.layout.activity_contact_profile_edit );
 
@@ -94,14 +94,14 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 		}
 		else
 		{
-			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText( contact.getUsername() );
+			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText( nickname );
 		}
 
 		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getGroupName()) ? contact.getGroupName() : "" );
 
-		if( contact  != null )
+		if( contact  != null &&  contact.getSubscribeStatus() != null )
 		{
-			if(           contact.getSubscribeStatus() == 0 )
+			if(      this.contact.getSubscribeStatus() == 0 )
 			{
 				ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor( super.getResources().getColor(R.color.gainsboro) );
 			}
@@ -159,7 +159,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 	{
 		if( response.code() == 200 )
 		{
-			ContactRepository.DAO.upsert(       old.clone().setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()) ,true );
+			ContactRepository.DAO.upsert( old.clone().setLastModifyTime(response.body().getLastModifyTime()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true );
 
 			super.showSneakerWindow( Sneaker.with(this),   com.irozon.sneaker.R.drawable.ic_success, R.string.updated,R.color.white,R.color.limegreen );
 		}
@@ -173,7 +173,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 	{
 		if( button.getId() == R.id.chat_or_subscribe_button )
 		{
-			Contact  contact         = ContactRepository.DAO.getContactDirect().get(this.contact.getId() );
+			Contact  contact         = ContactRepository.DAO.getContactDirect().get( this.contact.getId() );
 
 			if( contact!=null)
 			{
@@ -192,16 +192,17 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
                     {
                         RetrofitRegistry.INSTANCE.get(ContactService.class).changeSubscribeStatus(7,contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
-							new  AbstractRetrofit2Callback<Contact>( this, ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(), ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(     DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+							new  AbstractRetrofit2Callback<Contact>( this, ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 							{
 								@SneakyThrows
-								public  void  onResponse( Call<Contact>  call,Response<Contact>  response )
+								public  void  onResponse( Call<Contact>  call, Response<Contact>  response )
 								{
 									super.onResponse(  call,response );
 
 									if( response.code()==200)
 									{
-										ContactRepository.DAO.upsert( response.body() , true );
+										//  only  last  modify  time,  subscribe  status,  remark  and  group  name  are  updated,  so  update  them  on  local  storage
+										ContactRepository.DAO.upsert( contact.clone().setLastModifyTime(response.body().getLastModifyTime()).setSubscribeStatus(response.body().getSubscribeStatus()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()), true );
 
 										ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button).setBackgroundColor(       ContactProfileEditActivity.this.getResources().getColor(R.color.limegreen) );
 
@@ -224,12 +225,12 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 				{
                     if( StringUtils.isNoneBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),  StyleableEditView.class).getText().toString().trim()) )
                     {
-						RetrofitRegistry.INSTANCE.get(ContactService.class).subscribe( contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(), ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
+						RetrofitRegistry.INSTANCE.get(ContactService.class).subscribe(this.contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
-							new  AbstractRetrofit2Callback<Contact>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+							new  AbstractRetrofit2Callback<Contact>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this, 220)).setHeight(DensityUtils.px(this,150)) )
 							{
 								@SneakyThrows
-                                public  void  onResponse( Call<Contact>  call,Response<Contact>  response )
+                                public  void  onResponse( Call<Contact>  call, Response<Contact>  response )
 								{
 									super.onResponse(  call,response );
 
@@ -239,7 +240,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 
 										ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(   ContactProfileEditActivity.this.getResources().getColor(R.color.gainsboro) );
 
-										ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( buttonTexts.get(ContactRepository.DAO.getContactDirect().get(contact.getId()).getSubscribeStatus()) );
+										ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( buttonTexts.get(ContactRepository.DAO.getContactDirect().get(ContactProfileEditActivity.this.contact.getId()).getSubscribeStatus()) );
 
 										ContactProfileEditActivity.this.showSneakerWindow( Sneaker.with(ContactProfileEditActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(ContactProfileEditActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success  ,R.string.subscribe_request_sent,R.color.white,R.color.limegreen );
 									}
@@ -292,7 +293,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 
         (this.bottomSheet = new  BottomSheetDialog(this)).setContentView(            LayoutInflater.from(this).inflate(R.layout.activity_switch_contact_group, null ) );
         //  swiping  down  event  on  bottom  sheet  dialog  is  conflict  with  sliding  down  event  on  listview,  so  set  bottom  sheet  dialog's  behavior  as  non-hideable.
-        BottomSheetBehavior.from(bottomSheet.findViewById(R.id.design_bottom_sheet )).setHideable( false );
+        BottomSheetBehavior.from(bottomSheet.findViewById(R.id.design_bottom_sheet )).setHideable(  false );
 
         ObjectUtils.cast(this.bottomSheet.findViewById(R.id.add_to_new_group_button),TextView.class).setOnClickListener( (addToNewGroupButton) -> {  bottomSheet.hide();      this.newGroupBottomSheetEditor.withText("").show();} );
 

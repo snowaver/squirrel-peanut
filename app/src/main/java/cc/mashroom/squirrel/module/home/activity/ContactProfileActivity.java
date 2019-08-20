@@ -167,7 +167,7 @@ public  class  ContactProfileActivity  extends          AbstractPacketListenerAc
 			}
 			else
 			{
-				ActivityCompat.startActivity( this,new  Intent(this,ContactProfileEditActivity.class).putExtra("CONTACT",ObjectUtils.cast(contact,Serializable.class)),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+				ActivityCompat.startActivity( this,new  Intent(this,ContactProfileEditActivity.class).putExtra("NICKNAME",nickname).putExtra("CONTACT",ObjectUtils.cast(contact != null ? contact : this.contact,Serializable.class)),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 			}
 		}
 	}

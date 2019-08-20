@@ -11,7 +11,7 @@
 
         <LinearLayout  android:layout_width="match_parent"  android:layout_height="wrap_content"  android:orientation="horizontal"  android:paddingLeft="10dp"  android:paddingRight="10dp"  android:paddingTop="5dp"  android:paddingBottom="5dp">
 
-            <ViewSwitcher  android:id="@+id/editor_switcher"  android:layout_width="0dp"  android:layout_height="wrap_content"  android:layout_weight="1">
+            <cc.mashroom.hedgehog.widget.ViewSwitcher  android:id="@+id/editor_switcher"  android:layout_width="0dp"  android:layout_height="wrap_content"  android:layout_weight="1">
 
                 <LinearLayout  android:layout_width="match_parent"  android:layout_height="wrap_content">
 
@@ -21,7 +21,7 @@
 
                 </LinearLayout>
 
-                <LinearLayout  android:layout_width="match_parent"  android:layout_height="wrap_content">
+                <LinearLayout  android:layout_width="match_parent"  android:layout_height="wrap_content"  android:visibility="gone">
 
                     <ImageView  android:id="@+id/switch_to_words_inputting_button"  android:layout_width="40dp"  android:layout_height="40dp"    android:src="@drawable/keyboard"  android:scaleType="fitCenter"  android:layout_gravity="bottom"/>
 
@@ -29,7 +29,7 @@
 
                 </LinearLayout>
 
-            </ViewSwitcher>
+            </cc.mashroom.hedgehog.widget.ViewSwitcher>
 
             <ImageView  android:id="@+id/more_inputs_button"  android:layout_width="50dp"  android:layout_height="40dp"  android:paddingLeft="10dp"  android:src="@drawable/more"  android:scaleType="fitCenter"  android:layout_gravity="bottom"/>
 

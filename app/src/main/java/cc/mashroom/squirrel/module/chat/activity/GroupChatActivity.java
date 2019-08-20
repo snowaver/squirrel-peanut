@@ -24,9 +24,7 @@ import  android.widget.EditText;
 import  android.widget.GridView;
 import  android.widget.ImageView;
 import  android.widget.ListView;
-import  android.widget.TextView;
 import  android.widget.Toast;
-import  android.widget.ViewSwitcher;
 
 import  com.fasterxml.jackson.core.type.TypeReference;
 import  com.google.common.collect.Lists;
@@ -41,6 +39,7 @@ import  androidx.core.app.ActivityOptionsCompat;
 
 import  cc.mashroom.hedgehog.util.MultimediaUtils;
 import  cc.mashroom.db.common.Db;
+import  cc.mashroom.hedgehog.widget.ViewSwitcher;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.PacketListener;
@@ -101,7 +100,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setAdapter( new  MoreInputsAdapter(this,groupId,Lists.newArrayList(new  HashMap<String,Integer>().addEntry("image",R.drawable.camera),new  HashMap<String,Integer>().addEntry("image",R.drawable.album))) );
 
-		ObjectUtils.cast(super.findViewById(R.id.additional_text),TextView.class).setOnClickListener( (view) -> ActivityCompat.startActivity( this , new  Intent(this, GroupChatProfileActivity.class).putExtra("CHAT_GROUP_ID",groupId) , ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() ) );
+		ObjectUtils.cast(super.findViewById(R.id.additional_switcher),ViewSwitcher.class).setOnClickListener( (view) -> ActivityCompat.startActivity( this , new  Intent(this, GroupChatProfileActivity.class).putExtra("CHAT_GROUP_ID",groupId) , ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() ) );
 	}
 
 	public  void  send(       File  audioFile )

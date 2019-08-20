@@ -20,6 +20,7 @@ import  android.os.Bundle;
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 import  android.widget.GridView;
+import android.widget.ImageView;
 import  android.widget.TextView;
 
 import  com.aries.ui.widget.progress.UIProgressDialog;
@@ -57,7 +58,6 @@ import  retrofit2.Response;
 import  java.io.Serializable;
 import  java.sql.Connection;
 import  java.util.HashSet;
-import  java.util.List;
 import  java.util.Set;
 
 public  class  GroupChatProfileActivity     extends  AbstractActivity
@@ -81,7 +81,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener(    (inviteContactButton) -> inviteMembers() );
 
-		ObjectUtils.cast(super.findViewById(R.id.more_members_button),TextView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+		ObjectUtils.cast(super.findViewById(R.id.more_members_button),ImageView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
 		super.findViewById(R.id.leave_or_delete_button).setOnClickListener((leaveButton)   ->  leaveOrDelete() );
 

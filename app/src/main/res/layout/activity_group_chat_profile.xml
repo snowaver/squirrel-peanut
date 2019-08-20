@@ -1,15 +1,15 @@
 <?xml  version="1.0"  encoding="utf-8"?>
 <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"  xmlns:app="http://schemas.android.com/apk/res-auto"  android:layout_width="match_parent"  android:layout_height="match_parent"  android:orientation="vertical"   android:background="@color/lightgray"    android:fitsSystemWindows="true">
 
-    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  app:backText="@string/goback"  app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
+    <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  app:backText="@string/goback"  app:backDrawable="@drawable/lt_all"   app:immersive="true"></cc.mashroom.hedgehog.widget.HeaderBar>
 
     <cc.mashroom.hedgehog.widget.StyleableEditView  android:id="@+id/name"  android:layout_width="match_parent"  android:layout_height="50dp"  android:layout_marginTop="1px"  android:title="@string/name"  android:textColor="@color/darkgray"  android:textAlignment="viewEnd"  app:mode="EXTERNAL"  app:showRightArrow="true"></cc.mashroom.hedgehog.widget.StyleableEditView>
 
     <RelativeLayout  android:layout_width="match_parent"  android:layout_height="30dp"  android:background="@color/lightgray"  android:orientation="horizontal">
 
-        <TextView  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:paddingLeft="10dp"   android:textColor="@color/darkgray"  android:textSize="18dp"  android:gravity="center_vertical"  android:text="@string/member_list"/>
+        <TextView  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:paddingLeft="10dp"  android:paddingRight="10dp"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:gravity="center_vertical"  android:text="@string/member_list"/>
 
-        <TextView  android:id="@+id/more_members_button"  android:layout_width="wrap_content"  android:layout_height="match_parent"  android:paddingLeft="10dp"  android:paddingRight="10dp"  android:layout_alignParentRight="true"  android:textColor="@color/darkgray"  android:textSize="18dp"  android:gravity="center_vertical"  android:text=">"/>
+        <ImageView  android:id="@+id/more_members_button"  android:layout_width="26dp"  android:layout_height="16dp"  android:paddingLeft="10dp"  android:layout_alignParentRight="true"  android:layout_marginRight="10dp"  android:layout_centerVertical="true"  android:src="@drawable/gt_alr"  android:tint="@color/darkgray"/>
 
     </RelativeLayout>
 

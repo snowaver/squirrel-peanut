@@ -25,7 +25,6 @@ import  android.widget.GridView;
 import  android.widget.ImageView;
 import  android.widget.ListView;
 import  android.widget.Toast;
-import  android.widget.ViewSwitcher;
 
 import  com.fasterxml.jackson.core.type.TypeReference;
 import  com.google.common.collect.Lists;
@@ -33,6 +32,7 @@ import  com.irozon.sneaker.Sneaker;
 
 import  cc.mashroom.hedgehog.util.MultimediaUtils;
 import  cc.mashroom.db.common.Db;
+import  cc.mashroom.hedgehog.widget.ViewSwitcher;
 import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
 import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.module.chat.adapters.MoreInputsAdapter;
