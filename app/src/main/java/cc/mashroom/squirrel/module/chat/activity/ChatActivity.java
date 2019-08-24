@@ -133,7 +133,7 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
     @Override
     public  void  onScroll(  AbsListView  view,int  firstVisibleItem,int  visibleItemCount,int  totalCount )
     {
-        if( firstVisibleItem == 0 && view.getChildAt(0).getTop() == 0 )
+        if( firstVisibleItem == 0 && visibleItemCount > 0 &&     view.getChildAt(0).getTop() == 0 )
         {
             ObjectUtils.cast(view.getAdapter(),       ChatMessageListviewAdapter.class).cachePreviousPage();
         }
