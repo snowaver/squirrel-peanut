@@ -22,19 +22,19 @@ import  cc.mashroom.squirrel.paip.message.TransportState;
 
 public  class  AbstractPacketListenerActivity  extends  AbstractActivity  implements  PacketListener
 {
-    public  void  sent(Packet packet, TransportState sendState )  throws  Exception
+    public  void  onSent(Packet  packet,TransportState  transportState )
     {
 
     }
 
-    public  void  received( Packet  packet )  throws  Exception
-    {
-
-    }
-
-    public  boolean  beforeSend( Packet  packet )  throws  Exception
+    public  boolean  onBeforeSend(   Packet  packet )  throws  Throwable
     {
         return  true;
+    }
+
+    public  void  onReceived( Packet  packet )
+    {
+
     }
 
     protected  void  onDestroy()

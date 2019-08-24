@@ -19,6 +19,7 @@ import  android.content.Intent;
 import  android.os.Bundle;
 import  android.view.KeyEvent;
 import  android.view.View;
+import  android.widget.AbsListView;
 import  android.widget.Button;
 import  android.widget.EditText;
 import  android.widget.GridView;
@@ -67,7 +68,7 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class  ChatActivity  extends  AbstractActivity implements PacketListener,View.OnKeyListener
+public  class  ChatActivity  extends  AbstractActivity      implements  PacketListener,  View.OnKeyListener, AbsListView.OnScrollListener
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
@@ -77,7 +78,7 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 
 		setContentView( R.layout.activity_chat  );
 
-		setContactId(super.getIntent().getLongExtra("CONTACT_ID",0) );
+		setContactId( super.getIntent().getLongExtra("CONTACT_ID",0) );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( ContactRepository.DAO.getContactDirect().get(contactId).getRemark() );
 
@@ -90,6 +91,8 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  ChatMessageListviewAdapter(this,contactId) );
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setSelection( ObjectUtils.cast(super.findViewById(R.id.messages) , ListView.class).getAdapter().getCount() - 1 );
+
+        ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setOnScrollListener(      this );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setVisibility(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getVisibility() == View.GONE ? View.VISIBLE : View.GONE) );
 
@@ -105,9 +108,9 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 			return;
 		}
 
-		long  voiceDuration= MultimediaUtils.getDuration( audioFile );
+		long  voiceDuration = MultimediaUtils.getDuration( audioFile );
 
-		if( voiceDuration >= 200 )
+		if( voiceDuration  >= 200 )
 		{
 			application().getSquirrelClient().asynchronousSend( new  ChatPacket(this.contactId,audioFile.getName() , ChatContentType.AUDIO , String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}
@@ -121,27 +124,43 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 	@Setter
 	private  long  contactId;
 
-	public  void  sent( final  Packet  packet,TransportState  transportState )    throws  Exception
+    @Override
+    public  void  onScrollStateChanged( AbsListView  view, int  state )
+    {
+
+    }
+
+    @Override
+    public  void  onScroll(  AbsListView  view,int  firstVisibleItem,int  visibleItemCount,int  totalCount )
+    {
+        if( firstVisibleItem == 0 && view.getChildAt(0).getTop() == 0 )
+        {
+            ObjectUtils.cast(view.getAdapter(),       ChatMessageListviewAdapter.class).cachePreviousPage();
+        }
+    }
+
+	public  void  onSent( Packet packet,TransportState transportState )
 	{
 		if( packet instanceof ChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).notifyDataSetChanged() );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).append(packet.getId()) );
 		}
 	}
 
-	public  void  received( final  Packet  packet )  throws  Exception
+	public  void  onReceived( final  Packet  packet )
 	{
 		if( packet instanceof ChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).notifyDataSetChanged() );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).append(packet.getId()) );
 		}
 	}
 
-	public  boolean  beforeSend(   Packet  packet )  throws  Exception
+	@SneakyThrows
+	public  boolean  onBeforeSend(   Packet  packet ) throws  Throwable
 	{
 		if( packet instanceof ChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).notifyDataSetChanged() );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).append(packet.getId()) );
 
 			if( ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{
@@ -163,9 +182,9 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 		return  true;
 	}
 
-	public  boolean  onKey( View  view, int  keyCode,KeyEvent  event )
+	public  boolean  onKey( View  view, int  keyCode, KeyEvent  event )
 	{
-		if( keyCode == KeyEvent.KEYCODE_ENTER && event.getAction()  == KeyEvent.ACTION_UP )
+		if( keyCode == KeyEvent.KEYCODE_ENTER         &&  event.getAction() == KeyEvent.ACTION_UP )
 		{
 			if( StringUtils.isNotBlank(ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim()) )
 			{
@@ -191,7 +210,6 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 		application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getAdapter(),MoreInputsAdapter.class).notifyDataSetChanged() );
 	}
 
-	@SneakyThrows
 	protected  void    onPause()
 	{
 		super.onPause(  );
@@ -199,7 +217,6 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
 	}
 
-	@SneakyThrows
 	protected  void  onDestroy()
 	{
 		super.onDestroy();
@@ -211,7 +228,7 @@ public  class  ChatActivity  extends  AbstractActivity implements PacketListener
 
 	protected  void  onActivityResult(    int  requestCode , int  resultCode , Intent  resultData )
 	{
-		super.onActivityResult( requestCode, resultCode, resultData );
+		super.onActivityResult( requestCode , resultCode, resultData );
 
 		if( resultData != null )
 		{

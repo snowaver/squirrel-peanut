@@ -30,7 +30,6 @@ import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
-import  cc.mashroom.squirrel.client.storage.model.user.User;
 import  cc.mashroom.squirrel.module.home.activity.ContactProfileActivity;
 import  cc.mashroom.squirrel.parent.AbstractPacketListenerFragment;
 import  cc.mashroom.squirrel.module.home.tab.contact.adapters.ContactGroupAdapter;
@@ -78,15 +77,7 @@ public  class  ContactGroupFragment  extends  AbstractPacketListenerFragment  im
 		ObjectUtils.cast(   contentView.findViewById(R.id.contact_group_layout),PinnedHeaderExpandableListViewLayout.class).notifyExpandableListAdapterDatasetChanged().expandAllGroups();
 	}
 
-	public  void  sent(     Packet  packet,TransportState  transportState )  throws  Exception
-	{
-		if( packet instanceof SubscribeAckPacket )
-		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(contentView.findViewById(R.id.contact_group_layout),PinnedHeaderExpandableListViewLayout.class).notifyExpandableListAdapterDatasetChanged().expandAllGroups() );
-		}
-	}
-
-	public  void  received( Packet  packet )  throws  Exception
+	public  void  onSent(        Packet  packet,TransportState  transportState )
 	{
 		if( packet instanceof SubscribeAckPacket )
 		{
@@ -97,5 +88,13 @@ public  class  ContactGroupFragment  extends  AbstractPacketListenerFragment  im
 	public  void  onChange( Locale  locale )
 	{
 
+	}
+
+	public  void  onReceived(     Packet  packet )
+	{
+		if( packet instanceof SubscribeAckPacket )
+		{
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(contentView.findViewById(R.id.contact_group_layout),PinnedHeaderExpandableListViewLayout.class).notifyExpandableListAdapterDatasetChanged().expandAllGroups() );
+		}
 	}
 }

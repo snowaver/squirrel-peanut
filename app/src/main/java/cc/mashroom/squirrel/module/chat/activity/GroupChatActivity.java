@@ -19,6 +19,7 @@ import  android.content.Intent;
 import  android.os.Bundle;
 import  android.view.KeyEvent;
 import  android.view.View;
+import  android.widget.AbsListView;
 import  android.widget.Button;
 import  android.widget.EditText;
 import  android.widget.GridView;
@@ -69,7 +70,7 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketListener,View.OnKeyListener//  View.OnClickListener
+public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketListener,View.OnKeyListener,AbsListView.OnScrollListener
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )
@@ -80,7 +81,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 		setContentView(     R.layout.activity_group_chat );
 
-		setGroupId(super.getIntent().getLongExtra("CHAT_GROUP_ID",0));
+		setGroupId(super.getIntent().getLongExtra("CHAT_GROUP_ID",0) );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( ChatGroupRepository.DAO.lookupOne(String.class,"SELECT  NAME  FROM  "+ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{groupId}) );
 
@@ -93,6 +94,8 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  GroupChatMessageListviewAdapter(this,this.groupId) );
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setSelection( ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter().getCount()-1 );
+
+		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setOnScrollListener(      this );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setVisibility(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getVisibility() == View.GONE ? View.VISIBLE : View.GONE) );
 
@@ -110,7 +113,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 			return;
 		}
 
-		long  voiceDuration= MultimediaUtils.getDuration( audioFile );
+		long  voiceDuration = MultimediaUtils.getDuration( audioFile );
 
 		if( voiceDuration >= 200 )
 		{
@@ -126,27 +129,42 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 	@Setter
 	private  long    groupId;
 
-	public  void  sent( final  Packet  packet,TransportState  transportState )    throws  Exception
+    @Override
+    public  void  onScrollStateChanged( AbsListView  view, int  state )
+    {
+
+    }
+
+    @Override
+    public  void  onScroll(AbsListView view, int  firstVisibleItem, int  visibleItemCount, int  totalCount )
+    {
+        if( firstVisibleItem == 0 && view.getChildAt(0).getTop() == 0 )
+        {
+            ObjectUtils.cast(view.getAdapter(),  GroupChatMessageListviewAdapter.class).cachePreviousPage();
+        }
+    }
+
+	public  void  onSent( Packet packet,TransportState transportState )
 	{
 		if( packet instanceof GroupChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).notifyDataSetChanged() );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).append(packet.getId()) );
 		}
 	}
 
-	public  void  received( final  Packet  packet )  throws  Exception
+	public  void  onReceived(  Packet  packet )
 	{
 		if( packet instanceof GroupChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).notifyDataSetChanged() );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).append(packet.getId()) );
 		}
 	}
 
-	public  boolean  beforeSend(   Packet  packet )  throws  Exception
+	public  boolean  onBeforeSend(  Packet  packet )  throws  Throwable
 	{
 		if( packet instanceof GroupChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).notifyDataSetChanged() );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).append(packet.getId()) );
 
 			if( ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{
@@ -167,9 +185,9 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 		return  true;
 	}
 
-	public  boolean  onKey( View  view,int  keyCode ,KeyEvent  event )
+	public  boolean  onKey( View  view, int  keyCode, KeyEvent  event )
 	{
-		if( keyCode == KeyEvent.KEYCODE_ENTER && event.getAction()  == KeyEvent.ACTION_UP )
+		if( keyCode == KeyEvent.KEYCODE_ENTER         && event.getAction()  == KeyEvent.ACTION_UP )
 		{
 			if( StringUtils.isNotBlank(ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim()) )
 			{
@@ -212,7 +230,6 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 		}
 	}
 
-	@SneakyThrows
 	protected  void    onPause()
 	{
 		super.onPause(  );
@@ -220,7 +237,6 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
 	}
 
-	@SneakyThrows
 	protected  void  onDestroy()
 	{
 		super.onDestroy();

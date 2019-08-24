@@ -63,7 +63,6 @@ import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.HashMap;
 import  cc.mashroom.util.collection.map.Map;
 import  cc.mashroom.util.ObjectUtils;
-import  lombok.SneakyThrows;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
@@ -88,7 +87,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 		ObjectUtils.cast(findViewById(R.id.tab_layout),TabLayout.class).addOnTabSelectedListener( this );
 
-		connectStateChanged(    application().getSquirrelClient().getConnectState() );
+		onConnectStateChanged(  application().getSquirrelClient().getConnectState() );
 
 		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setAdapter( new  SheetPagerAdapter(super.getSupportFragmentManager()) );
 
@@ -143,7 +142,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 		}
 	}
 	
-	public  void  connectStateChanged( ConnectState  state )
+	public  void  onConnectStateChanged(ConnectState state )
 	{
 		application().getMainLooperHandler().post( () -> ObjectUtils.cast(SheetActivity.this.findViewById(R.id.title),TextView.class).setText(state == ConnectState.CONNECTED ? ObjectUtils.cast(ObjectUtils.cast(this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).getSelectedTabPosition()).getInteger("title") : connectStateResIds.get(state)) );
 	}
@@ -158,7 +157,6 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 			(
 				new  AbstractRetrofit2Callback<OoIData>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(), ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
-					@SneakyThrows
 					public  void  onResponse(      Call<OoIData>  call    , Response<OoIData>  response )
 					{
 						super.onResponse( call , response );
@@ -200,7 +198,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 
 	public  void  onChange( Locale  locale )
 	{
-		connectStateChanged(    application().getSquirrelClient().getConnectState() );
+		onConnectStateChanged(  application().getSquirrelClient().getConnectState() );
 
 		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).getChildAt(1),TextView.class).setText(   R.string.system_settings );
 

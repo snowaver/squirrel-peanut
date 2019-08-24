@@ -222,12 +222,12 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	}
 
-	public  boolean  beforeSend(    Packet  packet )  throws  Exception
+	public  boolean  onBeforeSend(  Packet  packet )  throws  Throwable
 	{
 		return  true;
 	}
 
-	public  void  sent(       Packet  sentPacket,TransportState  transportState )  throws  Exception
+	public  void  onSent(     Packet  sentPacket,TransportState  transportState )
 	{
 
 	}
@@ -247,7 +247,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		}
 	}
 
-	public  void  received( Packet  receivedPacket )  throws  Exception
+	public  void  onReceived(Packet receivedPacket )
 	{
 		if( receivedPacket instanceof   CallPacket )
 		{

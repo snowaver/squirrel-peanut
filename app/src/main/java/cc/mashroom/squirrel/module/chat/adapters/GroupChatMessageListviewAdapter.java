@@ -43,47 +43,80 @@ import  cc.mashroom.hedgehog.device.MediaPlayer;
 import  cc.mashroom.hedgehog.widget.ViewSwitcher;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.util.ObjectUtils;
+import  cc.mashroom.util.collection.map.HashMap;
+import  cc.mashroom.util.collection.map.Map;
 import  lombok.AccessLevel;
 import  lombok.AllArgsConstructor;
 import  lombok.Setter;
-import  lombok.SneakyThrows;
 import  lombok.experimental.Accessors;
 
 import  java.io.File;
 import  java.io.IOException;
+import  java.util.LinkedList;
 
 @AllArgsConstructor
 
-public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter
+public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter  <GroupChatMessage>
 {
+    public  GroupChatMessageListviewAdapter( GroupChatActivity  context, long  groupId )
+    {
+        this.setContext(context).setGroupId( groupId );
+
+        items    = new  LinkedList<GroupChatMessage>();
+
+		cachePreviousPage();
+    }
+
+    @Setter( value=AccessLevel.PROTECTED )
+    @Accessors( chain=true )
+    protected  long groupId;
 	@Setter( value=AccessLevel.PROTECTED )
 	@Accessors( chain=true )
 	protected  GroupChatActivity  context;
-	@Setter( value=AccessLevel.PROTECTED )
-	@Accessors( chain=true )
-	protected  long groupId;
-	@SneakyThrows
-	public  GroupChatMessage  getItem(   int  position )
+
+	protected  Map<Long, GroupChatMessage>  oqp = new  HashMap<Long,GroupChatMessage>();
+
+	public  void cachePreviousPage()
 	{
-		return  GroupChatMessageRepository.DAO.lookupOne(GroupChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  GROUP_ID = ?  ORDER  BY  CREATE_TIME  ASC  LIMIT  1  OFFSET  ?",new  Object[]{groupId,position} );
-	}
-	@SneakyThrows
-	public  int   getCount()
-	{
-		return  GroupChatMessageRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(ID)  AS  COUNT  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  GROUP_ID = ?",new  Object[]{ groupId}).intValue();
+		for( GroupChatMessage  groupChatMessage : GroupChatMessageRepository.DAO.lookup(GroupChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  GROUP_ID = ?  ORDER  BY  CREATE_TIME  DESC  LIMIT  ?,20",new  Object[]{groupId,items.size()}) )
+		{
+			oqp.put( groupChatMessage.getId() , groupChatMessage );
+
+			super.items.add(   0,   groupChatMessage );
+		}
 	}
 
-	public  View  getView( final  int  position,View  convertView,ViewGroup  parent )
+	public  void  append( long  id )
+    {
+        GroupChatMessage  cached  = this.oqp.get( id );
+
+        if( cached == null )
+        {
+        	GroupChatMessage  groupChatMessage = GroupChatMessageRepository.DAO.lookupOne( GroupChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  GROUP_ID = ?",new  Object[]{id,groupId} );
+
+            oqp.put(   groupChatMessage.getId(),groupChatMessage );
+
+            items.add( groupChatMessage );
+        }
+        else
+        {
+            cached.setTransportState( GroupChatMessageRepository.DAO.lookupOne(Integer.class,   "SELECT  TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  GROUP_ID = ?",new  Object[]{id,groupId}) );
+        }
+
+        super.notifyDataSetChanged(/*N*/);
+    }
+
+	public  View  getView( final  int  position , View  convertView, ViewGroup  parent )
 	{
 		convertView = convertView != null ? convertView : LayoutInflater.from(context).inflate( R.layout.activity_chat_message_item,parent,false );
 
-		GroupChatMessage  message = getItem( position );
+		GroupChatMessage  message =getItem( position );
 
 		ObjectUtils.cast(convertView.findViewById(TransportState.valueOf(message.getTransportState()) == TransportState.RECEIVED ? R.id.other_portrait : R.id.owner_portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+(TransportState.valueOf(message.getTransportState()) == TransportState.RECEIVED ? message.getContactId() : context.application().getSquirrelClient().getUserMetadata().getId())+"/portrait").build().toString()) );
 
 		ObjectUtils.cast(convertView.findViewById(R.id.message_vest_to_switcher),ViewSwitcher.class).setDisplayedChild( TransportState.valueOf(message.getTransportState()) == TransportState.RECEIVED ? 0 : 1 );
 
-		View  contentFrame = ObjectUtils.cast(convertView.findViewById(R.id.message_vest_to_switcher),ViewSwitcher.class).getDisplayedChild();
+		View  contentFrame      = ObjectUtils.cast(convertView.findViewById(R.id.message_vest_to_switcher),ViewSwitcher.class).getDisplayedChild();
 
 		ObjectUtils.cast(contentFrame.findViewById(R.id.send_failed_warning_image),ImageView.class).setVisibility( TransportState.valueOf(message.getTransportState()) == TransportState.SEND_FAILED ? View.VISIBLE : View.GONE );
 

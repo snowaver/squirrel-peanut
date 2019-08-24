@@ -137,7 +137,7 @@ public  class  ContactProfileActivity  extends          AbstractPacketListenerAc
 		}
 	}
 
-	public  void  received(        Packet  packet )   throws  Exception
+	public  void  onReceived(      Packet  packet )
     {
         if( packet  instanceof SubscribeAckPacket )
         {

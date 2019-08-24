@@ -49,7 +49,7 @@ public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  imp
 	{
 		PacketEventDispatcher.addListener( this );
 
-		LocaleChangeEventDispatcher.addListener(        this );
+		LocaleChangeEventDispatcher.addListener(    NewsProfileFragment.this );
 
 		if( contentView == null )
 		{
@@ -99,7 +99,7 @@ public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  imp
 	{
 		super.onDestroy(  );
 
-		LocaleChangeEventDispatcher.removeListener(     this );
+		LocaleChangeEventDispatcher.removeListener( NewsProfileFragment.this );
 	}
 
 	public  void  onResume()
@@ -114,7 +114,7 @@ public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  imp
 		ObjectUtils.cast( ObjectUtils.cast(contentView.findViewById(R.id.profile_list),ListView.class).getAdapter(),NewsProfileListAdapter.class).notifyDataSetChanged();
 	}
 
-	public  void  received( Packet  packet )  throws  Exception
+	public  void  onReceived(     Packet  packet )
 	{
 		application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(contentView.findViewById(R.id.profile_list),ListView.class).getAdapter(),NewsProfileListAdapter.class).notifyDataSetChanged() );
 	}
