@@ -76,35 +76,52 @@ public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter  <GroupChat
 
 	protected  Map<Long, GroupChatMessage>  oqp = new  HashMap<Long,GroupChatMessage>();
 
-	public  void cachePreviousPage()
-	{
-		for( GroupChatMessage  groupChatMessage : GroupChatMessageRepository.DAO.lookup(GroupChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  GROUP_ID = ?  ORDER  BY  CREATE_TIME  DESC  LIMIT  ?,20",new  Object[]{groupId,items.size()}) )
-		{
-			oqp.put( groupChatMessage.getId() , groupChatMessage );
-
-			super.items.add(   0,   groupChatMessage );
-		}
-	}
-
 	public  void  append( long  id )
     {
-        GroupChatMessage  cached  = this.oqp.get( id );
+    	synchronized( this )
+		{
+			GroupChatMessage  cached   = oqp.get( id );
 
-        if( cached == null )
-        {
-        	GroupChatMessage  groupChatMessage = GroupChatMessageRepository.DAO.lookupOne( GroupChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  GROUP_ID = ?",new  Object[]{id,groupId} );
+			if( cached     == null )
+			{
+				GroupChatMessage  groupChatMessage = GroupChatMessageRepository.DAO.lookupOne( GroupChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  GROUP_ID = ?",new  Object[]{id,groupId} );
 
-            oqp.put(   groupChatMessage.getId(),groupChatMessage );
+				this.oqp.put( groupChatMessage.getId(),groupChatMessage );
 
-            items.add( groupChatMessage );
-        }
-        else
-        {
-            cached.setTransportState( GroupChatMessageRepository.DAO.lookupOne(Integer.class,   "SELECT  TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  GROUP_ID = ?",new  Object[]{id,groupId}) );
-        }
+				this.items.add(     groupChatMessage );
+			}
+			else
+			{
+				cached.setTransportState( GroupChatMessageRepository.DAO.lookupOne(Integer.class,   "SELECT  TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  GROUP_ID = ?",new  Object[]{id,groupId}) );
+			}
 
-        super.notifyDataSetChanged(/*N*/);
+			super.notifyDataSetChanged( );
+		}
     }
+
+	public  void cachePreviousPage()
+	{
+		synchronized( this )
+		{
+			boolean  dataSetChanged=false;
+
+			for( GroupChatMessage  groupChatMessage : GroupChatMessageRepository.DAO.lookup(GroupChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  GROUP_ID = ?  ORDER  BY  CREATE_TIME  DESC  LIMIT  ?,20",new  Object[]{groupId,items.size()}) )
+			{
+				dataSetChanged=true;
+
+				this.oqp.put( groupChatMessage.getId(),groupChatMessage );
+
+				super.items.add( 0, groupChatMessage );
+			}
+
+			if( !   dataSetChanged )
+			{
+				return;
+			}
+
+            super.notifyDataSetChanged( );
+		}
+	}
 
 	public  View  getView( final  int  position , View  convertView, ViewGroup  parent )
 	{

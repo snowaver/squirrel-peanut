@@ -33,7 +33,7 @@ import  org.joda.time.DateTimeZone;
 
 import  java.io.File;
 import  java.io.IOException;
-import java.util.LinkedList;
+import  java.util.LinkedList;
 
 import  cc.mashroom.hedgehog.parent.BaseAdapter;
 import  cc.mashroom.hedgehog.widget.TipWindow;
@@ -58,7 +58,7 @@ import  cc.mashroom.util.collection.map.Map;
 import  lombok.AccessLevel;
 import  lombok.AllArgsConstructor;
 import  lombok.Setter;
-import  lombok.SneakyThrows;
+import  lombok.Synchronized;
 import  lombok.experimental.Accessors;
 
 @AllArgsConstructor
@@ -87,32 +87,49 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 
 	public  void cachePreviousPage()
 	{
-		for( ChatMessage  chatMessage : ChatMessageRepository.DAO.lookup(ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?  ORDER  BY  CREATE_TIME  DESC  LIMIT  ?,20",new  Object[]{contactId,items.size()}) )
+		synchronized( this )
 		{
-			this.oqp.put( chatMessage.getId()    , chatMessage );
+			boolean  dataSetChanged=false;
 
-			items.add(    0,chatMessage );
+			for( ChatMessage  chatMessage : ChatMessageRepository.DAO.lookup(ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?  ORDER  BY  CREATE_TIME  DESC  LIMIT  ?,20",new  Object[]{contactId,items.size()}) )
+			{
+				dataSetChanged=true;
+
+				this.oqp.put( chatMessage.getId(), chatMessage );
+
+				items.add(0,chatMessage );
+			}
+
+			if( !   dataSetChanged )
+			{
+				return;
+			}
+
+			super.notifyDataSetChanged( );
 		}
 	}
 
 	public  void  append( long  id )
 	{
-		ChatMessage   cached = this.oqp.get( id );
-
-		if( cached == null )
+		synchronized( this )
 		{
-			ChatMessage  chatMessage = ChatMessageRepository.DAO.lookupOne( ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  CONTACT_ID = ?",new  Object[]{id,contactId} );
+			ChatMessage   cached =  oqp.get( id );
 
-			this.oqp.put(    chatMessage.getId() , chatMessage );
+			if( cached     == null )
+			{
+				ChatMessage  chatMessage = ChatMessageRepository.DAO.lookupOne( ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  CONTACT_ID = ?",new  Object[]{id,contactId} );
 
-			this.items.add( chatMessage );
+				items.add(  chatMessage );
+
+				this.oqp.put( chatMessage.getId(), chatMessage );
+			}
+			else
+			{
+				cached.setTransportState( ChatMessageRepository.DAO.lookupOne(Integer.class,"SELECT  TRANSPORT_STATE  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  CONTACT_ID = ?",new  Object[]{id,contactId}) );
+			}
+
+			super.notifyDataSetChanged( );
 		}
-		else
-		{
-			cached.setTransportState( ChatMessageRepository.DAO.lookupOne(Integer.class,"SELECT  TRANSPORT_STATE  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  CONTACT_ID = ?",new  Object[]{id,contactId}) );
-		}
-
-		super.notifyDataSetChanged(/*N*/);
 	}
 
 	public  View  getView( int  position,View  convertView,ViewGroup  parent )

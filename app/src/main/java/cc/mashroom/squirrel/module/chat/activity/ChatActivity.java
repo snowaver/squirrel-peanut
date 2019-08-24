@@ -90,8 +90,6 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  ChatMessageListviewAdapter(this,contactId) );
 
-		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setSelection( ObjectUtils.cast(super.findViewById(R.id.messages) , ListView.class).getAdapter().getCount() - 1 );
-
         ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setOnScrollListener(      this );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setVisibility(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getVisibility() == View.GONE ? View.VISIBLE : View.GONE) );

@@ -22,26 +22,22 @@ import  android.content.Intent;
 import  androidx.core.app.NotificationCompat;
 import  android.widget.RemoteViews;
 
-import java.text.SimpleDateFormat;
+import  java.text.SimpleDateFormat;
 
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
-import cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
+import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.module.system.activity.LoadingActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  lombok.AccessLevel;
 import  lombok.NoArgsConstructor;
-import  lombok.Setter;
-import  lombok.experimental.Accessors;
 
 @NoArgsConstructor( access=AccessLevel.PRIVATE )
 
 public  class  PushServiceNotifier
 {
-	@Accessors( chain = true )
-	@Setter
 	private  Context  context;
 
 	private  SimpleDateFormat  format = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
