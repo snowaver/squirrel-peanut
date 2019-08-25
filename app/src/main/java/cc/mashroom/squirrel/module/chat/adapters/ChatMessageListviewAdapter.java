@@ -139,7 +139,7 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
     {
         synchronized( this )
         {
-            for( ChatMessage  chatMessage : ChatMessageRepository.DAO.lookup(ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?  AND  CREATE_TIME > ?  ORDER  BY  CREATE_TIME  ASC",new  Object[]{contactId,items.isEmpty() ? new  Timestamp(new  DateTime(2000,1,1,0,0,0).getMillis()) : items.get(items.size()-1)}) )
+            for( ChatMessage  chatMessage : ChatMessageRepository.DAO.lookup(ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?  AND  CREATE_TIME > ?  ORDER  BY  CREATE_TIME  ASC",new  Object[]{contactId,items.isEmpty()?new  Timestamp(new  DateTime(2000,1,1,0,0,0).getMillis()) : items.get(items.size()-1).getCreateTime()}) )
             {
                 if( this.oqp.put( chatMessage.getId(), chatMessage ) == null )
                 {

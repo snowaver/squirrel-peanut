@@ -200,13 +200,18 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 		return  false;
 	}
 
-	protected  void   onResume()
+    protected  void  onRestart()
+    {
+        super.onRestart();
+
+        application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).append() );
+    }
+
+    protected  void   onResume()
 	{
 		super.onResume( );
-
-		application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter() , ChatMessageListviewAdapter.class ).append() );
 		/*
-		application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter() , ChatMessageListviewAdapter.class ).notifyDataSetChanged() );
+		application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class   ).notifyDataSetChanged() );
 		*/
 		application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getAdapter(),MoreInputsAdapter.class).notifyDataSetChanged() );
 	}
