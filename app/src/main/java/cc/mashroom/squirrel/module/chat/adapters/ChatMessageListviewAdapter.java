@@ -33,6 +33,7 @@ import  org.joda.time.DateTimeZone;
 
 import  java.io.File;
 import  java.io.IOException;
+import java.sql.Timestamp;
 import  java.util.LinkedList;
 
 import  cc.mashroom.hedgehog.parent.BaseAdapter;
@@ -133,6 +134,22 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 			notifyDataSetChanged( );
 		}
 	}
+
+	public  void    append()
+    {
+        synchronized( this )
+        {
+            for( ChatMessage  chatMessage : ChatMessageRepository.DAO.lookup(ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?  AND  CREATE_TIME > ?  ORDER  BY  CREATE_TIME  ASC",new  Object[]{contactId,items.isEmpty() ? new  Timestamp(new  DateTime(2000,1,1,0,0,0).getMillis()) : items.get(items.size()-1)}) )
+            {
+                if( this.oqp.put( chatMessage.getId(), chatMessage ) == null )
+                {
+                    this.items.add( chatMessage );
+                }
+            }
+
+            notifyDataSetChanged( );
+        }
+    }
 
 	public  View  getView( int  position,View  convertView,ViewGroup  parent )
 	{
