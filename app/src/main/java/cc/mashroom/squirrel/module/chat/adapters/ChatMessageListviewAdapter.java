@@ -122,7 +122,7 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 
 				if( this.oqp.put( chatMessage.getId(), chatMessage ) == null )
 				{
-					this.items.add(0,chatMessage);
+					this.items.add( chatMessage );
 				}
 			}
 			else
