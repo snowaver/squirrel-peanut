@@ -94,10 +94,11 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 			for( ChatMessage  chatMessage : ChatMessageRepository.DAO.lookup(ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?  ORDER  BY  CREATE_TIME  DESC  LIMIT  ?,20",new  Object[]{contactId,items.size()}) )
 			{
 				dataSetChanged=true;
-
-				this.oqp.put( chatMessage.getId(), chatMessage );
-
-				items.add(0,chatMessage );
+				//  it  is  necessary  that  checking  the  existence  of  the  chat  message  while  the  method  is  triggered  after  a  chat  message  is  added  to  the  empty  list  by  <append>  method  and  the  listview  scrolled  to  the  top.
+				if( this.oqp.put( chatMessage.getId(), chatMessage ) == null )
+				{
+					this.items.add(0,chatMessage);
+				}
 			}
 
 			if( !   dataSetChanged )
@@ -119,16 +120,17 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 			{
 				ChatMessage  chatMessage = ChatMessageRepository.DAO.lookupOne( ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  CONTACT_ID = ?",new  Object[]{id,contactId} );
 
-				items.add(  chatMessage );
-
-				this.oqp.put( chatMessage.getId(), chatMessage );
+				if( this.oqp.put( chatMessage.getId(), chatMessage ) == null )
+				{
+					this.items.add(0,chatMessage);
+				}
 			}
 			else
 			{
 				cached.setTransportState( ChatMessageRepository.DAO.lookupOne(Integer.class,"SELECT  TRANSPORT_STATE  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  CONTACT_ID = ?",new  Object[]{id,contactId}) );
 			}
 
-			super.notifyDataSetChanged( );
+			notifyDataSetChanged( );
 		}
 	}
 

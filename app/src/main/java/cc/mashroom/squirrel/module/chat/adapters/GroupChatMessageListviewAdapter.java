@@ -86,16 +86,17 @@ public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter  <GroupChat
 			{
 				GroupChatMessage  groupChatMessage = GroupChatMessageRepository.DAO.lookupOne( GroupChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  GROUP_ID = ?",new  Object[]{id,groupId} );
 
-				this.oqp.put( groupChatMessage.getId(),groupChatMessage );
-
-				this.items.add(     groupChatMessage );
+				if( this.oqp.put( groupChatMessage.getId(), groupChatMessage ) == null )
+				{
+					this.items.add( groupChatMessage );
+				}
 			}
 			else
 			{
 				cached.setTransportState( GroupChatMessageRepository.DAO.lookupOne(Integer.class,   "SELECT  TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  GROUP_ID = ?",new  Object[]{id,groupId}) );
 			}
 
-			super.notifyDataSetChanged( );
+			notifyDataSetChanged( );
 		}
     }
 
@@ -108,10 +109,11 @@ public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter  <GroupChat
 			for( GroupChatMessage  groupChatMessage : GroupChatMessageRepository.DAO.lookup(GroupChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE  FROM  "+GroupChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  GROUP_ID = ?  ORDER  BY  CREATE_TIME  DESC  LIMIT  ?,20",new  Object[]{groupId,items.size()}) )
 			{
 				dataSetChanged=true;
-
-				this.oqp.put( groupChatMessage.getId(),groupChatMessage );
-
-				super.items.add( 0, groupChatMessage );
+				//  it  is  necessary  that  checking  the  existence  of  the  chat  message  while  the  method  is  triggered  after  a  chat  message  is  added  to  the  empty  list  by  <append>  method  and  the  listview  scrolled  to  the  top.
+				if( this.oqp.put( groupChatMessage.getId(), groupChatMessage ) == null )
+				{
+					this.items.add( groupChatMessage );
+				}
 			}
 
 			if( !   dataSetChanged )
