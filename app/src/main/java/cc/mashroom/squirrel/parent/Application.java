@@ -70,6 +70,7 @@ import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.call.CallPacket;
 import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
+import cc.mashroom.util.FileUtils;
 import  cc.mashroom.util.NoopHostnameVerifier;
 import  cc.mashroom.util.NoopX509TrustManager;
 import  cc.mashroom.util.ObjectUtils;
@@ -99,7 +100,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	{
 		super.onCreate();
 
-		this.squirrelClient= new  SquirrelClient( this,getCacheDir() );
+		this.squirrelClient = new  SquirrelClient( this,  super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir() );
 
 		PacketEventDispatcher.addListener(   this );
 		/*
@@ -236,6 +237,8 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	{
 		if( code == 200 )
 		{
+			RetrofitRegistry.INSTANCE.initialize(   Application.this );
+
 			super.getSharedPreferences("LATEST_NETWORK_ROUTE",MODE_PRIVATE).edit().putString("HOST",squirrelClient.getHost()).putInt("PORT",squirrelClient.getPort()).putInt("HTTPPORT",squirrelClient.getHttpPort()).commit();
 		}
 

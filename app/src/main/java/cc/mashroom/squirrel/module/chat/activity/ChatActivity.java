@@ -56,6 +56,7 @@ import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
 
 import  java.io.File;
+import java.io.IOException;
 import  java.sql.Connection;
 import  java.util.List;
 
@@ -184,7 +185,7 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 	{
 		if( keyCode == KeyEvent.KEYCODE_ENTER         &&  event.getAction() == KeyEvent.ACTION_UP )
 		{
-			if( StringUtils.isNotBlank(ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim()) )
+			if( StringUtils.isNotBlank(   ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim()) )
 			{
 				application().getSquirrelClient().send( new  ChatPacket(contactId,null,ChatContentType.WORDS,ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim().getBytes()) );
 
@@ -215,27 +216,36 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
 	}
 
-	protected  void  onDestroy()
-	{
-		super.onDestroy();
-
-		PacketEventDispatcher.removeListener( this );
-
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
-	}
-
 	protected  void  onActivityResult(    int  requestCode , int  resultCode , Intent  resultData )
 	{
 		super.onActivityResult( requestCode , resultCode, resultData );
 
 		if( resultData != null )
 		{
-			for( Media  choosedMedia : ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS"),new  TypeReference<List<Media>>(){}) )
+			for( Media  media :ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS"),new  TypeReference<List<Media>>(){}) )
 			{
-				File  cachedFile = application().cache(choosedMedia.getId(),new  File(choosedMedia.getPath()),choosedMedia.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
+				try
+                {
+                    File  cachedFile = application().cache(media.getId(),new  File(media.getPath()),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
 
-				application().getSquirrelClient().asynchronousSend( new  ChatPacket(contactId,cachedFile.getName(),choosedMedia.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
+                    application().getSquirrelClient().asynchronousSend( new  ChatPacket(contactId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
+                }
+				catch( IOException  ioe  )
+                {
+                    error(ioe );
+
+                    this.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.io_exception, R.color.white,R.color.red );
+                }
 			}
 		}
 	}
+
+    protected  void  onDestroy()
+    {
+        super.onDestroy();
+
+        PacketEventDispatcher.removeListener( this );
+
+        Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
+    }
 }

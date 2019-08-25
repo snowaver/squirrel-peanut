@@ -32,6 +32,7 @@ import  com.google.common.collect.Lists;
 import  com.irozon.sneaker.Sneaker;
 
 import  java.io.File;
+import java.io.IOException;
 import  java.sql.Connection;
 import  java.util.List;
 
@@ -91,7 +92,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 		ObjectUtils.cast(super.findViewById(R.id.voice_recording_button),Button.class).setOnTouchListener( new  AudioTouchRecoder(this,application().getCacheDir(),(audioFile) -> send(audioFile)) );
 
-		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  GroupChatMessageListviewAdapter(this,this.groupId) );
+		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  GroupChatMessageListviewAdapter(this,groupId) );
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setOnScrollListener(      this );
 
@@ -187,7 +188,7 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 	{
 		if( keyCode == KeyEvent.KEYCODE_ENTER         && event.getAction()  == KeyEvent.ACTION_UP )
 		{
-			if( StringUtils.isNotBlank(ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim()) )
+			if( StringUtils.isNotBlank(ObjectUtils.cast(      super.findViewById(R.id.editor),EditText.class).getText().toString().trim()) )
 			{
 				application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),this.groupId,"",ChatContentType.WORDS,ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim().getBytes()) );
 
@@ -213,21 +214,6 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( ChatGroupRepository.DAO.lookupOne(String.class,"SELECT  NAME  FROM  "+ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{groupId}) );
 	}
 
-	protected  void  onActivityResult(    int  requestCode , int  resultCode , Intent  resultData )
-	{
-		super.onActivityResult( requestCode, resultCode, resultData );
-
-		if( resultData != null )
-		{
-			for( Media  choosedMedia : ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS"),new  TypeReference<List<Media>>(){}) )
-			{
-				File  cachedFile = application().cache( choosedMedia.getId(),new  File(choosedMedia.getPath()),choosedMedia.getType()  == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
-
-				application().getSquirrelClient().asynchronousSend( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),groupId,cachedFile.getName(),choosedMedia.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
-			}
-		}
-	}
-
 	protected  void    onPause()
 	{
 		super.onPause(  );
@@ -235,11 +221,35 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
 	}
 
+	protected  void  onActivityResult(    int  requestCode , int  resultCode , Intent  resultData )
+	{
+		super.onActivityResult( requestCode , resultCode, resultData );
+
+		if( resultData != null )
+		{
+			for( Media  media : ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS"),  new  TypeReference<List<Media>>(){}) )
+			{
+				try
+				{
+					File  cachedFile = application().cache( media.getId(),new  File(media.getPath()),media.getType()  == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
+
+					application().getSquirrelClient().asynchronousSend( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),groupId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
+				}
+				catch(       IOException  ioe )
+				{
+					error(ioe );
+
+					super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,  R.string.io_exception, R.color.white,R.color.red );
+				}
+			}
+		}
+	}
+
 	protected  void  onDestroy()
 	{
 		super.onDestroy();
 
-		PacketEventDispatcher.removeListener( this );
+		PacketEventDispatcher.removeListener( GroupChatActivity.this );
 
 		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
 	}
