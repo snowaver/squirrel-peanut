@@ -43,7 +43,7 @@ import  com.irozon.sneaker.Sneaker;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.hedgehog.util.DensityUtils;
-import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
+import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.ClientConnectEventDispatcher;
@@ -138,7 +138,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 	{
 		if( position  == 0 )
 		{
-			ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.chat_create_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(dialog, which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
+			StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.chat_create_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(dialog, which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
 		}
 	}
 	
@@ -155,7 +155,7 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 		{
 			RetrofitRegistry.INSTANCE.get(         ChatGroupService.class ).add(createdGroupName).enqueue
 			(
-				new  AbstractRetrofit2Callback<OoIData>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(), ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<OoIData>( this,StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(), ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					public  void  onResponse(      Call<OoIData>  call    , Response<OoIData>  response )
 					{

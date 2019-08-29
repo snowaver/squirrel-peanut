@@ -33,7 +33,7 @@ import  com.irozon.sneaker.Sneaker;
 
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.DensityUtils;
-import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
+import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.BottomSheetEditor;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
@@ -192,7 +192,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
                     {
                         RetrofitRegistry.INSTANCE.get(ContactService.class).changeSubscribeStatus(7,contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
-							new  AbstractRetrofit2Callback<Contact>( this, ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+							new  AbstractRetrofit2Callback<Contact>( this, StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 							{
 								@SneakyThrows
 								public  void  onResponse( Call<Contact>  call, Response<Contact>  response )
@@ -227,7 +227,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
                     {
 						RetrofitRegistry.INSTANCE.get(ContactService.class).subscribe(this.contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
-							new  AbstractRetrofit2Callback<Contact>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this, 220)).setHeight(DensityUtils.px(this,150)) )
+							new  AbstractRetrofit2Callback<Contact>( this,StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this, 220)).setHeight(DensityUtils.px(this,150)) )
 							{
 								@SneakyThrows
                                 public  void  onResponse( Call<Contact>  call, Response<Contact>  response )

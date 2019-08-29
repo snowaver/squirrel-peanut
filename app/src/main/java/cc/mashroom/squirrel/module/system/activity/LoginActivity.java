@@ -39,7 +39,7 @@ import  java.util.Locale;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.DensityUtils;
-import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
+import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
@@ -83,7 +83,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
 
         if( super.getIntent().getIntExtra("RELOGIN_REASON", 0) == 1 )
         {
-            ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.login_remote_login_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColorResource(R.color.red).setPositiveButtonTextSize(18).setPositiveButton(R.string.close,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
+            StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.login_remote_login_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColorResource(R.color.red).setPositiveButtonTextSize(18).setPositiveButton(R.string.close,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
         }
         //  clear  the  password  styleable  editview  after  successful  registration,  logout  or  squeezing  off  line  by  remote  login.
         ObjectUtils.cast(super.findViewById(R.id.login_button),Button.class).setOnClickListener( this );
@@ -98,7 +98,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
 
         ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.back_text),TextView.class).setOnClickListener( (backtt) -> this.languagesBottomSheetDialog.show() );
 
-        this.progressDialog = ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
+        this.progressDialog = StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCancelable(false).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
     }
 
     public  void  onChange(    Locale  locale )

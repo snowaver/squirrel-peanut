@@ -21,7 +21,7 @@ import  android.widget.ListView;
 import  com.aries.ui.widget.alert.UIAlertDialog;
 
 import  androidx.core.content.res.ResourcesCompat;
-import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
+import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.module.home.adapters.ContactGroupAdapter;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
@@ -43,7 +43,7 @@ public  class  SwitchContactGroupActivity  extends  AbstractActivity  implements
 
     private  void  add()
     {
-        ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
+        StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextSize(18).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
     }
 
     public  void  onCheckedChanged( SmoothCheckBox  smoothCheckbox,boolean  isChecked )

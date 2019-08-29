@@ -37,7 +37,7 @@ import  java.util.Locale;
 import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
-import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
+import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
@@ -51,7 +51,6 @@ import  cc.mashroom.squirrel.module.home.tab.contact.adapters.ChatGroupAdapter;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
-import  lombok.SneakyThrows;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
@@ -69,7 +68,7 @@ public  class  ChatGroupFragment  extends  AbstractFragment  implements  DialogI
 
 			ObjectUtils.cast(contentView.findViewById(R.id.chat_group_list),ListView.class).setOnItemClickListener( (parent,view,position,id) -> ActivityCompat.startActivity(super.getActivity(),new  Intent(this.getActivity(),GroupChatActivity.class).putExtra("CHAT_GROUP_ID",ObjectUtils.cast(parent.getAdapter().getItem(position),ChatGroup.class).getId()),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle()) );
 
-			ObjectUtils.cast(contentView.findViewById(R.id.create_button),LinearLayout.class).setOnClickListener( (view) -> ExtviewsAdapter.adapter(new  UIAlertDialog.DividerIOSBuilder(this.getActivity()).setBackgroundRadius(15).setTitle(R.string.chat_create_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(dialog, which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this.getActivity(),R.font.droid_sans_mono)).show() );
+			ObjectUtils.cast(contentView.findViewById(R.id.create_button),LinearLayout.class).setOnClickListener( (view) -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this.getActivity()).setBackgroundRadius(15).setTitle(R.string.chat_create_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(dialog, which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this.getActivity(),R.font.droid_sans_mono)).show() );
 		}
 
 		return  this.contentView;
@@ -99,7 +98,6 @@ public  class  ChatGroupFragment  extends  AbstractFragment  implements  DialogI
 			(
 				new  AbstractRetrofit2Callback<OoIData>(super.getActivity() )
 				{
-					@SneakyThrows
 					public  void  onResponse( Call<OoIData>  call   , Response<OoIData>  response )
 					{
 						if( response.code()  == 200 )

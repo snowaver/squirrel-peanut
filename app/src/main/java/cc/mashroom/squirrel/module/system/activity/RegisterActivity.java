@@ -41,7 +41,7 @@ import  java.util.List;
 import  androidx.core.content.res.ResourcesCompat;
 
 import  cc.mashroom.hedgehog.util.ContextUtils;
-import  cc.mashroom.hedgehog.util.ExtviewsAdapter;
+import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
@@ -73,7 +73,7 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 
 		super.setContentView( R.layout.activity_register );
 
-		ObjectUtils.cast(super.findViewById(R.id.portrait_input),SimpleDraweeView.class).setOnClickListener( (view) -> ExtviewsAdapter.adapter(new  UIActionSheetDialog.ListIOSBuilder(this).setBackgroundRadius(15).addItem(R.string.camera_take_photo).addItem(R.string.album).setItemsTextSize(18).setCancel(R.string.close).setCancelTextColorResource(R.color.red).setCancelTextSize(18).setItemsMinHeight(DensityUtils.px(this,50)).setPadding(DensityUtils.px(this,10)).setCanceledOnTouchOutside(true).setOnItemClickListener(this).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );
+		ObjectUtils.cast(super.findViewById(R.id.portrait_input),SimpleDraweeView.class).setOnClickListener( (view) -> StyleUnifier.unify(new  UIActionSheetDialog.ListIOSBuilder(this).setBackgroundRadius(15).addItem(R.string.camera_take_photo).addItem(R.string.album).setItemsTextSize(18).setCancel(R.string.close).setCancelTextColorResource(R.color.red).setCancelTextSize(18).setItemsMinHeight(DensityUtils.px(this,50)).setPadding(DensityUtils.px(this,10)).setCanceledOnTouchOutside(true).setOnItemClickListener(this).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );
 
 		KeyboardVisibilityEvent.setEventListener(   this , this );
 
@@ -95,7 +95,7 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 		{
 			RetrofitRegistry.INSTANCE.get(UserService.class).register(RequestBody.create(MediaType.parse("multipart/form-data"),JsonUtils.toJson(new  HashMap<String,Object>().addEntry("username",ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString().trim()).addEntry("password",ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString().trim()).addEntry("nickname",ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).getText().toString().trim()))),portrait == null ? null : MultipartBody.Part.createFormData("portrait",portrait.getName(),RequestBody.create(MediaType.parse("multipart/form-data"),portrait))).enqueue
 			(
-				new  AbstractRetrofit2Callback<Void>( this,ExtviewsAdapter.adapter(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<Void>( this,StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 				{
 					public  void  onResponse(   Call<Void>  call,Response<Void>  response )
 					{
