@@ -78,7 +78,7 @@ public  class  AudioTouchRecoder   implements  View.OnTouchListener
                 {
                     recording = true;
 
-                    (recorder = new  MediaRecorder()).prepare(android.media.MediaRecorder.AudioSource.MIC,android.media.MediaRecorder.AudioEncoder.AMR_WB,android.media.MediaRecorder.OutputFormat.AMR_WB,new  File(ObjectUtils.cast(context.getApplication(),Application.class).getCacheDir(),"audio.amr.tmp")).wrapped().start();
+                    (recorder = new  MediaRecorder()).prepare(android.media.MediaRecorder.AudioSource.MIC,android.media.MediaRecorder.AudioEncoder.AMR_WB,android.media.MediaRecorder.OutputFormat.AMR_WB,new  File(ObjectUtils.cast(context.getApplication(),Application.class).getCacheDir(),"audio.amr.tmp")).unwrap().start();
                 }
                 catch( Throwable  e )
                 {
