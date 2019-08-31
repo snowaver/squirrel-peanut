@@ -80,7 +80,7 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 		ObjectUtils.cast(super.findViewById(R.id.register_button),Button.class).setOnClickListener( this );
 	}
 
-	protected  Map<Integer,Integer>  failures = new  HashMap<Integer,Integer>().addEntry(0,R.string.network_or_internal_server_error).addEntry( 601,R.string.register_username_registered );
+	protected  Map<Integer,Integer>  failures = new  HashMap<Integer,Integer>().addEntry(0,R.string.network_or_internal_server_error).addEntry(601,R.string.register_username_registered );
 
 	protected  File   portrait;
 
@@ -103,11 +103,11 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 
 						if( response.code() != 200 )
 						{
-							showSneakerWindow(Sneaker.with(RegisterActivity.this),com.irozon.sneaker.R.drawable.ic_warning,failures.containsKey(response.code()) ? failures.get(response.code()) : failures.get(0),R.color.black,R.color.orange );
+							showSneakerWindow(Sneaker.with(RegisterActivity.this),com.irozon.sneaker.R.drawable.ic_warning,                failures.containsKey(response.code()) ? failures.get(response.code()) : failures.get(0),R.color.black,R.color.orange );
 						}
 						else
 						{
-							showSneakerWindow(Sneaker.with(RegisterActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(RegisterActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success       ,R.string.register_registered,R.color.white,R.color.limegreen );
+							showSneakerWindow(Sneaker.with(RegisterActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(RegisterActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success,R.string.register_registered,  R.color.white,R.color.limegreen );
 						}
 					}
 				}
@@ -126,12 +126,12 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 	{
 		if( i == 0 )
 		{
-			ActivityCompat.startActivityForResult( this,new  Intent(this,CamcorderActivity.class).putExtra("CAPTURE_FLAG",1),0,    ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+			ActivityCompat.startActivityForResult( this,new  Intent(this,CamcorderActivity.class).putExtra("MEDIA_TYPE",1),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 		else
 		if( i == 1 )
 		{
-			ActivityCompat.startActivityForResult( this,new  Intent(this,AlbumMediaMultichoiceActivity.class).putExtra("CAPTURE_FLAG",1).putExtra("LIMITATION",1),0,ActivityOptionsCompat.makeCustomAnimation(this, R.anim.right_in,R.anim.left_out).toBundle() );
+			ActivityCompat.startActivityForResult( this,new  Intent(this,AlbumMediaMultichoiceActivity.class).putExtra("MEDIA_TYPE",1).putExtra("MAX_COUNT",1),   0,ActivityOptionsCompat.makeCustomAnimation(this, R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 	}
 
@@ -143,12 +143,12 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 		{
 			if( requestCode== 0 )
 			{
-				ActivityCompat.startActivityForResult(    this,new  Intent(this,ImageCropingActivity.class).putExtra("PATH",ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS") , new  TypeReference<List<Media>>(){}).get(0).getPath()),1,null );
+				ActivityCompat.startActivityForResult(    this,new  Intent(this,ImageCropingActivity.class).putExtra("IMAGE_FILE_PATH",ObjectUtils.cast(resultData.getSerializableExtra("MEDIAS"),new  TypeReference<List<Media>>(){}).get(0).getPath()),1,null );
 			}
 			else
 			if( requestCode== 1 )
 			{
-				ObjectUtils.cast(super.findViewById(R.id.portrait_input),SimpleDraweeView.class).setImageURI( Uri.fromFile(portrait = new  File(resultData.getStringExtra("CROPPED"))) );
+				ObjectUtils.cast(super.findViewById(R.id.portrait_input),SimpleDraweeView.class).setImageURI( Uri.fromFile(portrait = new  File(ObjectUtils.cast(resultData.getSerializableExtra("MEDIAS"),Media.class).getPath())) );
 			}
 		}
 	}

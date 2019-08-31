@@ -76,7 +76,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( chatGroup.getName() );
 
-		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> ActivityCompat.startActivityForResult(this,new  Intent(this,EditorActivity.class).putExtra("EDIT_CONTENT",chatGroup.getName()).putExtra("TITLE",super.getString(R.string.name)).putExtra("LIMITATION",16),1,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> ActivityCompat.startActivityForResult(this,new  Intent(this,EditorActivity.class).putExtra("CONTENT",chatGroup.getName()).putExtra("TITLE",super.getString(R.string.name)).putExtra("MAX_COUNT",16),1,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
 	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener(    (inviteContactButton) -> inviteMembers() );
 
