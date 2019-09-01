@@ -70,24 +70,24 @@ public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  imp
 	{
 		NewsProfile  newsProfile=ObjectUtils.cast(parent.getAdapter(),NewsProfileListAdapter.class).getItem( position );
 
-		if( PAIPPacketType.valueOf(newsProfile.getPacketType()) == PAIPPacketType.CHAT ||    PAIPPacketType.valueOf(newsProfile.getPacketType()) == PAIPPacketType.CALL )
+		if( newsProfile.getPacketType() == PAIPPacketType.CHAT ||  newsProfile.getPacketType()  == PAIPPacketType.CALL )
 		{
 			ActivityCompat.startActivity( super.getActivity(),new  Intent(this.getActivity(),ChatActivity.class).putExtra("CONTACT_ID", newsProfile.getContactId()),ActivityOptionsCompat.makeCustomAnimation(this.getContext(),R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 		else
-		if( PAIPPacketType.valueOf(newsProfile.getPacketType()) == PAIPPacketType.GROUP_CHAT )
+		if( newsProfile.getPacketType() == PAIPPacketType.GROUP_CHAT )
 		{
 			ActivityCompat.startActivity( super.getActivity(),new  Intent(this.getActivity(),GroupChatActivity.class).putExtra("CHAT_GROUP_ID",newsProfile.getId()),ActivityOptionsCompat.makeCustomAnimation(this.getContext(),R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 		else
-		if( PAIPPacketType.valueOf(newsProfile.getPacketType()) == PAIPPacketType.SUBSCRIBE && Integer.parseInt(newsProfile.getContent()) == 1 )
+		if( newsProfile.getPacketType() == PAIPPacketType.SUBSCRIBE && Integer.parseInt(newsProfile.getContent()) == 2 )
 		{
 			Contact  contact = ContactRepository.DAO.getContactDirect().get( newsProfile.getContactId() );
 
             ActivityCompat.startActivity( this.getActivity(),new  Intent(this.getActivity(),ContactProfileEditActivity.class).putExtra("CONTACT",contact),ActivityOptionsCompat.makeCustomAnimation(this.getActivity(),R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 		else
-		if( PAIPPacketType.valueOf(newsProfile.getPacketType()) == PAIPPacketType.SUBSCRIBE && Integer.parseInt(newsProfile.getContent()) == 0 )
+		if( newsProfile.getPacketType() == PAIPPacketType.SUBSCRIBE && Integer.parseInt(newsProfile.getContent()) == 1 )
 		{
 			Contact  contact = ContactRepository.DAO.getContactDirect().get( newsProfile.getContactId() );
 

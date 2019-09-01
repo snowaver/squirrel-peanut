@@ -76,7 +76,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 	@Setter
 	private  BottomSheetDialog   bottomSheet;
 
-	private  cc.mashroom.util.collection.map.Map<Integer,Integer>  buttonTexts = new  HashMap<Integer,Integer>().addEntry(0,R.string.subscribe_add_contact).addEntry(1,R.string.subscribe_accept_request).addEntry(6,R.string.message).addEntry( 7,R.string.message );
+	private  cc.mashroom.util.collection.map.Map<Integer,Integer>  buttonTexts = new  HashMap<Integer,Integer>().addEntry(1,R.string.subscribe_add_contact).addEntry(2,R.string.subscribe_accept_request).addEntry(7,R.string.message).addEntry( 8,R.string.message );
 
 	protected  void  onCreate(   Bundle  savedInstanceState )
 	{
@@ -101,7 +101,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 
 		if( contact  != null &&  contact.getSubscribeStatus() != null )
 		{
-			if(      this.contact.getSubscribeStatus() == 0 )
+			if(      this.contact.getSubscribeStatus() == 1 )
 			{
 				ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor( super.getResources().getColor(R.color.gainsboro) );
 			}
@@ -177,12 +177,12 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 
 			if( contact!=null)
 			{
-				if(       contact.getSubscribeStatus() == 0 )
+				if(       contact.getSubscribeStatus() == 1 )
 				{
-					super.showSneakerWindow(  Sneaker.with(this) , com.irozon.sneaker.R.drawable.ic_success , R.string.subscribe_request_sent , R.color.white, R.color.limegreen );
+					super.showSneakerWindow(  Sneaker.with(this) , com.irozon.sneaker.R.drawable.ic_success,  R.string.subscribe_request_sent , R.color.white, R.color.limegreen );
 				}
 				else
-				if(       contact.getSubscribeStatus() == 1 )
+				if(       contact.getSubscribeStatus() == 2 )
 				{
 				    if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),   StyleableEditView.class).getText().toString().trim()) )
                     {
@@ -190,7 +190,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
                     }
                     else
                     {
-                        RetrofitRegistry.INSTANCE.get(ContactService.class).changeSubscribeStatus(7,contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
+                        RetrofitRegistry.INSTANCE.get(ContactService.class).changeSubscribeStatus(8,contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
 							new  AbstractRetrofit2Callback<Contact>( this, StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
 							{

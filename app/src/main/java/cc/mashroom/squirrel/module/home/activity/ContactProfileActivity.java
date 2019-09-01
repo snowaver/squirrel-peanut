@@ -122,7 +122,7 @@ public  class  ContactProfileActivity  extends          AbstractPacketListenerAc
 		{
 			ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText(buttonTexts.get(contact.getSubscribeStatus()) );
 
-			if( contact.getSubscribeStatus() == 0 )
+			if( contact.getSubscribeStatus() == 1 )
 			{
 				ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(super.getResources().getColor(R.color.gainsboro) );
 			}
@@ -156,12 +156,12 @@ public  class  ContactProfileActivity  extends          AbstractPacketListenerAc
 		{
 			Contact contact=ContactRepository.DAO.getContactDirect().get(this.contact.getId() );
 
-			if( contact != null &&  contact.getSubscribeStatus() == 0 )
+			if( contact != null &&  contact.getSubscribeStatus() == 1 )
 			{
 				super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_request_sent,R.color.white,R.color.limegreen );
 			}
 			else
-			if( contact != null && (contact.getSubscribeStatus() == 6||            contact.getSubscribeStatus() == 7) )
+			if( contact != null && (contact.getSubscribeStatus() == 7||            contact.getSubscribeStatus() == 8) )
 			{
 				ActivityCompat.startActivity( this,new  Intent(this,ChatActivity.class).putExtra("CONTACT_ID",contact.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in ,R.anim.left_out).toBundle() );
 			}

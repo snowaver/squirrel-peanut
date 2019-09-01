@@ -49,6 +49,7 @@ import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.chat.activity.AudioCallActivity;
 import  cc.mashroom.squirrel.module.chat.activity.VideoCallActivity;
+import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
 import  cc.mashroom.squirrel.module.system.activity.LoadingActivity;
 import  cc.mashroom.squirrel.module.system.activity.LoginActivity;
 import  cc.mashroom.squirrel.module.system.activity.RegisterActivity;
@@ -70,12 +71,10 @@ import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.call.CallPacket;
 import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
-import cc.mashroom.util.FileUtils;
+import  cc.mashroom.util.FileUtils;
 import  cc.mashroom.util.NoopHostnameVerifier;
 import  cc.mashroom.util.NoopX509TrustManager;
 import  cc.mashroom.util.ObjectUtils;
-import  cc.mashroom.util.collection.map.HashMap;
-import  cc.mashroom.util.collection.map.Map;
 import  es.dmoral.toasty.Toasty;
 import  io.netty.util.concurrent.DefaultThreadFactory;
 import  lombok.Getter;
@@ -92,8 +91,6 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	public  static  String  BALANCING_PROXY_URL     ="https://192.168.1.114:8011/system/balancingproxy?action=1&keyword=0";
 
 	public  static  List<String>  BALANCING_PROXY_BACKUP_ADDRESSES       = Lists.newArrayList( "118.24.16.67", "118.24.19.163","118.25.216.217" );
-
-    public  static  final  Map<String,Integer>  NEWS_PROFILE_PLACEHOLDERS = new  HashMap<String,Integer>().addEntry(ChatContentType.IMAGE.getPlaceholder(),R.string.chat_image_message).addEntry(ChatContentType.AUDIO.getPlaceholder(),R.string.chat_audio_message).addEntry(ChatContentType.VIDEO.getPlaceholder(),R.string.chat_video_message).addEntry("$(0707)",R.string.subscribe_contact_added).addEntry("$(0e00)",R.string.audio_call).addEntry( "$(0e01)",R.string.video_call );
 
     @SneakyThrows
 	public  void  onCreate()
@@ -259,7 +256,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		else
 		if( receivedPacket instanceof   ChatPacket )
 		{
-			PushServiceNotifier.INSTANCE.notify( new  NewsProfile(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId(),new  Timestamp(DateTime.now().getMillis()),PAIPPacketType.CHAT.getValue(),ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId(),ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType() == ChatContentType.WORDS ? new  String(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContent()) : super.getString(NEWS_PROFILE_PLACEHOLDERS.get(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType().getPlaceholder())),0) );
+			PushServiceNotifier.INSTANCE.notify( new  NewsProfile(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId(),new  Timestamp(DateTime.now().getMillis()),PAIPPacketType.CHAT.getValue(),ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId(),ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType() == ChatContentType.WORDS ? new  String(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContent()) : super.getString(NewsProfileListAdapter.NEWS_PROFILE_PLACEHOLDERS.get(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType().getPlaceholder())),0) );
 		}
 	}
 }

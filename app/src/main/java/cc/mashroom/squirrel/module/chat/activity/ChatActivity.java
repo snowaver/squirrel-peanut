@@ -59,6 +59,7 @@ import  java.io.File;
 import java.io.IOException;
 import  java.sql.Connection;
 import  java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  es.dmoral.toasty.Toasty;
@@ -123,6 +124,8 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 	@Setter
 	private  long  contactId;
 
+	private  AtomicBoolean  initialized =  new  AtomicBoolean( false );
+
     @Override
     public  void  onScrollStateChanged( AbsListView  view, int  state )
     {
@@ -132,9 +135,15 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
     @Override
     public  void  onScroll(  AbsListView  view,int  firstVisibleItem,int  visibleItemCount,int  totalCount )
     {
-        if( firstVisibleItem == 0 && visibleItemCount > 0 &&     view.getChildAt(0).getTop() == 0 )
+    	//  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.  2.  last  item  is  partially  visible.
+    	if((firstVisibleItem == 0 && visibleItemCount > 0 && visibleItemCount < totalCount || firstVisibleItem == 0 && visibleItemCount > 0 && view.getChildCount() > 0 && view.getChildAt(visibleItemCount-1).getBottom() > view.getBottom()) && initialized.compareAndSet(false,true) )
+		{
+			view.setStackFromBottom(true);
+		}
+
+        if( firstVisibleItem == 0 && visibleItemCount > 0 && view.getChildCount()          > 0 &&      view.getChildAt(0).getTop() == 0 )
         {
-            ObjectUtils.cast(view.getAdapter(),       ChatMessageListviewAdapter.class).cachePreviousPage();
+            ObjectUtils.cast(     view.getAdapter() , ChatMessageListviewAdapter.class).cachePreviousPage();
         }
     }
 
@@ -229,7 +238,7 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 
 		if( resultData != null )
 		{
-			for( Media  media :ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS"),new  TypeReference<List<Media>>(){}) )
+			for( Media  media : ObjectUtils.cast( resultData.getSerializableExtra("MEDIAS"),      new  TypeReference<List<Media>>(){} ) )
 			{
 				try
                 {

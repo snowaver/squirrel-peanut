@@ -35,6 +35,7 @@ import  java.io.File;
 import java.io.IOException;
 import  java.sql.Connection;
 import  java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
@@ -71,7 +72,7 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketListener,View.OnKeyListener,AbsListView.OnScrollListener
+public  class  GroupChatActivity  extends  AbstractActivity       implements  PacketListener,View.OnKeyListener,AbsListView.OnScrollListener
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )
@@ -128,6 +129,8 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 	@Setter
 	private  long    groupId;
 
+	private  AtomicBoolean  initialized =  new  AtomicBoolean( false );
+
     @Override
     public  void  onScrollStateChanged( AbsListView  view, int  state )
     {
@@ -137,10 +140,16 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
     @Override
     public  void  onScroll( AbsListView  view,int  firstVisibleItem,int  visibleItemCount, int  totalCount )
     {
-        if( firstVisibleItem == 0 && visibleItemCount > 0 &&    view.getChildAt(0).getTop()  == 0 )
-        {
-            ObjectUtils.cast(view.getAdapter(),  GroupChatMessageListviewAdapter.class).cachePreviousPage();
-        }
+		//  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.  2.  last  item  is  partially  visible.
+		if((firstVisibleItem == 0 && visibleItemCount > 0 && visibleItemCount < totalCount || firstVisibleItem == 0 && visibleItemCount > 0 && view.getChildCount() > 0 && view.getChildAt(visibleItemCount-1).getBottom() > view.getBottom()) && initialized.compareAndSet(false,true) )
+		{
+			view.setStackFromBottom(    true );
+		}
+
+		if( firstVisibleItem == 0 && visibleItemCount > 0 && view.getChildCount()          > 0 &&         view.getChildAt(0).getTop() == 0 )
+		{
+			ObjectUtils.cast( view.getAdapter(), GroupChatMessageListviewAdapter.class).cachePreviousPage();
+		}
     }
 
 	public  void  onSent( Packet packet,TransportState transportState )
@@ -227,11 +236,11 @@ public  class  GroupChatActivity  extends  AbstractActivity  implements  PacketL
 
 		if( resultData != null )
 		{
-			for( Media  media : ObjectUtils.cast(resultData.getSerializableExtra("CAPTURED_MEDIAS"),  new  TypeReference<List<Media>>(){}) )
+			for( Media  media : ObjectUtils.cast(         resultData.getSerializableExtra("MEDIAS"), new  TypeReference<List<Media>>(){} ) )
 			{
 				try
 				{
-					File  cachedFile = application().cache( media.getId(),new  File(media.getPath()),media.getType()  == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
+					File  cachedFile= application().cache( media.getId(),new  File(media.getPath()), media.getType()  == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
 
 					application().getSquirrelClient().asynchronousSend( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),groupId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
 				}
