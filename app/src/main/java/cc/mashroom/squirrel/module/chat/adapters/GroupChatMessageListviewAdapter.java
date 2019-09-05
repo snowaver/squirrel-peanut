@@ -73,6 +73,9 @@ public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter  <GroupChat
 	@Setter( value=AccessLevel.PROTECTED )
 	@Accessors( chain=true )
 	protected  GroupChatActivity  context;
+	@Setter( value=   AccessLevel.PUBLIC )
+	@Accessors( chain=true )
+	protected  boolean  isStackFromBottom;
 
 	protected  Map<Long, GroupChatMessage>  oqp = new  HashMap<Long,GroupChatMessage>();
 
@@ -125,7 +128,7 @@ public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter  <GroupChat
 		}
 	}
 
-	public  View  getView( final  int  position , View  convertView, ViewGroup  parent )
+	public  View  getView(final  int  position , View  convertView, ViewGroup  parent )
 	{
 		convertView = convertView != null ? convertView : LayoutInflater.from(context).inflate( R.layout.activity_chat_message_item,parent,false );
 
@@ -156,13 +159,13 @@ public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter  <GroupChat
 		else
 		if( ChatContentType.valueOf(message.getContentType()) == ChatContentType.AUDIO )
 		{
-			ObjectUtils.cast(contentSwitcher.setDisplayedChild(2).getDisplayedChild().findViewById(R.id.content),TextView.class).setText(   new  DateTime(Long.parseLong(message.getContent()),DateTimeZone.UTC).toString("ss") );
+			ObjectUtils.cast(contentSwitcher.setDisplayedChild(2).getDisplayedChild().findViewById(R.id.content),TextView.class).setText( new  DateTime(Long.parseLong(message.getContent()),  DateTimeZone.UTC).toString("ss") );
 
-			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> { try{ new  MediaPlayer().play(new  File(context.application().getCacheDir(), "file/"+message.getMd5()).getPath(),null,null); }catch(IOException  e){} } );
+			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> { try{ new  MediaPlayer().play(new  File(context.application().getCacheDir(),"file/"+message.getMd5()).getPath(),null,null); }catch(IOException  e){} } );
 		}
 		else
 		{
-			ObjectUtils.cast(contentSwitcher.setDisplayedChild(0).getDisplayedChild().findViewById(R.id.message),TextView.class).setText( message.getContent());
+			ObjectUtils.cast(contentSwitcher.setDisplayedChild(0).getDisplayedChild().findViewById(R.id.message),TextView.class).setText(      message.getContent() );
 		}
 
 		ObjectUtils.cast(convertView.findViewById(TransportState.valueOf(message.getTransportState()) == TransportState.RECEIVED ? R.id.owner_portrait : R.id.other_portrait), SimpleDraweeView.class).setImageResource( R.color.white );  return  convertView;

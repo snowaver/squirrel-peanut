@@ -84,6 +84,9 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 	@Setter( value=AccessLevel.PROTECTED )
 	@Accessors( chain=true )
 	protected  long  contactId;
+	@Setter( value=   AccessLevel.PUBLIC )
+	@Accessors( chain=true )
+	protected  boolean  isStackFromBottom;
 
 	public  void cachePreviousPage()
 	{
@@ -149,6 +152,11 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
             notifyDataSetChanged( );
         }
     }
+
+	public  long  getItemId(int  position)
+	{
+		return  this.isStackFromBottom   ? super.getItemId(position) : super.getCount()- position-1;
+	}
 
 	public  View  getView( int  position,View  convertView,ViewGroup  parent )
 	{

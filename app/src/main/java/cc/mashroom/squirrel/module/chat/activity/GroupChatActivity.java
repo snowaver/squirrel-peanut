@@ -32,10 +32,10 @@ import  com.google.common.collect.Lists;
 import  com.irozon.sneaker.Sneaker;
 
 import  java.io.File;
-import java.io.IOException;
+import  java.io.IOException;
 import  java.sql.Connection;
 import  java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import  java.util.concurrent.atomic.AtomicBoolean;
 
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
@@ -71,6 +71,9 @@ import  lombok.experimental.Accessors;
 import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
+
+import static android.widget.AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL;
+import static android.widget.AbsListView.TRANSCRIPT_MODE_DISABLED;
 
 public  class  GroupChatActivity  extends  AbstractActivity       implements  PacketListener,View.OnKeyListener,AbsListView.OnScrollListener
 {
@@ -141,14 +144,19 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
     public  void  onScroll( AbsListView  view,int  firstVisibleItem,int  visibleItemCount, int  totalCount )
     {
 		//  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.  2.  last  item  is  partially  visible.
-		if((firstVisibleItem == 0 && visibleItemCount > 0 && visibleItemCount < totalCount || firstVisibleItem == 0 && visibleItemCount > 0 && view.getChildCount() > 0 && view.getChildAt(visibleItemCount-1).getBottom() > view.getBottom()) && initialized.compareAndSet(false,true) )
+		if( (view.getLastVisiblePosition()-view.getFirstVisiblePosition()>0 && view.getLastVisiblePosition()-view.getFirstVisiblePosition() < view.getAdapter().getCount() || view.getLastVisiblePosition()-view.getFirstVisiblePosition() > 0 && view.getChildAt(view.getLastVisiblePosition()).getBottom() > view.getBottom()) && initialized.compareAndSet(false,true) )
 		{
 			view.setStackFromBottom(    true );
-		}
 
+//			ObjectUtils.cast(listview.getAdapter(),ChatMessageListviewAdapter.class).notifyDataSetChanged();
+		}
 		if( firstVisibleItem == 0 && visibleItemCount > 0 && view.getChildCount()          > 0 &&         view.getChildAt(0).getTop() == 0 )
 		{
-			ObjectUtils.cast( view.getAdapter(), GroupChatMessageListviewAdapter.class).cachePreviousPage();
+			view.setTranscriptMode( TRANSCRIPT_MODE_DISABLED );
+
+			ObjectUtils.cast(view.getAdapter(),  GroupChatMessageListviewAdapter.class).cachePreviousPage();
+
+			view.setTranscriptMode( TRANSCRIPT_MODE_ALWAYS_SCROLL    );
 		}
     }
 
@@ -216,7 +224,11 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
 	{
 		super.onResume( );
 
-		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).notifyDataSetChanged();
+        ListView  listview  = ObjectUtils.cast( super.findViewById(R.id.messages),ListView.class );
+
+
+
+//		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).notifyDataSetChanged();
 
 		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getAdapter(),MoreInputsAdapter.class).notifyDataSetChanged();
 
