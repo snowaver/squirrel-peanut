@@ -81,7 +81,7 @@ public  class  MoreInputsAdapter  extends  BaseAdapter  implements  View.OnClick
             }
             case  1:
             {
-                ActivityCompat.startActivityForResult( context,new  Intent(context,AlbumMediaMultichoiceActivity.class).putExtra("MAX_COUNT",3).putExtra("MAX_FILE_SIZE",10*1024*1024),1,ActivityOptionsCompat.makeCustomAnimation(context,R.anim.right_in,R.anim.left_out).toBundle() );  break;
+                ActivityCompat.startActivityForResult( context,new  Intent(context,AlbumMediaMultichoiceActivity.class).putExtra("MAX_COUNT",3).putExtra("MAX_FILE_SIZE",10*1024*1024L),1,ActivityOptionsCompat.makeCustomAnimation(context,R.anim.right_in,R.anim.left_out).toBundle() );  break;
             }
             case  2:
             {
