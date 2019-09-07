@@ -3,7 +3,7 @@
 
     <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  app:immersive="true"  app:backDrawable="@drawable/lt_all"></cc.mashroom.hedgehog.widget.HeaderBar>
 
-    <ListView  android:id="@+id/messages"  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"  android:dividerHeight="0px"  android:transcriptMode="alwaysScroll"  android:background="@color/white"></ListView>
+    <ListView  android:id="@+id/messages"  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"  android:dividerHeight="0px"  android:stackFromBottom="true"  android:transcriptMode="alwaysScroll"  android:background="@color/white"></ListView>
 
     <View  android:layout_width="match_parent"  android:layout_height="1px"  android:background="@color/gainsboro"></View>
 

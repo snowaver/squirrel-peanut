@@ -33,7 +33,6 @@ import  org.joda.time.DateTimeZone;
 
 import  java.io.File;
 import  java.io.IOException;
-import java.sql.Timestamp;
 import  java.util.LinkedList;
 
 import  cc.mashroom.hedgehog.parent.BaseAdapter;
@@ -59,7 +58,6 @@ import  cc.mashroom.util.collection.map.Map;
 import  lombok.AccessLevel;
 import  lombok.AllArgsConstructor;
 import  lombok.Setter;
-import  lombok.Synchronized;
 import  lombok.experimental.Accessors;
 
 @AllArgsConstructor
@@ -68,12 +66,12 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 {
 	public  ChatMessageListviewAdapter(ChatActivity  context,long  contactId )
 	{
-		this.setContext(context).setContactId(contactId).setItems( new  LinkedList<ChatMessage>() );
+		super(   new  LinkedList<ChatMessage>() );
 
-		cachePreviousPage();
+		this.setContext(context).setContactId(contactId).setTotalCount( ChatMessageRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(ID)  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?",new  Object[]{contactId}).intValue() );
 	}
 
-	protected  Map<Long, ChatMessage>  oqp = new  HashMap<Long,ChatMessage>();
+	protected  Map<Long,ChatMessage>   oqp = new  HashMap<Long,ChatMessage>();
 
 	public  final  static  Map<String, Integer>  CLOSE_PROFILES = new HashMap<String,Integer>().addEntry(CloseCallReason.ROOM_NOT_FOUND.getPlaceholder()+":"+0,R.string.call_room_not_found).addEntry(CloseCallReason.ROOM_NOT_FOUND.getPlaceholder()+":"+1,R.string.call_room_not_found).addEntry(CloseCallReason.STATE_ERROR.getPlaceholder()+":"+0,R.string.call_state_error).addEntry(CloseCallReason.STATE_ERROR.getPlaceholder()+":"+1,R.string.call_state_error)
 		.addEntry(CloseCallReason.CANCEL.getPlaceholder()+":"+0,R.string.call_peer_canceled).addEntry(CloseCallReason.CANCEL.getPlaceholder()+":"+1,R.string.call_canceled).addEntry(CloseCallReason.TIMEOUT.getPlaceholder()+":"+0,R.string.call_peer_canceled).addEntry(CloseCallReason.TIMEOUT.getPlaceholder()+":"+1,R.string.call_no_response).addEntry(CloseCallReason.REJECT.getPlaceholder()+":"+0,R.string.call_peer_rejected).addEntry(CloseCallReason.REJECT.getPlaceholder()+":"+1,R.string.call_rejected).addEntry(CloseCallReason.NETWORK_ERROR.getPlaceholder()+":"+0,R.string.network_or_internal_server_error).addEntry(CloseCallReason.NETWORK_ERROR.getPlaceholder()+":"+1,R.string.network_or_internal_server_error);
@@ -83,86 +81,93 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 	protected  ChatActivity context;
 	@Setter( value=AccessLevel.PROTECTED )
 	@Accessors( chain=true )
-	protected  long  contactId;
-	@Setter( value=   AccessLevel.PUBLIC )
+	protected  int  totalCount;
+	@Setter( value=AccessLevel.PROTECTED )
 	@Accessors( chain=true )
-	protected  boolean  isStackFromBottom;
+	protected  long  contactId;
 
-	public  void cachePreviousPage()
-	{
-		synchronized( this )
-		{
-			boolean  dataSetChanged=false;
-
-			for( ChatMessage  chatMessage : ChatMessageRepository.DAO.lookup(ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?  ORDER  BY  CREATE_TIME  DESC  LIMIT  ?,20",new  Object[]{contactId,items.size()}) )
-			{
-				dataSetChanged=true;
-				//  it  is  necessary  that  checking  the  existence  of  the  chat  message  while  the  method  is  triggered  after  a  chat  message  is  added  to  the  empty  list  by  <append>  method  and  the  listview  scrolled  to  the  top.
-				if( this.oqp.put( chatMessage.getId(), chatMessage ) == null )
-				{
-					this.items.add(0,chatMessage);
-				}
-			}
-
-			if( !   dataSetChanged )
-			{
-				return;
-			}
-
-			super.notifyDataSetChanged( );
-		}
-	}
-
-	public  void  append( long  id )
-	{
-		synchronized( this )
-		{
-			ChatMessage   cached =  oqp.get( id );
-
-			if( cached     == null )
-			{
-				ChatMessage  chatMessage = ChatMessageRepository.DAO.lookupOne( ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  CONTACT_ID = ?",new  Object[]{id,contactId} );
-
-				if( this.oqp.put( chatMessage.getId(), chatMessage ) == null )
-				{
-					this.items.add( chatMessage );
-				}
-			}
-			else
-			{
-				cached.setTransportState( ChatMessageRepository.DAO.lookupOne(Integer.class,"SELECT  TRANSPORT_STATE  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  CONTACT_ID = ?",new  Object[]{id,contactId}) );
-			}
-
-			notifyDataSetChanged( );
-		}
-	}
-
-	public  void    append()
+	public  void     cacheIncoming()
     {
         synchronized( this )
         {
-            for( ChatMessage  chatMessage : ChatMessageRepository.DAO.lookup(ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?  AND  CREATE_TIME > ?  ORDER  BY  CREATE_TIME  ASC",new  Object[]{contactId,items.isEmpty()?new  Timestamp(new  DateTime(2000,1,1,0,0,0).getMillis()) : items.get(items.size()-1).getCreateTime()}) )
+            for( ChatMessage  chatMessage: ChatMessageRepository.DAO.lookup(ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?  AND  ID > ?  ORDER  BY  ID  ASC",new  Object[]{contactId,items.isEmpty() ? 0 : items.get(0).getId()}) )
             {
-                if( this.oqp.put( chatMessage.getId(), chatMessage ) == null )
-                {
-                    this.items.add( chatMessage );
-                }
+				if( this.oqp.put( chatMessage.getId(),chatMessage  ) == null )
+				{
+					this.totalCount= totalCount+1;
+
+					items.add( 0 ,  chatMessage );
+				}
             }
 
-            notifyDataSetChanged( );
+            super.notifyDataSetChanged( );
         }
     }
 
 	public  long  getItemId(int  position)
 	{
-		return  this.isStackFromBottom   ? super.getItemId(position) : super.getCount()- position-1;
+		return  totalCount - position - 1;
+	}
+
+	public  int   getCount()
+	{
+		return      this.totalCount;
+	}
+
+	public  ChatMessage  getItem(  int  position )
+	{
+		int  i = (int)  this.getItemId( position);
+
+		ChatMessage  cachedMessage = i >= 0 && i <super.items.size() ? super.items.get( i ) : null;
+
+		if( cachedMessage  == null )
+		{
+			for( ChatMessage  chatMessage: ChatMessageRepository.DAO.lookup(ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?  ORDER  BY  ID  DESC  LIMIT  ?,10",new  Object[]{contactId,items.size()}) )
+			{
+				//  it  is  necessary  that  checking  the  existence  of  the  chat  message  while  the  method  is  triggered  after  a  chat  message  is  added  to  the  empty  list  by  <append>  method  and  the  listview  scrolled  to  the  top.
+				if( this.oqp.put( chatMessage.getId(),chatMessage  ) == null )
+				{
+					this.items.add( chatMessage );
+
+					if(    cachedMessage == null )  cachedMessage=chatMessage;
+				}
+			}
+		}
+
+		return        cachedMessage;
+	}
+
+	public  void  upsert( long  id )
+	{
+		synchronized( this )
+		{
+			ChatMessage  cachedMessage = this.oqp.get( id );
+
+			if(    cachedMessage != null )
+			{
+				cachedMessage.setTransportState( ChatMessageRepository.DAO.lookupOne(Integer.class,"SELECT  TRANSPORT_STATE  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  CONTACT_ID = ?",new  Object[]{id,contactId}) );
+			}
+			else
+			{
+				ChatMessage  chatMessage = ChatMessageRepository.DAO.lookupOne( ChatMessage.class,"SELECT  ID,CREATE_TIME,CONTACT_ID,MD5,CONTENT_TYPE,CONTENT,TRANSPORT_STATE,IS_LOCAL,LOCAL_DESCRIPTION  FROM  "+ChatMessageRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  CONTACT_ID = ?",new  Object[]{id,contactId} );
+				//  it  is  necessary  that  checking  the  existence  of  the  chat  message  while  the  method  is  triggered  after  a  chat  message  is  added  to  the  empty  list  by  <append>  method  and  the  listview  scrolled  to  the  top.
+				if( this.oqp.put( chatMessage.getId(),chatMessage  ) == null )
+				{
+					this.totalCount =totalCount+1;
+
+					items.add( 0,   chatMessage );
+				}
+			}
+
+            super.notifyDataSetChanged( );
+		}
 	}
 
 	public  View  getView( int  position,View  convertView,ViewGroup  parent )
 	{
 		convertView = convertView != null ? convertView : LayoutInflater.from(context).inflate( R.layout.activity_chat_message_item,parent,false );
 
-		ChatMessage   chatMessage =  super.getItem(   position );
+		ChatMessage   chatMessage = this.getItem(position );
 
 		ObjectUtils.cast(convertView.findViewById(TransportState.valueOf(chatMessage.getTransportState()) == TransportState.RECEIVED ? R.id.other_portrait : R.id.owner_portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+(TransportState.valueOf(chatMessage.getTransportState()) == TransportState.RECEIVED ? contactId : context.application().getSquirrelClient().getUserMetadata().getId())+"/portrait").build().toString()) );
 
@@ -174,11 +179,11 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 
 		ObjectUtils.cast(contentFrame.findViewById(R.id.send_failed_warning_image),ImageView.class).setOnLongClickListener( (view) -> {TipWindow  tip = new  TipWindow(context,R.layout.activity_chat_message_item_tip,true);  tip.showAsDropDown(view);  tip.getContentView().findViewById(R.id.resend_button).setOnClickListener((resendButton) -> {context.application().getSquirrelClient().asynchronousSend(new  ChatPacket(contactId,chatMessage.getMd5(),ChatContentType.valueOf(chatMessage.getContentType()),chatMessage.getContent().getBytes()));  tip.dismiss();});  return  false;} );
 
-		ViewSwitcher  contentSwitcher =     ObjectUtils.cast( contentFrame.findViewById(R.id.message_content_switcher) );
+		ViewSwitcher  contentSwitcher =    ObjectUtils.cast( contentFrame.findViewById(R.id.message_content_switcher) );
 
 		if( ChatContentType.valueOf(chatMessage.getContentType()) == ChatContentType.IMAGE || ChatContentType.valueOf(chatMessage.getContentType())  == ChatContentType.VIDEO )
 		{
-			File  screenshotFile = new  File( context.application().getCacheDir(), "file/"+chatMessage.getMd5()+"$TMB" );
+			File  screenshotFile = new  File( context.application().getCacheDir(),"file/"+chatMessage.getMd5()+"$TMB" );
 
 			ObjectUtils.cast(contentSwitcher.setDisplayedChild(1).findViewById(R.id.screenshot),FlexibleSimpleDraweeView.class).setImageURI( screenshotFile.exists() ? Uri.parse(screenshotFile.toURI().toString()) : Uri.parse(context.application().baseUrl().addPathSegments("file/"+chatMessage.getMd5()+"$TMB").addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().getUserMetadata().getSecretKey()).build().toString()) );
 
@@ -189,7 +194,7 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> ActivityCompat.startActivity(context,new  Intent(context,ChatContentType.valueOf(chatMessage.getContentType()) == ChatContentType.IMAGE ? ImagePreviewActivity.class : VideoPreviewActivity.class).putExtra("CACHE_FILE_PATH",new  File(context.application().getCacheDir(),"file/"+chatMessage.getMd5()).getPath()).putExtra("URL",context.application().baseUrl().addPathSegments("file/"+chatMessage.getMd5()).addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().getUserMetadata().getSecretKey()).build().toString()),ActivityOptionsCompat.makeCustomAnimation(context,R.anim.right_in,R.anim.left_out).toBundle()) );
 		}
 		else
-		if( ChatContentType.valueOf(chatMessage.getContentType())         == ChatContentType.AUDIO )
+		if( ChatContentType.valueOf(chatMessage.getContentType())        == ChatContentType.AUDIO )
 		{
 			ObjectUtils.cast(contentSwitcher.setDisplayedChild(2).getDisplayedChild().findViewById(R.id.icon),ImageView.class).setImageResource(   R.drawable.voice_recorder );
 
@@ -198,7 +203,7 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> { try{new  MediaPlayer().play(new  File(context.application().getCacheDir(),"file/"+chatMessage.getMd5()).getPath(),null,null); }catch(IOException  ie){} } );
 		}
 		else
-		if( chatMessage.getIsLocal() && StringUtils.isNotBlank(chatMessage.getLocalDescription() ) )
+		if( chatMessage.getIsLocal() && StringUtils.isNotBlank(chatMessage.getLocalDescription()) )
 		{
 			Map<String,Object>  descripton    = JsonUtils.fromJson( chatMessage.getLocalDescription(),new  TypeReference<Map<String,Object>>(){} );
 

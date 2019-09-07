@@ -72,9 +72,6 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-import static android.widget.AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL;
-import static android.widget.AbsListView.TRANSCRIPT_MODE_DISABLED;
-
 public  class  GroupChatActivity  extends  AbstractActivity       implements  PacketListener,View.OnKeyListener,AbsListView.OnScrollListener
 {
 	@SneakyThrows
@@ -97,8 +94,6 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
 		ObjectUtils.cast(super.findViewById(R.id.voice_recording_button),Button.class).setOnTouchListener( new  AudioTouchRecoder(this,application().getCacheDir(),(audioFile) -> send(audioFile)) );
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  GroupChatMessageListviewAdapter(this,groupId) );
-
-		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setOnScrollListener(      this );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setVisibility(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getVisibility() == View.GONE ? View.VISIBLE : View.GONE) );
 
@@ -143,28 +138,18 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
     @Override
     public  void  onScroll( AbsListView  view,int  firstVisibleItem,int  visibleItemCount, int  totalCount )
     {
-		//  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.  2.  last  item  is  partially  visible.
-		if( (view.getLastVisiblePosition()-view.getFirstVisiblePosition()>0 && view.getLastVisiblePosition()-view.getFirstVisiblePosition() < view.getAdapter().getCount() || view.getLastVisiblePosition()-view.getFirstVisiblePosition() > 0 && view.getChildAt(view.getLastVisiblePosition()).getBottom() > view.getBottom()) && initialized.compareAndSet(false,true) )
-		{
-			view.setStackFromBottom(    true );
+        //  deperacated:  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.  2.  last  item  is  partially  visible.
+        if( view.getLastVisiblePosition()-firstVisibleItem > 0 && view.getChildAt(0).getTop()== 0 )
+        {
 
-//			ObjectUtils.cast(listview.getAdapter(),ChatMessageListviewAdapter.class).notifyDataSetChanged();
-		}
-		if( firstVisibleItem == 0 && visibleItemCount > 0 && view.getChildCount()          > 0 &&         view.getChildAt(0).getTop() == 0 )
-		{
-			view.setTranscriptMode( TRANSCRIPT_MODE_DISABLED );
-
-			ObjectUtils.cast(view.getAdapter(),  GroupChatMessageListviewAdapter.class).cachePreviousPage();
-
-			view.setTranscriptMode( TRANSCRIPT_MODE_ALWAYS_SCROLL    );
-		}
+        }
     }
 
 	public  void  onSent( Packet packet,TransportState transportState )
 	{
 		if( packet instanceof GroupChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).append(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).upsert(packet.getId()) );
 		}
 	}
 
@@ -172,7 +157,7 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
 	{
 		if( packet instanceof GroupChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).append(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).upsert(packet.getId()) );
 		}
 	}
 
@@ -180,7 +165,7 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
 	{
 		if( packet instanceof GroupChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).append(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).upsert(packet.getId()) );
 
 			if( ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{

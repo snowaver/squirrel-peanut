@@ -64,24 +64,20 @@ import  java.util.concurrent.atomic.AtomicBoolean;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  es.dmoral.toasty.Toasty;
 import  lombok.Setter;
-import  lombok.SneakyThrows;
 import  lombok.experimental.Accessors;
 import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-import  static android.widget.AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL;
-import  static android.widget.AbsListView.TRANSCRIPT_MODE_DISABLED;
-
 public  class  ChatActivity  extends  AbstractActivity      implements  PacketListener,  View.OnKeyListener, AbsListView.OnScrollListener
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
-		PacketEventDispatcher.addListener( this );
+		PacketEventDispatcher.addListener(    this );
 
-		super.onCreate( savedInstanceState );
+		super.onCreate(         savedInstanceState );
 
-		setContentView( R.layout.activity_chat  );
+		super.setContentView(     R.layout.activity_chat );
 
 		setContactId( super.getIntent().getLongExtra("CONTACT_ID",0) );
 
@@ -94,8 +90,6 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 		ObjectUtils.cast(super.findViewById(R.id.voice_recording_button),Button.class).setOnTouchListener( new  AudioTouchRecoder(this,application().getCacheDir(),(audioFile) -> send(audioFile)) );
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  ChatMessageListviewAdapter(this,contactId) );
-
-        ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setOnScrollListener(      this );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setVisibility(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getVisibility() == View.GONE ? View.VISIBLE : View.GONE) );
 
@@ -113,7 +107,7 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 
 		long  voiceDuration = MultimediaUtils.getDuration( audioFile );
 
-		if( voiceDuration  >= 200 )
+		if( voiceDuration >= 200 )
 		{
 			application().getSquirrelClient().asynchronousSend( new  ChatPacket(this.contactId,audioFile.getName() , ChatContentType.AUDIO , String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}
@@ -130,7 +124,7 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 	private  AtomicBoolean  initialized =  new  AtomicBoolean( false );
 
     @Override
-    public  void  onScrollStateChanged( AbsListView  view, int  state )
+    public  void  onScrollStateChanged( AbsListView  view ,int  state )
     {
 
     }
@@ -138,21 +132,10 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
     @Override
     public  void  onScroll(  AbsListView  view,int  firstVisibleItem,int  visibleItemCount,int  totalCount )
     {
-    	//  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.  2.  last  item  is  partially  visible.
-		if( (view.getLastVisiblePosition()-view.getFirstVisiblePosition()>0 && view.getLastVisiblePosition()-view.getFirstVisiblePosition() < view.getAdapter().getCount() || view.getLastVisiblePosition()-view.getFirstVisiblePosition() > 0 && view.getChildAt(view.getLastVisiblePosition()).getBottom() > view.getBottom()) && initialized.compareAndSet(false,true) )
-		{
-			view.setStackFromBottom(true);
-
-//			ObjectUtils.cast(listview.getAdapter(),ChatMessageListviewAdapter.class).notifyDataSetChanged();
-		}
-
-        if( firstVisibleItem == 0 && visibleItemCount > 0 && view.getChildCount()          > 0 &&      view.getChildAt(0).getTop() == 0 )
+    	//  deperacated:  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.  2.  last  item  is  partially  visible.
+        if( view.getLastVisiblePosition()-firstVisibleItem > 0 && view.getChildAt(0).getTop()== 0 )
         {
-        	view.setTranscriptMode( TRANSCRIPT_MODE_DISABLED );
 
-            ObjectUtils.cast(     view.getAdapter() , ChatMessageListviewAdapter.class).cachePreviousPage();
-
-			view.setTranscriptMode( TRANSCRIPT_MODE_ALWAYS_SCROLL    );
         }
     }
 
@@ -160,7 +143,7 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 	{
 		if( packet instanceof ChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).append(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert(packet.getId()) );
 		}
 	}
 
@@ -168,16 +151,15 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 	{
 		if( packet instanceof ChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).append(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert(packet.getId()) );
 		}
 	}
 
-	@SneakyThrows
 	public  boolean  onBeforeSend(   Packet  packet ) throws  Throwable
 	{
 		if( packet instanceof ChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).append(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert(packet.getId()) );
 
 			if( ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{
@@ -222,7 +204,7 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
     {
         super.onRestart();
 
-        application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).append() );
+        application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter(), ChatMessageListviewAdapter.class).cacheIncoming() );
     }
 
     protected  void   onResume()
@@ -236,7 +218,7 @@ public  class  ChatActivity  extends  AbstractActivity      implements  PacketLi
 	{
 		super.onPause(  );
 
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
+		Db.tx(  String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
 	}
 
 	protected  void  onActivityResult(    int  requestCode , int  resultCode , Intent  resultData )
