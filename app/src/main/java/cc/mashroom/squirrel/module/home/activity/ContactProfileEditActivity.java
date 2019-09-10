@@ -24,16 +24,12 @@ import  android.widget.ListView;
 import  android.widget.TextView;
 
 import  androidx.annotation.Nullable;
-import  androidx.core.content.res.ResourcesCompat;
 
-import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.google.android.material.bottomsheet.BottomSheetBehavior;
 import  com.google.android.material.bottomsheet.BottomSheetDialog;
 import  com.irozon.sneaker.Sneaker;
 
 import  cc.mashroom.hedgehog.util.ContextUtils;
-import  cc.mashroom.hedgehog.util.DensityUtils;
-import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.BottomSheetEditor;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;

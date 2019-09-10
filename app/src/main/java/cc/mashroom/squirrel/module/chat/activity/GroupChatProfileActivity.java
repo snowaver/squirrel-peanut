@@ -22,15 +22,10 @@ import  androidx.core.app.ActivityOptionsCompat;
 import  android.widget.GridView;
 import  android.widget.ImageView;
 
-import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
-import  androidx.core.content.res.ResourcesCompat;
-
 import  cc.mashroom.hedgehog.module.common.activity.EditorActivity;
-import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.db.common.Db;
-import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;

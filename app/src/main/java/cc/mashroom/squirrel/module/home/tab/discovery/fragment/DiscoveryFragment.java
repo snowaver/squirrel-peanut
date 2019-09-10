@@ -35,10 +35,7 @@ import  com.irozon.sneaker.Sneaker;
 import  java.util.List;
 import  java.util.Locale;
 
-import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
-import  cc.mashroom.hedgehog.util.DensityUtils;
-import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;

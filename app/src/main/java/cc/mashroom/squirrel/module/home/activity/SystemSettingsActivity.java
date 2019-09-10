@@ -24,7 +24,6 @@ import  android.widget.Button;
 import  android.widget.ListView;
 import  android.widget.TextView;
 
-import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import  java.util.ArrayList;
@@ -33,11 +32,8 @@ import  java.util.Locale;
 
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
-import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.hedgehog.util.ContextUtils;
-import  cc.mashroom.hedgehog.util.DensityUtils;
-import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;

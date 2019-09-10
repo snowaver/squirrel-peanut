@@ -15,14 +15,12 @@
  */
 package cc.mashroom.squirrel.http;
 
-import  cc.mashroom.squirrel.client.SquirrelClient;
 import  cc.mashroom.squirrel.module.common.services.FileService;
 import  cc.mashroom.squirrel.parent.Application;
 import  cc.mashroom.util.JsonUtils;
 
 import  java.util.concurrent.TimeUnit;
 
-import  cc.mashroom.util.NoopHostnameVerifier;
 import  cc.mashroom.util.NoopX509TrustManager;
 import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.Map;

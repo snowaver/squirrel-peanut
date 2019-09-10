@@ -21,7 +21,6 @@ import  android.net.Uri;
 import  android.os.Bundle;
 
 import  com.aries.ui.widget.alert.UIAlertDialog;
-import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.google.android.material.tabs.TabLayout;
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
