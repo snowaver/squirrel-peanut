@@ -107,7 +107,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 		{
 			RetrofitRegistry.INSTANCE.get(ChatGroupUserService.class).add(chatGroup.getId(),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"),",")).enqueue
 			(
-				new  AbstractRetrofit2Callback<OoIData>( this,StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<OoIData>(  this,true )
 				{
 					@SneakyThrows
 					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
@@ -135,7 +135,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
         {
 			RetrofitRegistry.INSTANCE.get(ChatGroupService.class).update(chatGroup.getId(),data.getStringExtra("EDIT_CONTENT")).enqueue
 			(
-				new  AbstractRetrofit2Callback<OoIData>( this,StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<OoIData>(  this,true )
 				{
 					@SneakyThrows
 					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
@@ -173,7 +173,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 			invitedContactIds.add(    chatGroupUser.getContactId() );
 		}
 
-		ActivityCompat.startActivityForResult( this,new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS",ObjectUtils.cast(invitedContactIds,Serializable.class)),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+		ActivityCompat.startActivityForResult( this, new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS",ObjectUtils.cast(invitedContactIds,Serializable.class)),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 	}
 
 	private  void  leaveOrDelete()
@@ -181,7 +181,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 		{
 			RetrofitRegistry.INSTANCE.get(ChatGroupUserService.class).secede(this.chatGroup.getId(),this.chatGroupUser.getId()).enqueue
 			(
-				new  AbstractRetrofit2Callback<OoIData>( this,StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) )
+				new  AbstractRetrofit2Callback<OoIData>(  this,true )
 				{
 					@SneakyThrows
 					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )

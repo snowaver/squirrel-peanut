@@ -97,7 +97,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextVi
 			{
 				RetrofitRegistry.INSTANCE.get(UserService.class).lookup(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim(), "{}").enqueue
 				(
-					new  AbstractRetrofit2Callback<List<User>>( this.getActivity(),StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this.getActivity()).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this.getActivity(),R.font.droid_sans_mono)).setWidth(DensityUtils.px(this.getActivity(),220)).setHeight(DensityUtils.px(this.getActivity(),150)) )
+					new  AbstractRetrofit2Callback<List<User>>( this.getActivity() ,true )
 					{
 						public  void  onResponse( Call<List<User>>  call, Response<List<User>>  response )
 						{

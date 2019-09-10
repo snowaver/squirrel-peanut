@@ -17,9 +17,13 @@ package cc.mashroom.squirrel.http;
 
 import  android.app.Activity;
 
+import  androidx.core.content.res.ResourcesCompat;
+
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
+import  cc.mashroom.hedgehog.util.DensityUtils;
+import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.squirrel.R;
 
 import  cc.mashroom.squirrel.parent.AbstractActivity;
@@ -31,18 +35,18 @@ import  retrofit2.Call;
 import  retrofit2.Callback;
 import  retrofit2.Response;
 
-public  abstract  class  AbstractRetrofit2Callback<T>  implements  Callback<T>
+public  abstract    class  AbstractRetrofit2Callback<T>  implements  Callback<T>
 {
-	public  AbstractRetrofit2Callback( Activity  context,UIProgressDialog  waitingDailog )
+	public  AbstractRetrofit2Callback( Activity  context,boolean  isShowWaitingProgressDialog )
 	{
-		this.setContext(context).setWaitingDailog( waitingDailog );
+		this.setContext(context).setWaitingProgressDailog( !isShowWaitingProgressDialog? null : StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(context).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(context,R.font.droid_sans_mono)).setWidth(DensityUtils.px(context,220)).setHeight(DensityUtils.px(context,150)) );
 
-		waitingDailog.show();
+		if( isShowWaitingProgressDialog   )   this.waitingProgressDailog.show();
 	}
 
 	public  AbstractRetrofit2Callback( Activity  context )
 	{
-		this.setContext( context );
+		this(context,false );
 	}
 
 	@Accessors( chain= true )
@@ -52,23 +56,23 @@ public  abstract  class  AbstractRetrofit2Callback<T>  implements  Callback<T>
 	@Accessors( chain= true )
 	@Setter
 	@Getter
-	protected  UIProgressDialog  waitingDailog;
+	protected  UIProgressDialog     waitingProgressDailog;
 
 	public  void  onResponse( Call<T>  call,Response<T>  response )
 	{
-		if( waitingDailog != null )
+		if( waitingProgressDailog != null )
 		{
-			waitingDailog.cancel();
+			waitingProgressDailog.cancel();
 		}
 	}
 
 	public  void  onFailure( Call<T>  call,Throwable  ie )
 	{
-		ie.printStackTrace( );
+		ie.printStackTrace();
 
-		if( waitingDailog != null )
+		if( waitingProgressDailog != null )
 		{
-			waitingDailog.cancel();
+			waitingProgressDailog.cancel();
 		}
 
 		ObjectUtils.cast(context,AbstractActivity.class).showSneakerWindow( Sneaker.with(context),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
