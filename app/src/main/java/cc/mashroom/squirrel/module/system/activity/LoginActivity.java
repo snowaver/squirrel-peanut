@@ -45,10 +45,9 @@ import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.LifecycleListener;
-import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
 import  cc.mashroom.squirrel.module.home.adapters.SystemSettingsLanguageAdapter;
-import  cc.mashroom.squirrel.parent.AbstractActivity;
+import  cc.mashroom.squirrel.parent.AbstractLifecycleListenerActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
@@ -57,7 +56,7 @@ import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
 
-public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnClickListener,LifecycleListener,HeaderBar.OnItemClickListener,SmoothCheckBox.OnCheckedChangeListener,AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
+public  class  LoginActivity  extends  AbstractLifecycleListenerActivity  implements  Button.OnClickListener,LifecycleListener,HeaderBar.OnItemClickListener,SmoothCheckBox.OnCheckedChangeListener,AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
     protected  void  onActivityResult( int  requestCode , int  rstCode , Intent  data )
     {
@@ -85,7 +84,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
         {
             StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.login_remote_login_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColorResource(R.color.red).setPositiveButtonTextSize(18).setPositiveButton(R.string.close,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
         }
-        //  clear  the  password  styleable  editview  after  successful  registration,  logout  or  squeezing  off  line  by  remote  login.
+        //  clear  the  password  styleable  editview  after  successful  registration,  logout  or  squeezing  off  line  by  remote  signin.
         ObjectUtils.cast(super.findViewById(R.id.login_button),Button.class).setOnClickListener( this );
 
         ObjectUtils.cast(super.findViewById(R.id.jump_to_registration_link),TextView.class).setOnClickListener( (view) -> ActivityCompat.startActivityForResult(this,new  Intent(this,RegisterActivity.class),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
@@ -94,7 +93,7 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
 
         ObjectUtils.cast(this.getLanguagesBottomSheetDialog().findViewById(R.id.languages), ListView.class).setAdapter( new  SystemSettingsLanguageAdapter(this,this) );
 
-        ObjectUtils.cast(this.getLanguagesBottomSheetDialog().findViewById(R.id.languages), ListView.class).setOnItemClickListener(   this );
+        ObjectUtils.cast(this.getLanguagesBottomSheetDialog().findViewById(R.id.languages), ListView.class).setOnItemClickListener(    this );
 
         ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.back_text),TextView.class).setOnClickListener( (backtt) -> this.languagesBottomSheetDialog.show() );
 
@@ -169,18 +168,13 @@ public  class  LoginActivity  extends  AbstractActivity  implements  Button.OnCl
 
         LocaleUtils.change( this,(ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString().equals("ENGLISH") ? Locale.ENGLISH : Locale.CHINESE).toLanguageTag() );
     }
-
-    public  void  onDisconnected( int  reason )
+    @Override
+    public  void  onError(  Throwable   error )
     {
-
+        application().getMainLooperHandler().post( () -> showSneakerWindow(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red) );
     }
 
-    public  void  onReceivedOfflineData(OoIData   ooIData )
-    {
-
-    }
-
-    public  void  onClick(  View  loginButton )
+    public  void  onClick( View  signinButton )
     {
         if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString(),ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString()) || !NetworkUtils.isNetworkAvailable(this) )
         {

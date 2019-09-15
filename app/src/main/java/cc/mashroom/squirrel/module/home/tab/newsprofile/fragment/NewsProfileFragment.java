@@ -47,7 +47,7 @@ public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  imp
 {
 	public  View  onCreateView( LayoutInflater  inflater,ViewGroup  container,Bundle  savedInstanceState )
 	{
-		PacketEventDispatcher.addListener( this );
+		super.onCreateView( inflater, container, savedInstanceState );
 
 		LocaleChangeEventDispatcher.addListener(    NewsProfileFragment.this );
 

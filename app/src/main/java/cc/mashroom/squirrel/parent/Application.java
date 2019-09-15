@@ -18,7 +18,6 @@ package cc.mashroom.squirrel.parent;
 import  android.app.Activity;
 import  android.content.Context;
 import  android.content.Intent;
-import  android.content.SharedPreferences;
 import  android.graphics.Typeface;
 import  android.location.Location;
 import  android.net.ConnectivityManager;
@@ -37,11 +36,14 @@ import  org.joda.time.DateTime;
 import  org.webrtc.PeerConnection;
 
 import  cc.mashroom.hedgehog.util.NetworkUtils;
-import  cc.mashroom.router.BalancerStateListener;
-import  cc.mashroom.router.DefaultBalancingProxyFactory;
+import  cc.mashroom.router.DefaultServiceListRequestStrategy;
+import cc.mashroom.router.Schema;
+import cc.mashroom.router.Service;
+import cc.mashroom.router.ServiceRouteManager;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.LifecycleListener;
 import  cc.mashroom.squirrel.client.SquirrelClient;
+import  cc.mashroom.squirrel.client.connect.ConnectState;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.PacketListener;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
@@ -59,21 +61,18 @@ import  cc.mashroom.squirrel.paip.message.chat.ChatContentType;
 import  cc.mashroom.squirrel.paip.message.connect.DisconnectAckPacket;
 import  cc.mashroom.squirrel.push.PushServiceNotifier;
 
-import  java.net.URL;
 import  java.sql.Timestamp;
 import  java.util.List;
 import  java.util.Set;
 import  java.util.concurrent.ScheduledThreadPoolExecutor;
 import  java.util.concurrent.TimeUnit;
-import  java.util.concurrent.atomic.AtomicInteger;
 
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.call.CallPacket;
 import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
+import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.FileUtils;
-import  cc.mashroom.util.NoopHostnameVerifier;
-import  cc.mashroom.util.NoopX509TrustManager;
 import  cc.mashroom.util.ObjectUtils;
 import  es.dmoral.toasty.Toasty;
 import  io.netty.util.concurrent.DefaultThreadFactory;
@@ -81,61 +80,38 @@ import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.SneakyThrows;
 import  lombok.experimental.Accessors;
-import  okhttp3.HttpUrl;
-import  okhttp3.OkHttpClient;
+import okhttp3.HttpUrl;
 
-public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  BalancerStateListener, LifecycleListener, PacketListener
+public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  LifecycleListener, PacketListener
 {
+    private  Set<Class>  authenticateNeedlessActivityClasses = Sets.newHashSet(LoadingActivity.class,LoginActivity.class,RegisterActivity.class );
+
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList( new  PeerConnection.IceServer("stun:47.105.210.154:3478"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302"),new  PeerConnection.IceServer("turn:47.105.210.154:3478","snowaver","snowaver") );
 
-	public  static  String  BALANCING_PROXY_URL     ="https://192.168.1.114:8011/system/balancingproxy?action=1&keyword=0";
-
-	public  static  List<String>  BALANCING_PROXY_BACKUP_ADDRESSES       = Lists.newArrayList( "118.24.16.67", "118.24.19.163","118.25.216.217" );
+	public  static  String  SERVICE_LIST_REQUEST_URL="https://192.168.1.114:8011/system/balancingproxy?action=1&keyword=0";
 
     @SneakyThrows
 	public  void  onCreate()
 	{
 		super.onCreate();
 
-		this.squirrelClient = new  SquirrelClient( this,  super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir() );
+		this.squirrelClient = new  SquirrelClient(this,super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir()).route( new  DefaultServiceListRequestStrategy(Lists.newArrayList(SERVICE_LIST_REQUEST_URL),SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS) );
 
 		PacketEventDispatcher.addListener(   this );
-		/*
+
 		LocaleUtils.change( this , null );
-		*/
+
+		PushServiceNotifier.INSTANCE.initialize(    this );
+
 		Toasty.Config.getInstance().allowQueue(  false).setTextSize(14).setToastTypeface(Typeface.createFromAsset(super.getResources().getAssets(),"font/droid_sans_mono.ttf")).apply();
-
-		PushServiceNotifier.INSTANCE.initialize(    Application.this );
-
-		Long  userId = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0);
-
-		if( userId >= 1 )
-		{
-			//  scheduler  job  will  not  be  executed  on  xiaomi  (4a)  and   vivo  (y66)  after  pushing  off  the  application,  so  the  proposal  using  scheduler  job  is  not  available  to  keep  application  alive.  give  up.
-
-			SharedPreferences  networkSharedPreference = super.getSharedPreferences( "LATEST_NETWORK_ROUTE",MODE_PRIVATE );
-
-			squirrelClient.route( networkSharedPreference.getString("HOST",null),networkSharedPreference.getInt("PORT",8012),networkSharedPreference.getInt("HTTPPORT",8011) );
-		}
-		else
-		{
-			URL  balancingProxyUrl   = new  URL( BALANCING_PROXY_URL );
-
-			squirrelClient.route( balancingProxyUrl.getHost(),  8012, balancingProxyUrl.getPort() );
-		}
 
 		RetrofitRegistry.INSTANCE.initialize(this );
 
-		Fresco.initialize( this,OkHttpImagePipelineConfigFactory.newBuilder(this,new  OkHttpClient.Builder().hostnameVerifier(new  NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new  NoopX509TrustManager()).connectTimeout(2,TimeUnit.SECONDS).writeTimeout(2,TimeUnit.SECONDS).readTimeout(8,TimeUnit.SECONDS).addInterceptor((chain) -> chain.proceed(chain.request().newBuilder().header("SECRET_KEY",squirrelClient.getUserMetadata().getSecretKey() == null ? "" : squirrelClient.getUserMetadata().getSecretKey()).build())).build()).build() );
-
-		squirrelClient.route( new  DefaultBalancingProxyFactory(new  URL(BALANCING_PROXY_URL),BALANCING_PROXY_BACKUP_ADDRESSES,SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS),this );
+		Fresco.initialize( Application.this,OkHttpImagePipelineConfigFactory.newBuilder(this, this.squirrelClient.okhttpClient(5,5,10)).build() );
 
 		ObjectUtils.cast(super.getSystemService(Context.CONNECTIVITY_SERVICE),ConnectivityManager.class).requestNetwork( new  NetworkRequest.Builder().build(),new  ConnectivityStateListener( this ) );
 	}
 
-	private  Set<Class>  authenticateNeedlessActivityClasses = Sets.newHashSet(LoadingActivity.class,LoginActivity.class,RegisterActivity.class );
-
-	public  final  static  AtomicInteger  PROCESS_KEEPER_SCHEDUAL_JOB_ID  = new  AtomicInteger( 0 );
 	@Accessors(  chain = true )
 	@Getter
 	@Setter
@@ -147,21 +123,16 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	{
 		super.onTerminate();
 
-		squirrelClient.close();
+		this.squirrelClient.release();
 
 		scheduler.shutdown(  );
 	}
 
-	public      HttpUrl.Builder  baseUrl()
-	{
-		return  new  HttpUrl.Builder().scheme("https").host(squirrelClient.getHost()).port( squirrelClient.getHttpPort() );
-	}
-
-	public  void  onAuthenticateComplete(  int  returnCode )
+	public  void  onAuthenticateComplete( int  returnCode )
 	{
 		if( returnCode == 601||  returnCode == 602 )
 		{
-			super.getSharedPreferences( "LATEST_LOGIN_FORM", MODE_PRIVATE ).edit().clear().commit();
+			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().clear().apply();
 
 			if( !AbstractActivity.STACK.isEmpty() && !authenticateNeedlessActivityClasses.contains(AbstractActivity.STACK.getLast().getClass() ) )
 			{
@@ -171,56 +142,78 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		else
 		if( returnCode == 200 )
 		{
-			super.getSharedPreferences("LATEST_LOGIN_FORM", MODE_PRIVATE).edit().putLong("ID",squirrelClient.getUserMetadata().getId()).putString("USERNAME",squirrelClient.getUserMetadata().getUsername()).putString("NAME", squirrelClient.getUserMetadata().getName()).putString("NICKNAME", squirrelClient.getUserMetadata().getNickname()).commit();
+			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().putLong("ID",squirrelClient.getUserMetadata().getId()).putString("USERNAME",squirrelClient.getUserMetadata().getUsername()).putString("NAME",squirrelClient.getUserMetadata().getName()).putString("NICKNAME",squirrelClient.getUserMetadata().getNickname()).putString("BASE_URL",baseUrl().toString()).apply();
 		}
 	}
 
 	@SneakyThrows
-	public  void  connect( String  username, String  password, Location  geometryLoc,LifecycleListener  lifecycleListener )
+	public  void  connect(   String  username,String  password,Location  geometryLoc,LifecycleListener  lifecycleListener )
 	{
 		if( !NetworkUtils.isNetworkAvailable(this) )
 		{
 			return;
 		}
 
-		squirrelClient.asynchronousConnect( username,password,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
+		this.squirrelClient.connect( username,password,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
 	}
 
 	@SneakyThrows
-	public  void  connect( Long  id , Location  geometryLoc,  LifecycleListener  lifecycleListener )
+	public  void  connect( Long  id,Location  geometryLoc,LifecycleListener  lifecycleListener )
 	{
 		if( !NetworkUtils.isNetworkAvailable(this) )
 		{
 			return;
 		}
 
-		squirrelClient.asynchronousConnect( id,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
+		this.squirrelClient.connect( id,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
 	}
 
 	public  void  clearStackActivitiesAndStart( Intent  intent , Bundle  bundle )
 	{
-		for(   Activity  activity : AbstractActivity.STACK )   activity.finish();
+		for(  Activity  activity : AbstractActivity.STACK )    activity.finish();
 
-		ActivityCompat.startActivity( this, intent,bundle );
+		ActivityCompat.startActivity( this,intent,bundle );
 	}
 
-	public  void  onDisconnected( int  closeReason )
+	public  void  onError(   Throwable   throwable )
+	{
+
+	}
+
+	public  void  onLogout(  int  reason )
 	{
 		//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  loginactivity.
-		if( closeReason    == DisconnectAckPacket.REASON_REMOTE_LOGIN )
+		if( reason ==        DisconnectAckPacket.REASON_REMOTE_SIGNIN  )
 		{
-			clearStackActivitiesAndStart(     new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",1).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+			this.clearStackActivitiesAndStart(new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",1).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 
-			super.getSharedPreferences( "LATEST_LOGIN_FORM", MODE_PRIVATE ).edit().clear().commit();
+			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().clear().apply();
 		}
 	}
 
-	public  void  onReceivedOfflineData(  OoIData  offline )
+	public  void  onConnectStateChanged(    ConnectState  connectState )
 	{
 
 	}
 
-	public  boolean  onBeforeSend(  Packet  packet )  throws  Throwable
+    public  void  onReceivedOfflineData( OoIData  offline )
+    {
+
+    }
+
+	public  HttpUrl.Builder      baseUrl()
+	{
+		Service  service = ServiceRouteManager.INSTANCE.current(  Schema.HTTPS );
+
+		if( service != null )
+		{
+			return  new  HttpUrl.Builder().scheme(service.getSchema()).host(service.getHost()).port(   service.getPort() );
+		}
+
+		return  HttpUrl.parse(super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("BASE_URL",null)).newBuilder();
+	}
+
+	public  boolean  onBeforeSend(  Packet  packet )//throws   Throwable
 	{
 		return  true;
 	}
@@ -228,23 +221,6 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	public  void  onSent(     Packet  sentPacket,TransportState  transportState )
 	{
 
-	}
-
-	public  void  onBalanceComplete( int  code , Throwable  throwable )
-	{
-		if( code == 200 )
-		{
-			RetrofitRegistry.INSTANCE.initialize(   Application.this );
-
-			super.getSharedPreferences("LATEST_NETWORK_ROUTE",MODE_PRIVATE).edit().putString("HOST",squirrelClient.getHost()).putInt("PORT",squirrelClient.getPort()).putInt("HTTPPORT",squirrelClient.getHttpPort()).commit();
-		}
-
-		Long  userId = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0);
-
-		if( userId >= 1 )
-		{
-			this.connect( userId,NetworkUtils.getLocation(this),this );
-		}
 	}
 
 	public  void  onReceived(Packet receivedPacket )

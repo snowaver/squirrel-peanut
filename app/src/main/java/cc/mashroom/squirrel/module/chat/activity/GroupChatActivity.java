@@ -77,8 +77,6 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
-		PacketEventDispatcher.addListener( this );
-
 		super.onCreate( savedInstanceState   );
 
 		setContentView(     R.layout.activity_group_chat );

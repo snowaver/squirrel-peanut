@@ -17,40 +17,49 @@ package cc.mashroom.squirrel.parent;
 
 import  android.os.Bundle;
 
-import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
-import  cc.mashroom.squirrel.client.connect.PacketListener;
-import  cc.mashroom.squirrel.paip.message.Packet;
-import  cc.mashroom.squirrel.paip.message.TransportState;
+import  cc.mashroom.squirrel.client.LifecycleListener;
+import  cc.mashroom.squirrel.client.connect.ConnectState;
+import  cc.mashroom.squirrel.client.storage.model.OoIData;
 
-public  class  AbstractPacketListenerActivity  extends  AbstractActivity  implements  PacketListener
+public  class  AbstractLifecycleListenerActivity    extends  AbstractActivity  implements  LifecycleListener
 {
     @Override
     protected  void  onCreate( Bundle  savedInstanceState )
     {
-        PacketEventDispatcher.addListener(    this );
+        application().getSquirrelClient().addLifecycleListener(  this );
 
         super.onCreate(savedInstanceState);
-    }
-    @Override
-    public  void  onSent(Packet  packet,TransportState  transportState )
-    {
-
-    }
-    @Override
-    public  boolean  onBeforeSend(   Packet  packet )  throws  Throwable
-    {
-        return  true;
-    }
-    @Override
-    public  void  onReceived(        Packet  packet )
-    {
-
     }
     @Override
     protected  void  onDestroy()
     {
         super.onDestroy();
 
-        PacketEventDispatcher.removeListener( this );
+        application().getSquirrelClient().removeLifecycleListener(this);
+    }
+    @Override
+    public  void  onError(    Throwable   throwable )
+    {
+
+    }
+    @Override
+    public  void  onLogout(   int  reason )
+    {
+
+    }
+    @Override
+    public  void  onConnectStateChanged( ConnectState     connectState )
+    {
+
+    }
+    @Override
+    public  void  onAuthenticateComplete( int  code )
+    {
+
+    }
+    @Override
+    public  void  onReceivedOfflineData( OoIData  ooIData )
+    {
+
     }
 }

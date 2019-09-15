@@ -142,7 +142,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 		if( !  getIntent().getBooleanExtra("CALLED",true) )
 		{
-            application().getSquirrelClient().newCall(-1,this.contactId,callContentType );
+            application().getSquirrelClient().newCall( this.contactId , callContentType );
 		}
 		else
 		{
@@ -150,9 +150,9 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 			application().getMainLooperHandler().post( () -> ObjectUtils.cast(super.findViewById(R.id.control_switcher),ViewSwitcher.class).setDisplayedChild(1) );
 
-			ObjectUtils.cast(super.findViewById(R.id.accept_button),SimpleDraweeView.class).setOnClickListener( (button) -> {  call.accept();  ObjectUtils.cast(super.findViewById(R.id.control_switcher),ViewSwitcher.class).setDisplayedChild(0);} );
+			ObjectUtils.cast(super.findViewById(R.id.accept_button),SimpleDraweeView.class).setOnClickListener( (button) -> {   call.agree();  ObjectUtils.cast(super.findViewById(R.id.control_switcher),ViewSwitcher.class).setDisplayedChild(0);} );
 
-			ObjectUtils.cast(super.findViewById(R.id.reject_button),SimpleDraweeView.class).setOnClickListener( (button) -> {  call.reject();  ContextUtils.finish(this);} );
+			ObjectUtils.cast(super.findViewById(R.id.reject_button),SimpleDraweeView.class).setOnClickListener( (button) -> { call.decline();  ContextUtils.finish(this);} );
 		}
 	}
 
@@ -176,7 +176,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 	public  void  onRoomCreated(     Call  call )
 	{
 		{
-			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75-(int)  (((double)  DensityUtils.px(this,10)/super.getResources().getDisplayMetrics().widthPixels)*100),(int)  ((((double)  ContextUtils.getStatusBarHeight(this)+DensityUtils.px(this,50))/super.getResources().getDisplayMetrics().heightPixels)*100)+1,24,24),"opus",1,Application.ICE_SERVERS) ).demand();
+			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75-(int)  (((double)  DensityUtils.px(this,10)/super.getResources().getDisplayMetrics().widthPixels)*100),(int)  ((((double)  ContextUtils.getStatusBarHeight(this)+DensityUtils.px(this,50))/super.getResources().getDisplayMetrics().heightPixels)*100)+1,24,24),"opus",1,Application.ICE_SERVERS) ).request();
 		}
 	}
 

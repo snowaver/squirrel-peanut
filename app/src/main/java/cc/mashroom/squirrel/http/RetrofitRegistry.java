@@ -19,14 +19,12 @@ import  cc.mashroom.squirrel.module.common.services.FileService;
 import  cc.mashroom.squirrel.parent.Application;
 import  cc.mashroom.util.JsonUtils;
 
-import  java.util.concurrent.TimeUnit;
-
-import  cc.mashroom.util.NoopX509TrustManager;
 import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.Map;
 import  lombok.AccessLevel;
+import  lombok.Getter;
 import  lombok.NoArgsConstructor;
-import  okhttp3.OkHttpClient;
+import  okhttp3.HttpUrl;
 import  retrofit2.Retrofit;
 import  retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -38,25 +36,27 @@ public  class  RetrofitRegistry
 {
 	private  Retrofit  fileUploadRetrofit;
 
-	private  Retrofit     defaultRetrofit;
+	private  Retrofit  dataRetrofit;
+	@Getter
+	private  Retrofit      fileDownloadRetrofit;
 
 	private  Map<Class<?>,Object>  services = new  ConcurrentHashMap<Class<?>,Object>();
 
 	public   final  static  RetrofitRegistry  INSTANCE = new  RetrofitRegistry();
 
+	public  <T>  T  get( Class<T>  clazz )
+	{
+		return  (T) services.computeIfLackof(clazz,(key) -> clazz == FileService.class ? fileUploadRetrofit.create(clazz) : dataRetrofit.create(clazz) );
+	}
+
 	public  void  initialize( Application  application )
 	{
 		//  set  http  write  timeout  of  1200  seconds  and  file  size  should  be  considered  anyway.
 
-		this.defaultRetrofit = new  Retrofit.Builder().client(application.getSquirrelClient().getOkhttpResolver()).build();
+		this.dataRetrofit = new  Retrofit.Builder().baseUrl(new  HttpUrl.Builder().build()).client(application.getSquirrelClient().okhttpClient(5,5,10)).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
 
-		this.fileUploadRetrofit = new  Retrofit.Builder().client(new  OkHttpClient.Builder().hostnameVerifier(application.getSquirrelClient().getOkhttpResolver().hostnameVerifier()).sslSocketFactory(application.getSquirrelClient().getOkhttpResolver().sslSocketFactory(),new  NoopX509TrustManager()).connectTimeout(5,TimeUnit.SECONDS).writeTimeout(1200,TimeUnit.SECONDS).readTimeout(5,TimeUnit.SECONDS).addInterceptor(application.getSquirrelClient().getOkhttpResolver().interceptors().get(0)).build()).baseUrl(application.baseUrl().toString()).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
+		this.fileUploadRetrofit = new  Retrofit.Builder().baseUrl(new  HttpUrl.Builder().build()).client(application.getSquirrelClient().okhttpClient(5,1200,5)).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
 
-		application.setFileDownloadRetrofit( new  Retrofit.Builder().client(new  OkHttpClient.Builder().hostnameVerifier(application.getSquirrelClient().getOkhttpResolver().hostnameVerifier()).sslSocketFactory(application.getSquirrelClient().getOkhttpResolver().sslSocketFactory(),new  NoopX509TrustManager()).connectTimeout(5,TimeUnit.SECONDS).writeTimeout(5,TimeUnit.SECONDS).readTimeout(1200,TimeUnit.SECONDS).addInterceptor(application.getSquirrelClient().getOkhttpResolver().interceptors().get(0)).build()).baseUrl(application.baseUrl().toString()).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build() );
-	}
-
-	public  <T>  T  get( Class<T>  clazz )
-	{
-		return  (T)  services.computeIfLackof( clazz,(key) -> clazz == FileService.class ? fileUploadRetrofit.create(clazz) : defaultRetrofit.create(clazz) );
+		application.setFileDownloadRetrofit( this.fileDownloadRetrofit = new  Retrofit.Builder().baseUrl(new  HttpUrl.Builder().build()).client(application.getSquirrelClient().okhttpClient(5,5,1200)).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build() );
 	}
 }

@@ -124,8 +124,6 @@ public  class  SheetActivity  extends  AbstractActivity  implements  ClientConne
 		super.onDestroy();
 
 		LocaleChangeEventDispatcher.removeListener(  this );
-
-		ClientConnectEventDispatcher.removeListener( this );
 	}
 
 	public  void  onTabReselected( TabLayout.Tab  tab )

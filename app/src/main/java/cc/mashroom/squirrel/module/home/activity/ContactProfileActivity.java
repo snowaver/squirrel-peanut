@@ -61,8 +61,6 @@ public  class  ContactProfileActivity  extends          AbstractPacketListenerAc
 	{
 		super.onCreate( savedInstanceState  );
 
-		PacketEventDispatcher.addListener(  this );
-
 		super.setContentView(      R.layout.activity_contact_profile );
 
 		this.contact  = ObjectUtils.cast(   super.getIntent().getSerializableExtra("CONTACT") );

@@ -17,24 +17,29 @@ package cc.mashroom.squirrel.parent;
 
 import  android.os.Bundle;
 
+import  cc.mashroom.squirrel.client.LifecycleListener;
+import  cc.mashroom.squirrel.client.connect.ConnectState;
 import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.PacketListener;
+import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 
-public  class  AbstractPacketListenerActivity  extends  AbstractActivity  implements  PacketListener
+public  class    AbstractLifecycleAndPacketListenerActivity  extends  AbstractActivity  implements  LifecycleListener,PacketListener
 {
+    @Override
+    public  void  onSent(Packet  packet,TransportState  transportState )
+    {
+
+    }
     @Override
     protected  void  onCreate( Bundle  savedInstanceState )
     {
         PacketEventDispatcher.addListener(    this );
 
-        super.onCreate(savedInstanceState);
-    }
-    @Override
-    public  void  onSent(Packet  packet,TransportState  transportState )
-    {
+        application().getSquirrelClient().addLifecycleListener(  this );
 
+        super.onCreate(savedInstanceState);
     }
     @Override
     public  boolean  onBeforeSend(   Packet  packet )  throws  Throwable
@@ -52,5 +57,32 @@ public  class  AbstractPacketListenerActivity  extends  AbstractActivity  implem
         super.onDestroy();
 
         PacketEventDispatcher.removeListener( this );
+
+        application().getSquirrelClient().removeLifecycleListener(this);
+    }
+    @Override
+    public  void  onError(    Throwable   throwable )
+    {
+
+    }
+    @Override
+    public  void  onLogout(   int  reason )
+    {
+
+    }
+    @Override
+    public  void  onConnectStateChanged( ConnectState     connectState )
+    {
+
+    }
+    @Override
+    public  void  onAuthenticateComplete( int  code )
+    {
+
+    }
+    @Override
+    public  void  onReceivedOfflineData( OoIData  ooIData )
+    {
+
     }
 }

@@ -28,6 +28,8 @@ import  com.aries.ui.widget.alert.UIAlertDialog;
 import  java.util.concurrent.TimeUnit;
 
 import  androidx.core.content.res.ResourcesCompat;
+
+import cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
@@ -42,25 +44,24 @@ public  class  LoadingActivity  extends  AbstractActivity  implements  Runnable
 
 		LocaleUtils.change(    this , null );
 
-		super.getWindow().addFlags( WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS );
+		super.getWindow().addFlags(    WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS );
 
 		super.getWindow().setStatusBarColor( super.getResources().getColor(R.color.gainsboro) );
 
 		super.setContentView(  R.layout.activity_loading );
 
-		super.application().getScheduler().schedule( this,super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0) >= 1 ? 1 : 3, TimeUnit.SECONDS );
+		super.application().getScheduler().schedule( this,super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0) > 0 ? 5 : 5, TimeUnit.SECONDS );
 	}
 
 	public  void  run()
 	{
-        if( !application().getSquirrelClient().isRouted() )
-        {
-            application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );
-        }
-        else
-		if( !super.isFinishing() )
+		Long  userId = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong( "ID",0 );
+
+		if( userId> 0 )
 		{
-			ActivityCompat.startActivity( this,new  Intent(LoadingActivity.this,application().getSquirrelClient().getUserMetadata() == null ? LoginActivity.class : SheetActivity.class),ActivityOptionsCompat.makeCustomAnimation(LoadingActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
+			super.application().connect( userId, NetworkUtils.getLocation(this),super.application() );
 		}
+
+		ActivityCompat.startActivity( this,new  Intent(LoadingActivity.this,userId> 0 ? SheetActivity.class : LoginActivity.class),ActivityOptionsCompat.makeCustomAnimation(LoadingActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
 	}
 }

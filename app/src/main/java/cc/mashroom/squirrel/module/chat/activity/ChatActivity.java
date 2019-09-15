@@ -69,12 +69,10 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class  ChatActivity  extends  AbstractActivity      implements  PacketListener,  View.OnKeyListener, AbsListView.OnScrollListener
+public  class  ChatActivity  extends AbstractActivity        implements  PacketListener, View.OnKeyListener, AbsListView.OnScrollListener
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
-		PacketEventDispatcher.addListener(    this );
-
 		super.onCreate(         savedInstanceState );
 
 		super.setContentView(     R.layout.activity_chat );

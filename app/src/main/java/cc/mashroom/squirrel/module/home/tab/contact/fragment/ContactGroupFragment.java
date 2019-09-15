@@ -43,7 +43,7 @@ public  class  ContactGroupFragment  extends  AbstractPacketListenerFragment  im
 {
 	public  View  onCreateView( LayoutInflater  inflater,ViewGroup  container,Bundle  savedInstanceState )
 	{
-		PacketEventDispatcher.addListener( this );
+		super.onCreateView( inflater,container,savedInstanceState );
 
 		LocaleChangeEventDispatcher.addListener(    ContactGroupFragment.this );
 
