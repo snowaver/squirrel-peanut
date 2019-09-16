@@ -24,7 +24,6 @@ import  cc.mashroom.util.collection.map.Map;
 import  lombok.AccessLevel;
 import  lombok.Getter;
 import  lombok.NoArgsConstructor;
-import  okhttp3.HttpUrl;
 import  retrofit2.Retrofit;
 import  retrofit2.converter.jackson.JacksonConverterFactory;
 

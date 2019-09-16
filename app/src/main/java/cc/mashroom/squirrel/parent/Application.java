@@ -39,7 +39,6 @@ import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.router.DefaultServiceListRequestStrategy;
 import  cc.mashroom.router.Schema;
 import  cc.mashroom.router.Service;
-import  cc.mashroom.router.ServiceRouteManager;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.LifecycleListener;
 import  cc.mashroom.squirrel.client.SquirrelClient;
@@ -74,7 +73,6 @@ import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.FileUtils;
 import  cc.mashroom.util.ObjectUtils;
-import  cc.mashroom.util.StringUtils;
 import  es.dmoral.toasty.Toasty;
 import  io.netty.util.concurrent.DefaultThreadFactory;
 import  lombok.Getter;
@@ -89,7 +87,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList( new  PeerConnection.IceServer("stun:47.105.210.154:3478"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302"),new  PeerConnection.IceServer("turn:47.105.210.154:3478","snowaver","snowaver") );
 
-	public  static  String  SERVICE_LIST_REQUEST_URL="https://192.168.1.114:8011/system/balancingproxy?action=1&keyword=0";
+	public  static  String  SERVICE_LIST_REQUEST_URL      = "https://192.168.1.114:8011/system/service?action=1&keyword=0";
 
     @SneakyThrows
 	public  void  onCreate()
@@ -100,13 +98,16 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		PacketEventDispatcher.addListener(   this );
 
-		LocaleUtils.change( this , null );
-
 		PushServiceNotifier.INSTANCE.initialize(    this );
+
+		LocaleUtils.change( this , null );
 
 		Toasty.Config.getInstance().allowQueue(  false).setTextSize(14).setToastTypeface(Typeface.createFromAsset(super.getResources().getAssets(),"font/droid_sans_mono.ttf")).apply();
 
-		RetrofitRegistry.INSTANCE.initialize(this );
+		if( baseUrl() != null )
+		{
+			RetrofitRegistry.INSTANCE.initialize(   this );
+		}
 
 		Fresco.initialize( Application.this,OkHttpImagePipelineConfigFactory.newBuilder(this, this.squirrelClient.okhttpClient(5,5,10)).build() );
 
@@ -211,9 +212,9 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 			return  new  HttpUrl.Builder().scheme( service.getSchema()).host(service.getHost()).port(  service.getPort() );
 		}
 
-		String  httpsBaseUrl=super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("HTTPS_BASE_URL",null);
+		String  httpsUrl = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString( "HTTPS_BASE_URL",null );
 
-		return  httpsBaseUrl==      null ?      null :HttpUrl.parse(httpsBaseUrl).newBuilder( );
+		return  httpsUrl   == null ? null : HttpUrl.parse(httpsUrl).newBuilder();
 	}
 
 	public  boolean  onBeforeSend(  Packet  packet )//throws   Throwable
