@@ -177,7 +177,7 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 
 		ObjectUtils.cast(contentFrame.findViewById(R.id.send_failed_warning_image),ImageView.class).setVisibility( TransportState.valueOf(     chatMessage.getTransportState()) == TransportState.SEND_FAILED ?  View.VISIBLE : View.GONE );
 
-		ObjectUtils.cast(contentFrame.findViewById(R.id.send_failed_warning_image),ImageView.class).setOnLongClickListener( (view) -> {TipWindow  tip = new  TipWindow(context,R.layout.activity_chat_message_item_tip,true);  tip.showAsDropDown(view);  tip.getContentView().findViewById(R.id.resend_button).setOnClickListener((resendButton) -> {context.application().getSquirrelClient().asynchronousSend(new  ChatPacket(contactId,chatMessage.getMd5(),ChatContentType.valueOf(chatMessage.getContentType()),chatMessage.getContent().getBytes()));  tip.dismiss();});  return  false;} );
+		ObjectUtils.cast(contentFrame.findViewById(R.id.send_failed_warning_image),ImageView.class).setOnLongClickListener( (view) -> {TipWindow  tip = new  TipWindow(context,R.layout.activity_chat_message_item_tip,true);  tip.showAsDropDown(view);  tip.getContentView().findViewById(R.id.resend_button).setOnClickListener((resendButton) -> {context.application().getSquirrelClient().send(new  ChatPacket(contactId,chatMessage.getMd5(),ChatContentType.valueOf(chatMessage.getContentType()),chatMessage.getContent().getBytes()));  tip.dismiss();});  return  false;} );
 
 		ViewSwitcher  contentSwitcher =    ObjectUtils.cast( contentFrame.findViewById(R.id.message_content_switcher) );
 

@@ -107,7 +107,7 @@ public  class  ChatActivity  extends AbstractActivity        implements  PacketL
 
 		if( voiceDuration >= 200 )
 		{
-			application().getSquirrelClient().asynchronousSend( new  ChatPacket(this.contactId,audioFile.getName() , ChatContentType.AUDIO , String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
+			application().getSquirrelClient().send( new  ChatPacket(this.contactId,audioFile.getName() , ChatContentType.AUDIO , String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}
 		else
 		{
@@ -130,7 +130,7 @@ public  class  ChatActivity  extends AbstractActivity        implements  PacketL
     @Override
     public  void  onScroll(  AbsListView  view,int  firstVisibleItem,int  visibleItemCount,int  totalCount )
     {
-    	//  deperacated:  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.  2.  last  item  is  partially  visible.
+    	//  deperacated:  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.   2.  last  item  is  partially  visible.
         if( view.getLastVisiblePosition()-firstVisibleItem > 0 && view.getChildAt(0).getTop()== 0 )
         {
 
@@ -149,7 +149,7 @@ public  class  ChatActivity  extends AbstractActivity        implements  PacketL
 	{
 		if( packet instanceof ChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert( packet.getId()) );
 		}
 	}
 
@@ -157,7 +157,7 @@ public  class  ChatActivity  extends AbstractActivity        implements  PacketL
 	{
 		if( packet instanceof ChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert( packet.getId()) );
 
 			if( ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{
@@ -231,7 +231,7 @@ public  class  ChatActivity  extends AbstractActivity        implements  PacketL
                 {
                     File  cachedFile = application().cache(media.getId(),new  File(media.getPath()),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
 
-                    application().getSquirrelClient().asynchronousSend( new  ChatPacket(contactId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
+                    application().getSquirrelClient().send( new  ChatPacket(contactId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
                 }
 				catch( IOException  ioe  )
                 {
@@ -249,6 +249,6 @@ public  class  ChatActivity  extends AbstractActivity        implements  PacketL
 
         PacketEventDispatcher.removeListener( this );
 
-        Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
+        Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId, PAIPPacketType.CHAT.getValue()) );
     }
 }

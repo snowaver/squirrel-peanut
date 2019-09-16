@@ -113,7 +113,7 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
 
 		if( voiceDuration >= 200 )
 		{
-			application().getSquirrelClient().asynchronousSend( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(), this.groupId, audioFile.getName(), ChatContentType.AUDIO,     String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
+			application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(), this.groupId, audioFile.getName(),ChatContentType.AUDIO,String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}
 		else
 		{
@@ -237,7 +237,7 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
 				{
 					File  cachedFile= application().cache( media.getId(),new  File(media.getPath()), media.getType()  == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
 
-					application().getSquirrelClient().asynchronousSend( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),groupId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
+					application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),groupId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
 				}
 				catch(       IOException  ioe )
 				{

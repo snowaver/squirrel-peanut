@@ -53,10 +53,10 @@ public  class  RetrofitRegistry
 	{
 		//  set  http  write  timeout  of  1200  seconds  and  file  size  should  be  considered  anyway.
 
-		this.dataRetrofit = new  Retrofit.Builder().baseUrl(new  HttpUrl.Builder().build()).client(application.getSquirrelClient().okhttpClient(5,5,10)).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
+		this.dataRetrofit = new  Retrofit.Builder().baseUrl(application.baseUrl().build()).client(application.getSquirrelClient().okhttpClient(5,5,10)).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
 
-		this.fileUploadRetrofit = new  Retrofit.Builder().baseUrl(new  HttpUrl.Builder().build()).client(application.getSquirrelClient().okhttpClient(5,1200,5)).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
+		this.fileUploadRetrofit = new  Retrofit.Builder().baseUrl(application.baseUrl().build()).client(application.getSquirrelClient().okhttpClient(5,1200,5)).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build();
 
-		application.setFileDownloadRetrofit( this.fileDownloadRetrofit = new  Retrofit.Builder().baseUrl(new  HttpUrl.Builder().build()).client(application.getSquirrelClient().okhttpClient(5,5,1200)).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build() );
+		application.setFileDownloadRetrofit( this.fileDownloadRetrofit = new  Retrofit.Builder().baseUrl(application.baseUrl().build()).client(application.getSquirrelClient().okhttpClient(5,5,1200)).addConverterFactory(JacksonConverterFactory.create(JsonUtils.mapper)).build() );
 	}
 }

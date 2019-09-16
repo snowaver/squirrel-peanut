@@ -37,9 +37,9 @@ import  org.webrtc.PeerConnection;
 
 import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.router.DefaultServiceListRequestStrategy;
-import cc.mashroom.router.Schema;
-import cc.mashroom.router.Service;
-import cc.mashroom.router.ServiceRouteManager;
+import  cc.mashroom.router.Schema;
+import  cc.mashroom.router.Service;
+import  cc.mashroom.router.ServiceRouteManager;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.LifecycleListener;
 import  cc.mashroom.squirrel.client.SquirrelClient;
@@ -74,13 +74,14 @@ import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.FileUtils;
 import  cc.mashroom.util.ObjectUtils;
+import  cc.mashroom.util.StringUtils;
 import  es.dmoral.toasty.Toasty;
 import  io.netty.util.concurrent.DefaultThreadFactory;
 import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.SneakyThrows;
 import  lombok.experimental.Accessors;
-import okhttp3.HttpUrl;
+import  okhttp3.HttpUrl;
 
 public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  LifecycleListener, PacketListener
 {
@@ -142,7 +143,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		else
 		if( returnCode == 200 )
 		{
-			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().putLong("ID",squirrelClient.getUserMetadata().getId()).putString("USERNAME",squirrelClient.getUserMetadata().getUsername()).putString("NAME",squirrelClient.getUserMetadata().getName()).putString("NICKNAME",squirrelClient.getUserMetadata().getNickname()).putString("BASE_URL",baseUrl().toString()).apply();
+			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().putLong("ID",squirrelClient.getUserMetadata().getId()).putString("USERNAME",squirrelClient.getUserMetadata().getUsername()).putString("NAME",squirrelClient.getUserMetadata().getName()).putString("NICKNAME",squirrelClient.getUserMetadata().getNickname()).putString("HTTPS_BASE_URL",baseUrl().toString()).apply();
 		}
 	}
 
@@ -203,14 +204,16 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  HttpUrl.Builder      baseUrl()
 	{
-		Service  service = ServiceRouteManager.INSTANCE.current(  Schema.HTTPS );
+		Service  service = this.squirrelClient.getServiceRouteManager().current( Schema.HTTPS );
 
 		if( service != null )
 		{
-			return  new  HttpUrl.Builder().scheme(service.getSchema()).host(service.getHost()).port(   service.getPort() );
+			return  new  HttpUrl.Builder().scheme( service.getSchema()).host(service.getHost()).port(  service.getPort() );
 		}
 
-		return  HttpUrl.parse(super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("BASE_URL",null)).newBuilder();
+		String  httpsBaseUrl=super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("HTTPS_BASE_URL",null);
+
+		return  httpsBaseUrl==      null ?      null :HttpUrl.parse(httpsBaseUrl).newBuilder( );
 	}
 
 	public  boolean  onBeforeSend(  Packet  packet )//throws   Throwable
