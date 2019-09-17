@@ -67,7 +67,7 @@
     <string  name="moments">MOMENTS</string>
     <string  name="more">MORE</string>
     <string  name="name">NAME</string>
-    <string  name="network_configuration_error">SYSTEM MAINTAING, TRY LATER PLEASE</string>
+    <string  name="network_configuration_error">NETWORK ERROR</string>
     <string  name="nickname">NICKNAME</string>
     <string  name="not_implement">UNIMPLEMENT</string>
     <string  name="notice">NOTICE</string>
@@ -86,6 +86,7 @@
     <string  name="register_username_registered">USERNAME HAS BEEN REGISTERED</string>
     <string  name="remark">REMARK</string>
     <string  name="resend">RESEND</string>
+    <string  name="retry">RETRY</string>
     <string  name="scan">SCAN</string>
     <string  name="second">SECOND</string>
     <string  name="select">SELECT</string>

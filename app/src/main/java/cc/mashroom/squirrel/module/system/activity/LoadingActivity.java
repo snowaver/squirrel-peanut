@@ -24,21 +24,23 @@ import  androidx.core.app.ActivityOptionsCompat;
 import  android.view.WindowManager;
 
 import  com.aries.ui.widget.alert.UIAlertDialog;
+import  com.aries.ui.widget.progress.UIProgressDialog;
 
 import  java.util.concurrent.TimeUnit;
 
 import  androidx.core.content.res.ResourcesCompat;
 
-import cc.mashroom.hedgehog.util.NetworkUtils;
+import  cc.mashroom.hedgehog.util.DensityUtils;
+import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 
-public  class  LoadingActivity  extends  AbstractActivity  implements  Runnable
+public  class  LoadingActivity   extends  AbstractActivity implements  Runnable
 {
-	protected  void  onCreate( Bundle  savedInstanceState )
+	protected  void  onCreate(Bundle  savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
 
@@ -48,16 +50,38 @@ public  class  LoadingActivity  extends  AbstractActivity  implements  Runnable
 
 		super.getWindow().setStatusBarColor( super.getResources().getColor(R.color.gainsboro) );
 
-		super.setContentView(  R.layout.activity_loading );
+		super.setContentView( R.layout.activity_loading );
 
-		super.application().getScheduler().schedule( this,super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID",0) > 0 ? 5 : 5, TimeUnit.SECONDS );
+		this.progressDialog = StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
+
+		super.application().getScheduler().schedule( this,5,TimeUnit.SECONDS );
 	}
 
-	public  void  run()
-	{
-		Long  userId = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong( "ID",0 );
+	private UIProgressDialog  progressDialog;
 
-		if( userId> 0 )
+	public  void  retry()
+	{
+		this.progressDialog.show();
+
+		super.application().getSquirrelClient().reroute();
+
+		super.application().getScheduler().schedule( this,5,TimeUnit.SECONDS );
+	}
+
+	public  void    run()
+	{
+		super.application().getMainLooperHandler().post( () -> progressDialog.dismiss() );
+
+		if( application().getSquirrelClient().getServiceRouteManager().getServices().isEmpty() )
+		{
+			application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> retry()).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );
+
+			return;
+		}
+
+		Long  userId= super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong( "ID" ,0 );
+
+		if( userId  > 0 )
 		{
 			super.application().connect( userId, NetworkUtils.getLocation(this),super.application() );
 		}
