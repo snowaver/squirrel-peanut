@@ -41,8 +41,7 @@ import  cc.mashroom.squirrel.module.chat.listener.AudioTouchRecoder;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.chat.ChatContentType;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
-import  cc.mashroom.squirrel.client.connect.PacketListener;
+import  cc.mashroom.squirrel.client.PacketListener;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.chat.adapters.ChatMessageListviewAdapter;
@@ -247,7 +246,7 @@ public  class  ChatActivity  extends AbstractActivity        implements  PacketL
     {
         super.onDestroy();
 
-        PacketEventDispatcher.removeListener( this );
+        application().getSquirrelClient().removePacketListener( this );
 
         Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId, PAIPPacketType.CHAT.getValue()) );
     }

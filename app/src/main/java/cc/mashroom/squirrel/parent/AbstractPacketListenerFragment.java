@@ -23,8 +23,7 @@ import  android.view.ViewGroup;
 import  androidx.annotation.NonNull;
 import  androidx.annotation.Nullable;
 
-import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
-import  cc.mashroom.squirrel.client.connect.PacketListener;
+import  cc.mashroom.squirrel.client.PacketListener;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 
@@ -34,19 +33,19 @@ public  class  AbstractPacketListenerFragment extends   AbstractFragment  implem
     @Override
     public  View  onCreateView( @NonNull  LayoutInflater  inflater,@Nullable  ViewGroup  container,@Nullable  Bundle  savedInstanceState )
     {
-        PacketEventDispatcher.addListener(    this );
+        super.application().getSquirrelClient().addPacketListener(this);
 
-        return  super.onCreateView( inflater, container,savedInstanceState );
+        return  super.onCreateView( inflater,container,savedInstanceState );
+    }
+    @Override
+    public  boolean  onBeforeSend(   Packet  packet )
+    {
+        return  true;
     }
     @Override
     public  void  onSent(Packet  packet,TransportState  transportState )
     {
 
-    }
-    @Override
-    public  boolean  onBeforeSend(   Packet  packet )  throws  Throwable
-    {
-        return  true;
     }
     @Override
     public  void  onReceived(        Packet  packet )
@@ -58,6 +57,6 @@ public  class  AbstractPacketListenerFragment extends   AbstractFragment  implem
     {
         super.onDestroyView();
 
-        PacketEventDispatcher.removeListener( this );
+        application().getSquirrelClient().removePacketListener(  this );
     }
 }

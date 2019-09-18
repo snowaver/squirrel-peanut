@@ -44,8 +44,7 @@ import  cc.mashroom.hedgehog.util.MultimediaUtils;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.widget.ViewSwitcher;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
-import  cc.mashroom.squirrel.client.connect.PacketListener;
+import  cc.mashroom.squirrel.client.PacketListener;
 import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
@@ -253,7 +252,7 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
 	{
 		super.onDestroy();
 
-		PacketEventDispatcher.removeListener( GroupChatActivity.this );
+		application().getSquirrelClient().removePacketListener( this );
 
 		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
 	}

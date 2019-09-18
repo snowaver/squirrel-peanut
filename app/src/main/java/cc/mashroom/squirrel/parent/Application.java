@@ -39,13 +39,12 @@ import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.router.DefaultServiceListRequestStrategy;
 import  cc.mashroom.router.Schema;
 import  cc.mashroom.router.Service;
-import cc.mashroom.router.ServiceRouteListener;
+import  cc.mashroom.router.ServiceRouteListener;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.LifecycleListener;
 import  cc.mashroom.squirrel.client.SquirrelClient;
 import  cc.mashroom.squirrel.client.connect.ConnectState;
-import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
-import  cc.mashroom.squirrel.client.connect.PacketListener;
+import  cc.mashroom.squirrel.client.PacketListener;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
@@ -103,9 +102,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		LocaleUtils.change(this,null);
 
-		this.squirrelClient = new  SquirrelClient(this,super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir()).route( new  DefaultServiceListRequestStrategy(Lists.newArrayList(SERVICE_LIST_REQUEST_URL),SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS) );
-
-		PacketEventDispatcher.addListener(   this );
+		this.squirrelClient = new  SquirrelClient(this,super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir()).route(new  DefaultServiceListRequestStrategy(Lists.newArrayList(SERVICE_LIST_REQUEST_URL),SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS)).addPacketListener( this );
 
 		PushServiceNotifier.INSTANCE.initialize(    this );
 

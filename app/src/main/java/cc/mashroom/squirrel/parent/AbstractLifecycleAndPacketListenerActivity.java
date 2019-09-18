@@ -19,8 +19,7 @@ import  android.os.Bundle;
 
 import  cc.mashroom.squirrel.client.LifecycleListener;
 import  cc.mashroom.squirrel.client.connect.ConnectState;
-import  cc.mashroom.squirrel.client.connect.PacketEventDispatcher;
-import  cc.mashroom.squirrel.client.connect.PacketListener;
+import  cc.mashroom.squirrel.client.PacketListener;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
@@ -35,14 +34,12 @@ public  class    AbstractLifecycleAndPacketListenerActivity  extends  AbstractAc
     @Override
     protected  void  onCreate( Bundle  savedInstanceState )
     {
-        PacketEventDispatcher.addListener(    this );
-
-        application().getSquirrelClient().addLifecycleListener(  this );
+        application().getSquirrelClient().addLifecycleListener(    this).addPacketListener(   this );
 
         super.onCreate(savedInstanceState);
     }
     @Override
-    public  boolean  onBeforeSend(   Packet  packet )  throws  Throwable
+    public  boolean  onBeforeSend(   Packet  packet )
     {
         return  true;
     }
@@ -56,9 +53,7 @@ public  class    AbstractLifecycleAndPacketListenerActivity  extends  AbstractAc
     {
         super.onDestroy();
 
-        PacketEventDispatcher.removeListener( this );
-
-        application().getSquirrelClient().removeLifecycleListener(this);
+        application().getSquirrelClient().removeLifecycleListener(this).removePacketListener( this );
     }
     @Override
     public  void  onError(    Throwable   throwable )
