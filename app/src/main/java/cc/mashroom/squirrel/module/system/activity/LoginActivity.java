@@ -82,7 +82,7 @@ public  class  LoginActivity  extends  AbstractLifecycleListenerActivity  implem
 
         if( super.getIntent().getIntExtra("RELOGIN_REASON", 0) == 1 )
         {
-            StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.login_remote_login_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColorResource(R.color.red).setPositiveButtonTextSize(18).setPositiveButton(R.string.close,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
+            StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.login_remote_login_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColorResource(R.color.red).setPositiveButtonTextSize(18).setPositiveButton(R.string.close,(dialog, which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
         }
         //  clear  the  password  styleable  editview  after  successful  registration,  logout  or  squeezing  off  line  by  remote  signin.
         ObjectUtils.cast(super.findViewById(R.id.login_button),Button.class).setOnClickListener( this );

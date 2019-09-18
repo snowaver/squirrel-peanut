@@ -26,6 +26,7 @@ import  android.view.WindowManager;
 import  com.aries.ui.widget.alert.UIAlertDialog;
 import  com.aries.ui.widget.progress.UIProgressDialog;
 
+import  java.util.List;
 import  java.util.concurrent.TimeUnit;
 
 import  androidx.core.content.res.ResourcesCompat;
@@ -33,15 +34,19 @@ import  androidx.core.content.res.ResourcesCompat;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.hedgehog.util.StyleUnifier;
+import  cc.mashroom.router.Service;
+import  cc.mashroom.router.ServiceRouteListener;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 
-public  class  LoadingActivity   extends  AbstractActivity implements  Runnable
+public  class  LoadingActivity   extends  AbstractActivity implements  Runnable  ,ServiceRouteListener
 {
 	protected  void  onCreate(Bundle  savedInstanceState )
 	{
+        super.application().getSquirrelClient().getServiceRouteManager().addListener(    this );
+
 		super.onCreate( savedInstanceState );
 
 		LocaleUtils.change(    this , null );
@@ -59,22 +64,22 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable
 
 	private UIProgressDialog  progressDialog;
 
-	public  void  retry()
+	@Override
+	public  void  onRequestComplete( List<Service>  list )
 	{
-		this.progressDialog.show();
+		if( this.progressDialog.isShowing() )
+		{
+			super.application().getMainLooperHandler().post(    () -> progressDialog.cancel() );
 
-		super.application().getSquirrelClient().reroute();
-
-		super.application().getScheduler().schedule( this,5,TimeUnit.SECONDS );
+			run();
+		}
 	}
 
 	public  void    run()
 	{
-		super.application().getMainLooperHandler().post( () -> progressDialog.dismiss() );
-
 		if( application().getSquirrelClient().getServiceRouteManager().getServices().isEmpty() )
 		{
-			application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> retry()).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.9)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );
+			application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> application().getSquirrelClient().reroute()).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );
 
 			return;
 		}
@@ -88,4 +93,14 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable
 
 		ActivityCompat.startActivity( this,new  Intent(LoadingActivity.this,userId> 0 ? SheetActivity.class : LoginActivity.class),ActivityOptionsCompat.makeCustomAnimation(LoadingActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
 	}
+	@Override
+	public  void  onBeforeRequest()
+	{
+		super.application().getMainLooperHandler().post( () -> progressDialog.show() );
+	}
+    @Override
+    public  void  onChanged( Service  oldService,Service  newService )
+    {
+
+    }
 }

@@ -39,6 +39,7 @@ import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.router.DefaultServiceListRequestStrategy;
 import  cc.mashroom.router.Schema;
 import  cc.mashroom.router.Service;
+import cc.mashroom.router.ServiceRouteListener;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.LifecycleListener;
 import  cc.mashroom.squirrel.client.SquirrelClient;
@@ -81,18 +82,26 @@ import  lombok.SneakyThrows;
 import  lombok.experimental.Accessors;
 import  okhttp3.HttpUrl;
 
-public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  LifecycleListener, PacketListener
+public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  LifecycleListener,PacketListener,   ServiceRouteListener
 {
-    private  Set<Class>  authenticateNeedlessActivityClasses = Sets.newHashSet(LoadingActivity.class,LoginActivity.class,RegisterActivity.class );
-
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList( new  PeerConnection.IceServer("stun:47.105.210.154:3478"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302"),new  PeerConnection.IceServer("turn:47.105.210.154:3478","snowaver","snowaver") );
 
 	public  static  String  SERVICE_LIST_REQUEST_URL      = "https://192.168.1.114:8011/system/service?action=1&keyword=0";
 
-    @SneakyThrows
-	public  void  onCreate()
+	private  Set<Class> authenticateNeedlessActivityClasses  = Sets.newHashSet(LoadingActivity.class,LoginActivity.class,RegisterActivity.class );
+	@Accessors(  chain = true )
+	@Getter
+	@Setter
+	private  SquirrelClient  squirrelClient  = null;
+	@Getter
+	private  ScheduledThreadPoolExecutor   scheduler  = new  ScheduledThreadPoolExecutor( 1,new  DefaultThreadFactory("DEFAULT-TASK-SCHEDULER") );
+
+	@SneakyThrows
+	public   void    onCreate()
 	{
 		super.onCreate();
+
+		LocaleUtils.change(this,null);
 
 		this.squirrelClient = new  SquirrelClient(this,super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir()).route( new  DefaultServiceListRequestStrategy(Lists.newArrayList(SERVICE_LIST_REQUEST_URL),SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS) );
 
@@ -100,26 +109,12 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		PushServiceNotifier.INSTANCE.initialize(    this );
 
-		LocaleUtils.change( this , null );
-
 		Toasty.Config.getInstance().allowQueue(  false).setTextSize(14).setToastTypeface(Typeface.createFromAsset(super.getResources().getAssets(),"font/droid_sans_mono.ttf")).apply();
-
-		if( baseUrl() != null )
-		{
-			RetrofitRegistry.INSTANCE.initialize(   this );
-		}
 
 		Fresco.initialize( Application.this,OkHttpImagePipelineConfigFactory.newBuilder(this, this.squirrelClient.okhttpClient(5,5,10)).build() );
 
 		ObjectUtils.cast(super.getSystemService(Context.CONNECTIVITY_SERVICE),ConnectivityManager.class).requestNetwork( new  NetworkRequest.Builder().build(),new  ConnectivityStateListener( this ) );
 	}
-
-	@Accessors(  chain = true )
-	@Getter
-	@Setter
-	private  SquirrelClient  squirrelClient  = null;
-	@Getter
-	private  ScheduledThreadPoolExecutor  scheduler = new  ScheduledThreadPoolExecutor( 1 , new  DefaultThreadFactory("DEFAULT-TASK-SCHEDULER") );
 
 	public  void  onTerminate()
 	{
@@ -148,26 +143,29 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		}
 	}
 
-	@SneakyThrows
 	public  void  connect(   String  username,String  password,Location  geometryLoc,LifecycleListener  lifecycleListener )
 	{
-		if( !NetworkUtils.isNetworkAvailable(this) )
-		{
-			return;
-		}
-
 		this.squirrelClient.connect( username,password,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
 	}
 
-	@SneakyThrows
 	public  void  connect( Long  id,Location  geometryLoc,LifecycleListener  lifecycleListener )
 	{
-		if( !NetworkUtils.isNetworkAvailable(this) )
-		{
-			return;
-		}
-
 		this.squirrelClient.connect( id,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
+	}
+	@Override
+	public  void     onBeforeRequest()
+	{
+
+	}
+	@Override
+	public  void  onRequestComplete( List  <Service> list )
+	{
+
+	}
+	@Override
+	public  void  onChanged( Service  oldService ,  Service newService )
+	{
+		RetrofitRegistry.INSTANCE.initialize(this );
 	}
 
 	public  void  clearStackActivitiesAndStart( Intent  intent , Bundle  bundle )
@@ -182,10 +180,10 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	}
 
-	public  void  onLogout(  int  reason )
+	public  void  onLogout(  int  rs )
 	{
 		//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  loginactivity.
-		if( reason ==        DisconnectAckPacket.REASON_REMOTE_SIGNIN  )
+		if( rs ==            DisconnectAckPacket.REASON_REMOTE_SIGNIN  )
 		{
 			this.clearStackActivitiesAndStart(new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",1).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 
@@ -207,14 +205,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	{
 		Service  service = this.squirrelClient.getServiceRouteManager().current( Schema.HTTPS );
 
-		if( service != null )
-		{
-			return  new  HttpUrl.Builder().scheme( service.getSchema()).host(service.getHost()).port(  service.getPort() );
-		}
-
-		String  httpsUrl = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString( "HTTPS_BASE_URL",null );
-
-		return  httpsUrl   == null ? null : HttpUrl.parse(httpsUrl).newBuilder();
+		return  new  HttpUrl.Builder().scheme(      service.getSchema()).host(service.getHost()).port( service.getPort() );
 	}
 
 	public  boolean  onBeforeSend(  Packet  packet )//throws   Throwable
