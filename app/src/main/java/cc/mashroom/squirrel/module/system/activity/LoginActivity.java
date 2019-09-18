@@ -169,8 +169,12 @@ public  class  LoginActivity  extends  AbstractLifecycleListenerActivity  implem
         LocaleUtils.change( this,(ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString().equals("ENGLISH") ? Locale.ENGLISH : Locale.CHINESE).toLanguageTag() );
     }
     @Override
-    public  void  onError(  Throwable   error )
+    public  void  onError( Throwable  exerror )
     {
+        progressDialog.cancel(  );
+
+        exerror.printStackTrace();
+
         application().getMainLooperHandler().post( () -> showSneakerWindow(Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red) );
     }
 
