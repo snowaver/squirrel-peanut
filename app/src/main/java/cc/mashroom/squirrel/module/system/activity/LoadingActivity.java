@@ -72,7 +72,6 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 	@Override
 	public  void  onRequestComplete( List<Service>  list )
 	{
-		System.err.println( "//"+list );
 		if( this.progressDialog.isShowing() )
 		{
 			super.application().getMainLooperHandler().post(    () -> progressDialog.cancel() );
@@ -102,7 +101,10 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 	@Override
 	public  void  onBeforeRequest()
 	{
-		super.application().getMainLooperHandler().post( () -> progressDialog.show() );
+	    if( !super.isFinishing() && !super.isDestroyed() )
+        {
+            super.application().getMainLooperHandler().post(() -> progressDialog.show() );
+        }
 	}
     @Override
     public  void  onChanged( Service  oldService,Service  newService )
