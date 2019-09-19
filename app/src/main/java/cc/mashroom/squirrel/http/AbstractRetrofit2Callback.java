@@ -15,15 +15,16 @@
  */
 package cc.mashroom.squirrel.http;
 
-import  android.app.Activity;
-
 import  androidx.core.content.res.ResourcesCompat;
 
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
+import  java.net.SocketTimeoutException;
+
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.StyleUnifier;
+import  cc.mashroom.router.Schema;
 import  cc.mashroom.squirrel.R;
 
 import  cc.mashroom.squirrel.parent.AbstractActivity;
@@ -37,14 +38,14 @@ import  retrofit2.Response;
 
 public  abstract    class  AbstractRetrofit2Callback<T>  implements  Callback<T>
 {
-	public  AbstractRetrofit2Callback( Activity  context,boolean  isShowWaitingProgressDialog )
+	public  AbstractRetrofit2Callback( AbstractActivity  context,boolean  isShowWaitingProgressDialog )
 	{
 		this.setContext(context).setWaitingProgressDailog( !isShowWaitingProgressDialog? null : StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(context).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(context,R.font.droid_sans_mono)).setWidth(DensityUtils.px(context,220)).setHeight(DensityUtils.px(context,150)) );
 
 		if( isShowWaitingProgressDialog   )   this.waitingProgressDailog.show();
 	}
 
-	public  AbstractRetrofit2Callback( Activity  context )
+	public  AbstractRetrofit2Callback( AbstractActivity  context  )
 	{
 		this(context,false );
 	}
@@ -52,13 +53,13 @@ public  abstract    class  AbstractRetrofit2Callback<T>  implements  Callback<T>
 	@Accessors( chain= true )
 	@Setter
 	@Getter
-	protected  Activity    context;
+	protected  AbstractActivity    context;
 	@Accessors( chain= true )
 	@Setter
 	@Getter
-	protected  UIProgressDialog     waitingProgressDailog;
+	protected  UIProgressDialog    waitingProgressDailog;
 
-	public  void  onResponse( Call<T>  call,Response<T>  response )
+	public  void  onResponse(Call<T>  call,Response<T>  response  )
 	{
 		if( waitingProgressDailog != null )
 		{
@@ -66,8 +67,10 @@ public  abstract    class  AbstractRetrofit2Callback<T>  implements  Callback<T>
 		}
 	}
 
-	public  void  onFailure( Call<T>  call,Throwable  ie )
+	public  void  onFailure( Call<T>  call,Throwable ie )
 	{
+		if( ie instanceof SocketTimeoutException )  context.application().getSquirrelClient().getServiceRouteManager().tryNext( Schema.HTTPS );
+
 		ie.printStackTrace();
 
 		if( waitingProgressDailog != null )
