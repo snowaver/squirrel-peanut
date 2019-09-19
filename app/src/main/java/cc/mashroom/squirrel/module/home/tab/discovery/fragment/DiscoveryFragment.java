@@ -94,7 +94,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextVi
 			{
 				RetrofitRegistry.INSTANCE.get(UserService.class).lookup(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim(), "{}").enqueue
 				(
-					new  AbstractRetrofit2Callback<List<User>>( this.getActivity() ,true )
+					new  AbstractRetrofit2Callback<List<User>>(ObjectUtils.cast(this.getActivity()),true )
 					{
 						public  void  onResponse( Call<List<User>>  call, Response<List<User>>  response )
 						{

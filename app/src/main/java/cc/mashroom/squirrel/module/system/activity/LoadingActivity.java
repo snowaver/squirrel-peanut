@@ -58,15 +58,21 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 		this.progressDialog = StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
 
 		super.application().getScheduler().schedule( this,5,TimeUnit.SECONDS );
-
-		super.application().getSquirrelClient().getServiceRouteManager().addListener(    this );
 	}
+    @Override
+    protected       void  onStart()
+    {
+        super.onStart();
 
-	private UIProgressDialog  progressDialog;
+        super.application().getSquirrelClient().getServiceRouteManager().addListener(    this );
+    }
+
+    private UIProgressDialog  progressDialog;
 
 	@Override
 	public  void  onRequestComplete( List<Service>  list )
 	{
+		System.err.println( "//"+list );
 		if( this.progressDialog.isShowing() )
 		{
 			super.application().getMainLooperHandler().post(    () -> progressDialog.cancel() );
@@ -79,7 +85,7 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 	{
 		if( application().getSquirrelClient().getServiceRouteManager().getServices().isEmpty() )
 		{
-			application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> application().getSquirrelClient().reroute()).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );
+			application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> {this.progressDialog.show();  application().getSquirrelClient().reroute();}).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );
 
 			return;
 		}

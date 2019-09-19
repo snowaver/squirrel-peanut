@@ -83,12 +83,12 @@ public  class  ChatGroupFragment  extends  AbstractFragment  implements  DialogI
 		LocaleChangeEventDispatcher.removeListener( ChatGroupFragment.this );
 	}
 
-	public  void  onChange( Locale  locale )
+	public  void  onChange( Locale   locale )
 	{
 		ObjectUtils.cast(ObjectUtils.cast(this.contentView.findViewById(R.id.create_button),LinearLayout.class).getChildAt(1),TextView.class).setText( R.string.chat_create_new_group );
 	}
 
-	public  void  onClick( DialogInterface  dialog,int  witch )
+	public  void  onClick(  DialogInterface  dialog ,int  witch )
 	{
 		String  addingGroupName = ObjectUtils.cast(ObjectUtils.cast(dialog,UIAlertDialog.class).getContentView().findViewById(R.id.edit_inputor),EditText.class).getText().toString().trim();
 
@@ -96,7 +96,7 @@ public  class  ChatGroupFragment  extends  AbstractFragment  implements  DialogI
 		{
 			RetrofitRegistry.INSTANCE.get(ChatGroupService.class).add(     addingGroupName).enqueue
 			(
-				new  AbstractRetrofit2Callback<OoIData>(super.getActivity() )
+				new  AbstractRetrofit2Callback<OoIData>(     ObjectUtils.cast(super.getActivity()))
 				{
 					public  void  onResponse( Call<OoIData>  call   , Response<OoIData>  response )
 					{

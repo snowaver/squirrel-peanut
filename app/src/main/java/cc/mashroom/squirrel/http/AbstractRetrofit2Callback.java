@@ -20,6 +20,7 @@ import  androidx.core.content.res.ResourcesCompat;
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
+import java.net.ConnectException;
 import  java.net.SocketTimeoutException;
 
 import  cc.mashroom.hedgehog.util.DensityUtils;
@@ -69,7 +70,7 @@ public  abstract    class  AbstractRetrofit2Callback<T>  implements  Callback<T>
 
 	public  void  onFailure( Call<T>  call,Throwable ie )
 	{
-		if( ie instanceof SocketTimeoutException )  context.application().getSquirrelClient().getServiceRouteManager().tryNext( Schema.HTTPS );
+		if( ie instanceof ConnectException)  context.application().getSquirrelClient().getServiceRouteManager().tryNext( Schema.HTTPS );
 
 		ie.printStackTrace();
 
