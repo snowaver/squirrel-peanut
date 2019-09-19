@@ -45,8 +45,6 @@ import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.client.connect.ClientConnectEventDispatcher;
-import  cc.mashroom.squirrel.client.connect.ClientConnectListener;
 import  cc.mashroom.squirrel.client.connect.ConnectState;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
@@ -55,8 +53,8 @@ import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.fragment.NewsProfileFragment;
-import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.adapters.SheetPagerAdapter;
+import  cc.mashroom.squirrel.parent.AbstractLifecycleListenerActivity;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -70,12 +68,10 @@ import  java.util.ArrayList;
 import  java.util.List;
 import  java.util.Locale;
 
-public  class  SheetActivity  extends  AbstractActivity  implements  ClientConnectListener,TabLayout.OnTabSelectedListener,LocaleChangeEventDispatcher.LocaleChangeListener,HeaderBar.OnItemClickListener,DialogInterface.OnClickListener
+public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   implements  TabLayout.OnTabSelectedListener,LocaleChangeEventDispatcher.LocaleChangeListener,HeaderBar.OnItemClickListener,DialogInterface.OnClickListener
 {
 	protected  void  onCreate(  Bundle  savedInstanceState )
 	{
-		ClientConnectEventDispatcher.addListener(this);
-
 		LocaleChangeEventDispatcher.addListener(this );
 
 		super.onCreate( savedInstanceState );

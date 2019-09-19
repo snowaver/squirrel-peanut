@@ -31,12 +31,12 @@ public  class  AbstractPacketListenerActivity  extends  AbstractActivity  implem
         super.onCreate(savedInstanceState);
     }
     @Override
-    public  boolean  onBeforeSend(   Packet  packet )
+    public  boolean  onBeforeSend(   Packet  packet )  throws  Throwable
     {
         return  true;
     }
     @Override
-    public  void  onSent(Packet packet,TransportState   transportState )
+    public  void  onSent(Packet packet,TransportState  transportState  )
     {
 
     }

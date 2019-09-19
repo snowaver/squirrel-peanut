@@ -42,7 +42,6 @@ import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.chat.ChatContentType;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.PacketListener;
-import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.chat.adapters.ChatMessageListviewAdapter;
 import  cc.mashroom.squirrel.module.common.services.FileService;
@@ -50,6 +49,7 @@ import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.hedgehog.system.Media;
+import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -68,7 +68,7 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class  ChatActivity  extends AbstractActivity        implements  PacketListener, View.OnKeyListener, AbsListView.OnScrollListener
+public  class  ChatActivity   extends    AbstractPacketListenerActivity           implements  PacketListener, View.OnKeyListener, AbsListView.OnScrollListener
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
@@ -104,7 +104,7 @@ public  class  ChatActivity  extends AbstractActivity        implements  PacketL
 
 		long  voiceDuration = MultimediaUtils.getDuration( audioFile );
 
-		if( voiceDuration >= 200 )
+		if( voiceDuration   >200 )
 		{
 			application().getSquirrelClient().send( new  ChatPacket(this.contactId,audioFile.getName() , ChatContentType.AUDIO , String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}
@@ -136,7 +136,7 @@ public  class  ChatActivity  extends AbstractActivity        implements  PacketL
         }
     }
 
-	public  void  onSent( Packet packet,TransportState transportState )
+	public  void  onSent(Packet packet,TransportState  transportState )
 	{
 		if( packet instanceof ChatPacket )
 		{
@@ -224,7 +224,7 @@ public  class  ChatActivity  extends AbstractActivity        implements  PacketL
 
 		if( resultData != null )
 		{
-			for( Media  media : ObjectUtils.cast( resultData.getSerializableExtra("MEDIAS"),      new  TypeReference<List<Media>>(){} ) )
+			for(  Media  media : ObjectUtils.cast( resultData.getSerializableExtra("MEDIAS"),     new  TypeReference<List<Media>>(){} ) )
 			{
 				try
                 {

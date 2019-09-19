@@ -47,7 +47,6 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.PacketListener;
 import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
-import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.chat.adapters.GroupChatMessageListviewAdapter;
 import  cc.mashroom.squirrel.module.chat.adapters.MoreInputsAdapter;
@@ -59,6 +58,7 @@ import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.chat.ChatContentType;
 import  cc.mashroom.squirrel.paip.message.chat.GroupChatPacket;
 import  cc.mashroom.hedgehog.system.Media;
+import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -71,7 +71,7 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class  GroupChatActivity  extends  AbstractActivity       implements  PacketListener,View.OnKeyListener,AbsListView.OnScrollListener
+public  class GroupChatActivity extends  AbstractPacketListenerActivity  implements  PacketListener  ,View.OnKeyListener , AbsListView.OnScrollListener
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )
@@ -110,7 +110,7 @@ public  class  GroupChatActivity  extends  AbstractActivity       implements  Pa
 
 		long  voiceDuration = MultimediaUtils.getDuration( audioFile );
 
-		if( voiceDuration >= 200 )
+		if( voiceDuration   >200 )
 		{
 			application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(), this.groupId, audioFile.getName(),ChatContentType.AUDIO,String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}

@@ -93,7 +93,7 @@ public  class  AudioTouchRecoder   implements  View.OnTouchListener
                         ObjectUtils.cast(context,AbstractActivity.class).showSneakerWindow( Sneaker.with(context),com.irozon.sneaker.R.drawable.ic_error,R.string.unknown_error,R.color.white,R.color.red );
                     }
 
-                    Tracer.trace(e );
+                    Tracer.trace( e);
                 }
                 finally
                 {
@@ -118,7 +118,7 @@ public  class  AudioTouchRecoder   implements  View.OnTouchListener
                 }
                 catch( Throwable  e )
                 {
-                    Tracer.trace(e );
+                    Tracer.trace( e);
                 }
                 finally
                 {
@@ -138,13 +138,13 @@ public  class  AudioTouchRecoder   implements  View.OnTouchListener
 
                     File  tmpAudioFile = new  File( cacheDir,"audio.amr.tmp" );
 
-                    listener.onRecord( tmpAudioFile.length() == 0 ? null : ObjectUtils.cast(context.getApplication(),Application.class).cache(-1,tmpAudioFile,2) );
+                    listener.onRecord( tmpAudioFile.length() == 0 ? null : ObjectUtils.cast(context.getApplication(),Application.class).cache(-1,tmpAudioFile,3) );
 
                     recorder.close();
                 }
                 catch( Throwable  e )
                 {
-                    Tracer.trace(e );
+                    Tracer.trace( e);
                 }
                 finally
                 {
