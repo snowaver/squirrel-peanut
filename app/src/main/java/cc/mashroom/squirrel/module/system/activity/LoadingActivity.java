@@ -58,14 +58,9 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 		this.progressDialog = StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
 
 		super.application().getScheduler().schedule( this,5,TimeUnit.SECONDS );
-	}
-    @Override
-    protected       void  onStart()
-    {
-        super.onStart();
 
         super.application().getSquirrelClient().getServiceRouteManager().addListener(    this );
-    }
+	}
 
     private UIProgressDialog  progressDialog;
 
@@ -74,13 +69,20 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 	{
 		if( this.progressDialog.isShowing() )
 		{
-			super.application().getMainLooperHandler().post(    () -> progressDialog.cancel() );
+			super.application().getMainLooperHandler().post(()-> this.progressDialog.cancel() );
 
 			run();
 		}
 	}
+    @Override
+    protected  void     onDestroy()
+    {
+        super.onDestroy();
 
-	public  void    run()
+        super.application().getSquirrelClient().getServiceRouteManager().removeListener( this );
+    }
+
+    public  void    run()
 	{
 		if( application().getSquirrelClient().getServiceRouteManager().getServices().isEmpty() )
 		{
@@ -103,7 +105,7 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 	{
 	    if( !super.isFinishing() && !super.isDestroyed() )
         {
-            super.application().getMainLooperHandler().post(() -> progressDialog.show() );
+            super.application().getMainLooperHandler().post(()-> progressDialog.show() );
         }
 	}
     @Override
