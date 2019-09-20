@@ -3,7 +3,7 @@
 
     <cc.mashroom.hedgehog.widget.HeaderBar  android:id="@+id/header_bar"  android:layout_width="match_parent"  android:layout_height="50dp"  android:background="@color/steelblue"  android:title="@string/register" app:immersive="true"  app:backDrawable="@drawable/lt_all"></cc.mashroom.hedgehog.widget.HeaderBar>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1">
+    <androidx.coordinatorlayout.widget.CoordinatorLayout  android:layout_width="match_parent"  android:layout_height="0dp"  android:layout_weight="1"    android:layout_marginTop="1px">
 
         <com.google.android.material.appbar.AppBarLayout  android:id="@+id/collapsing_bar_layout"  android:layout_width="match_parent"  android:layout_height="wrap_content">
 
