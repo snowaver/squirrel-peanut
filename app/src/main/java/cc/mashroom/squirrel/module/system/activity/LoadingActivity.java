@@ -82,7 +82,7 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
         super.application().getSquirrelClient().getServiceRouteManager().removeListener( this );
     }
 
-    public  void    run()
+    public  void     run()
 	{
 		if( application().getSquirrelClient().getServiceRouteManager().getServices().isEmpty() )
 		{
@@ -91,9 +91,9 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 			return;
 		}
 
-		Long  userId= super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong( "ID" ,0 );
+		Long  userId = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID" ,0 );
 
-		if( userId  > 0 )
+		if( userId   > 0 )
 		{
 			super.application().connect( userId, NetworkUtils.getLocation(this),super.application() );
 		}
@@ -103,10 +103,7 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 	@Override
 	public  void  onBeforeRequest()
 	{
-	    if( !super.isFinishing() && !super.isDestroyed() )
-        {
-            super.application().getMainLooperHandler().post(()-> progressDialog.show() );
-        }
+		super.application().getMainLooperHandler().post( () -> progressDialog.show() );
 	}
     @Override
     public  void  onChanged( Service  oldService,Service  newService )

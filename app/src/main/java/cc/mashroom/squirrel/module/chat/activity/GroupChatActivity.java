@@ -19,7 +19,6 @@ import  android.content.Intent;
 import  android.os.Bundle;
 import  android.view.KeyEvent;
 import  android.view.View;
-import  android.widget.AbsListView;
 import  android.widget.Button;
 import  android.widget.EditText;
 import  android.widget.GridView;
@@ -35,16 +34,18 @@ import  java.io.File;
 import  java.io.IOException;
 import  java.sql.Connection;
 import  java.util.List;
-import  java.util.concurrent.atomic.AtomicBoolean;
 
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 
+import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.MultimediaUtils;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.widget.ViewSwitcher;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.PacketListener;
+import  cc.mashroom.squirrel.client.storage.model.chat.GroupChatMessage;
+import  cc.mashroom.squirrel.client.storage.repository.chat.GroupChatMessageRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
@@ -71,14 +72,14 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class GroupChatActivity extends  AbstractPacketListenerActivity  implements  PacketListener  ,View.OnKeyListener , AbsListView.OnScrollListener
+public  class GroupChatActivity extends  AbstractPacketListenerActivity  implements  PacketListener  ,View.OnKeyListener
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
 		super.onCreate( savedInstanceState   );
 
-		setContentView(     R.layout.activity_group_chat );
+		super.setContentView(R.layout.activity_group_chat);
 
 		setGroupId(super.getIntent().getLongExtra("CHAT_GROUP_ID",0) );
 
@@ -92,6 +93,8 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  GroupChatMessageListviewAdapter(this,groupId) );
 
+		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).post(     ()->this.configStackFromDirect() );
+
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setVisibility(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getVisibility() == View.GONE ? View.VISIBLE : View.GONE) );
 
 		ObjectUtils.cast(super.findViewById(R.id.switch_to_words_inputting_button),ImageView.class).setOnClickListener( (imageView) -> ObjectUtils.cast(super.findViewById(R.id.editor_switcher), ViewSwitcher.class).setDisplayedChild( 0 ) );
@@ -103,44 +106,40 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 
 	public  void  send(       File  audioFile )
 	{
-		if( audioFile==null )
+		if( audioFile  == null )
 		{
 			return;
 		}
 
 		long  voiceDuration = MultimediaUtils.getDuration( audioFile );
 
-		if( voiceDuration   >200 )
+		if( voiceDuration >200 )
 		{
-			application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(), this.groupId, audioFile.getName(),ChatContentType.AUDIO,String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
+			application().getSquirrelClient().send(  new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),this.groupId, audioFile.getName(),ChatContentType.AUDIO,String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}
 		else
 		{
-			super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_warning,R.string.chat_recorded_voice_duration_too_short,R.color.black,R.color.orange );
+			super.showSneakerWindow(  Sneaker.with(this)  ,  com.irozon.sneaker.R.drawable.ic_warning,R.string.chat_recorded_voice_duration_too_short,R.color.black,R.color.orange );
 		}
 	}
 
-	@Accessors( chain= true )
+	@Accessors(   chain = true )
 	@Setter
-	private  long    groupId;
+	private  long  groupId;
 
-	private  AtomicBoolean  initialized =  new  AtomicBoolean( false );
+	private  void       configStackFromDirect()
+	{
+		ListView  listview   = ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class );
 
-    @Override
-    public  void  onScrollStateChanged( AbsListView  view, int  state )
-    {
+		int  totalchildrenHeightPixel =listview.getDividerHeight()*( listview.getChildCount()- 1 );
 
-    }
+		for( int  i = 0;       i < listview.getChildCount();i = i + 1 )
+		{
+			totalchildrenHeightPixel  =totalchildrenHeightPixel+listview.getChildAt(i).getHeight();
+		}
 
-    @Override
-    public  void  onScroll( AbsListView  view,int  firstVisibleItem,int  visibleItemCount, int  totalCount )
-    {
-        //  deperacated:  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.  2.  last  item  is  partially  visible.
-        if( view.getLastVisiblePosition()-firstVisibleItem > 0 && view.getChildAt(0).getTop()== 0 )
-        {
-
-        }
-    }
+		listview.setStackFromBottom( totalchildrenHeightPixel >= listview.getHeight() );
+	}
 
 	public  void  onSent( Packet packet,TransportState transportState )
 	{
@@ -166,21 +165,16 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 
 			if( ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{
-				if( RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )
-				{
-					return  false;
-				}
+				if( RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )  return  false;
 			}
 			else
 			if( ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.AUDIO && RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()))))).execute().code() != 200 )
 			{
-				{
-					return  false;
-				}
+				return    false;
 			}
 		}
 
-		return  true;
+		return  true ;
 	}
 
 	public  boolean  onKey( View  view, int  keyCode, KeyEvent  event )
@@ -206,12 +200,6 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 	{
 		super.onResume( );
 
-        ListView  listview  = ObjectUtils.cast( super.findViewById(R.id.messages),ListView.class );
-
-
-
-//		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).notifyDataSetChanged();
-
 		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getAdapter(),MoreInputsAdapter.class).notifyDataSetChanged();
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( ChatGroupRepository.DAO.lookupOne(String.class,"SELECT  NAME  FROM  "+ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{groupId}) );
@@ -234,7 +222,7 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 			{
 				try
 				{
-					File  cachedFile= application().cache( media.getId(),new  File(media.getPath()), media.getType()  == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
+					File  cachedFile= application().cache( media.getId(),new  File(media.getPath()), media.getType()    == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
 
 					application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),groupId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
 				}
@@ -251,8 +239,6 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 	protected  void  onDestroy()
 	{
 		super.onDestroy();
-
-		application().getSquirrelClient().removePacketListener( this );
 
 		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
 	}

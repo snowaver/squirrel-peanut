@@ -112,7 +112,7 @@ public  class  AudioTouchRecoder   implements  View.OnTouchListener
 
                     File  tmpAudioFile = new  File( cacheDir,"audio.amr.tmp" );
 
-                    listener.onRecord( tmpAudioFile.length() == 0 || !recording ? null : ObjectUtils.cast(context.getApplication(),Application.class).cache(-1,tmpAudioFile,2) );
+                    listener.onRecord( tmpAudioFile.length() == 0 || !recording ? null : ObjectUtils.cast(context.getApplication(),Application.class).cache(-1,tmpAudioFile,3) );
 
                     recorder.close();
                 }

@@ -19,7 +19,6 @@ import  android.content.Intent;
 import  android.os.Bundle;
 import  android.view.KeyEvent;
 import  android.view.View;
-import  android.widget.AbsListView;
 import  android.widget.Button;
 import  android.widget.EditText;
 import  android.widget.GridView;
@@ -31,9 +30,12 @@ import  com.fasterxml.jackson.core.type.TypeReference;
 import  com.google.common.collect.Lists;
 import  com.irozon.sneaker.Sneaker;
 
+import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.MultimediaUtils;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.widget.ViewSwitcher;
+import  cc.mashroom.squirrel.client.storage.model.chat.ChatMessage;
+import  cc.mashroom.squirrel.client.storage.repository.chat.ChatMessageRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
 import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.module.chat.adapters.MoreInputsAdapter;
@@ -58,7 +60,6 @@ import  java.io.File;
 import  java.io.IOException;
 import  java.sql.Connection;
 import  java.util.List;
-import  java.util.concurrent.atomic.AtomicBoolean;
 
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  es.dmoral.toasty.Toasty;
@@ -68,7 +69,7 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class  ChatActivity   extends    AbstractPacketListenerActivity           implements  PacketListener, View.OnKeyListener, AbsListView.OnScrollListener
+public  class  ChatActivity  extends AbstractPacketListenerActivity  implements  View.OnKeyListener
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
@@ -82,11 +83,13 @@ public  class  ChatActivity   extends    AbstractPacketListenerActivity         
 
 		ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).setOnKeyListener(  this );
 
-		ObjectUtils.cast(super.findViewById(R.id.switch_to_voice_recording_button),ImageView.class).setOnClickListener( (view)->ObjectUtils.cast(super.findViewById(R.id.editor_switcher),ViewSwitcher.class).setDisplayedChild(1) );
+		ObjectUtils.cast(super.findViewById(R.id.switch_to_voice_recording_button),ImageView.class).setOnClickListener( (bt) -> ObjectUtils.cast(super.findViewById(R.id.editor_switcher),ViewSwitcher.class).setDisplayedChild(1) );
 
 		ObjectUtils.cast(super.findViewById(R.id.voice_recording_button),Button.class).setOnTouchListener( new  AudioTouchRecoder(this,application().getCacheDir(),(audioFile) -> send(audioFile)) );
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  ChatMessageListviewAdapter(this,contactId) );
+
+		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).post( () -> this.configStackFromDirect() );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setVisibility(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getVisibility() == View.GONE ? View.VISIBLE : View.GONE) );
 
@@ -97,16 +100,16 @@ public  class  ChatActivity   extends    AbstractPacketListenerActivity         
 
 	public  void  send(  File  audioFile )
 	{
-		if( audioFile==null )
+		if( audioFile  == null )
 		{
 			return;
 		}
 
 		long  voiceDuration = MultimediaUtils.getDuration( audioFile );
 
-		if( voiceDuration   >200 )
+		if( voiceDuration> 200 )
 		{
-			application().getSquirrelClient().send( new  ChatPacket(this.contactId,audioFile.getName() , ChatContentType.AUDIO , String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
+			super.application().getSquirrelClient().send( new  ChatPacket(this.contactId,audioFile.getName(), ChatContentType.AUDIO , String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}
 		else
 		{
@@ -114,27 +117,23 @@ public  class  ChatActivity   extends    AbstractPacketListenerActivity         
 		}
 	}
 
-	@Accessors( chain= true )
+	@Accessors( chain   = true )
 	@Setter
-	private  long  contactId;
+	protected   long  contactId;
 
-	private  AtomicBoolean  initialized =  new  AtomicBoolean( false );
+    private  void  configStackFromDirect()
+	{
+		ListView  listview   = ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class );
 
-    @Override
-    public  void  onScrollStateChanged( AbsListView  view ,int  state )
-    {
+		int  totalchildrenHeightPixel =listview.getDividerHeight()*( listview.getChildCount()- 1 );
 
-    }
+		for( int  i = 0;       i < listview.getChildCount();i = i + 1 )
+		{
+			totalchildrenHeightPixel  =totalchildrenHeightPixel+listview.getChildAt(i).getHeight();
+		}
 
-    @Override
-    public  void  onScroll(  AbsListView  view,int  firstVisibleItem,int  visibleItemCount,int  totalCount )
-    {
-    	//  deperacated:  should  stack  from  bottom  on  conditions,  in  which  it  is  necessary  that  visible  item  count  is  greater  than  zero:  1.  visible  item  count  is  less  than  total  count.   2.  last  item  is  partially  visible.
-        if( view.getLastVisiblePosition()-firstVisibleItem > 0 && view.getChildAt(0).getTop()== 0 )
-        {
-
-        }
-    }
+		listview.setStackFromBottom( totalchildrenHeightPixel >= listview.getHeight() );
+	}
 
 	public  void  onSent(Packet packet,TransportState  transportState )
 	{
@@ -148,7 +147,7 @@ public  class  ChatActivity   extends    AbstractPacketListenerActivity         
 	{
 		if( packet instanceof ChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert( packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert(packet.getId()) );
 		}
 	}
 
@@ -156,31 +155,25 @@ public  class  ChatActivity   extends    AbstractPacketListenerActivity         
 	{
 		if( packet instanceof ChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert( packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert(packet.getId()) );
 
 			if( ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{
-				if( RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )
-				{
-					return  false;
-				}
+				if( RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )  return  false;
 			}
 			else
 			if( ObjectUtils.cast(packet,ChatPacket.class).getContentType()==ChatContentType.AUDIO )
 			{
-				if( RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))))).execute().code() != 200 )
-				{
-					return  false;
-				}
+				if( RetrofitRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))))).execute().code() != 200 )  return  false;
 			}
 		}
 
-		return  true;
+		return  true ;
 	}
 
 	public  boolean  onKey( View  view, int  keyCode, KeyEvent  event )
 	{
-		if( keyCode == KeyEvent.KEYCODE_ENTER         &&  event.getAction() == KeyEvent.ACTION_UP )
+		if( keyCode == KeyEvent.KEYCODE_ENTER         && event.getAction()==   KeyEvent.ACTION_UP )
 		{
 			if( StringUtils.isNotBlank(   ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim()) )
 			{
@@ -203,8 +196,13 @@ public  class  ChatActivity   extends    AbstractPacketListenerActivity         
 
         application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).getAdapter(), ChatMessageListviewAdapter.class).cacheIncoming() );
     }
+	@Override
+	protected  void    onStart()
+	{
+		super.onStart(  );
+	}
 
-    protected  void   onResume()
+	protected  void   onResume()
 	{
 		super.onResume( );
 
@@ -215,7 +213,14 @@ public  class  ChatActivity   extends    AbstractPacketListenerActivity         
 	{
 		super.onPause(  );
 
-		Db.tx(  String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
+		Db.tx(  String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection)-> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
+	}
+
+	protected  void  onDestroy()
+	{
+		super.onDestroy();
+
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection)-> NewsProfileRepository.DAO.clearBadgeCount(contactId, PAIPPacketType.CHAT.getValue()) );
 	}
 
 	protected  void  onActivityResult(    int  requestCode , int  resultCode , Intent  resultData )
@@ -228,7 +233,7 @@ public  class  ChatActivity   extends    AbstractPacketListenerActivity         
 			{
 				try
                 {
-                    File  cachedFile = application().cache(media.getId(),new  File(media.getPath()),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
+                    File  cachedFile = application().cache(media.getId(),new  File(media.getPath()),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ?        ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
 
                     application().getSquirrelClient().send( new  ChatPacket(contactId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
                 }
@@ -241,13 +246,4 @@ public  class  ChatActivity   extends    AbstractPacketListenerActivity         
 			}
 		}
 	}
-
-    protected  void  onDestroy()
-    {
-        super.onDestroy();
-
-        application().getSquirrelClient().removePacketListener( this );
-
-        Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(contactId, PAIPPacketType.CHAT.getValue()) );
-    }
 }
