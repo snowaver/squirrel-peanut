@@ -61,6 +61,7 @@ import  cc.mashroom.squirrel.paip.message.connect.DisconnectAckPacket;
 import  cc.mashroom.squirrel.push.PushServiceNotifier;
 
 import  java.sql.Timestamp;
+import java.util.LinkedList;
 import  java.util.List;
 import  java.util.Set;
 import  java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -103,7 +104,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		LocaleUtils.change(this,null);
 
-		this.squirrelClient = new  SquirrelClient(this,super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir()).route(new  DefaultServiceListRequestStrategy(Lists.newArrayList(SERVICE_LIST_REQUEST_URL),SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS)).addPacketListener( this );
+		this.squirrelClient = new  SquirrelClient(this,super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir()).route(new  DefaultServiceListRequestStrategy(Lists.newArrayList(SERVICE_LIST_REQUEST_URL),SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS)).addPacketListener(     this );
 
 		this.squirrelClient.getServiceRouteManager().addListener(this );
 
@@ -124,7 +125,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 			if( !AbstractActivity.STACK.isEmpty() && !authenticateNeedlessActivityClasses.contains(AbstractActivity.STACK.getLast().getClass() ) )
 			{
-				clearStackActivitiesAndStart( new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",0).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+				this.clearStackActivitiesAndStart( new  Intent(AbstractActivity.STACK.getLast(),LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",0),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 			}
 		}
 		else
@@ -171,11 +172,16 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		}
 	}
 
-	public  void  clearStackActivitiesAndStart( Intent  intent , Bundle  bundle )
+	public  void  clearStackActivitiesAndStart( Intent  intent ,  Bundle bundle )
 	{
-		for(  Activity  activity : AbstractActivity.STACK )    activity.finish();
+		LinkedList<Activity>  activities  = new  LinkedList<Activity>( AbstractActivity.STACK );
 
-		ActivityCompat.startActivity( this,intent,bundle );
+		ActivityCompat.startActivity(  activities.isEmpty()  ? Application.this :   activities.getLast(), intent, bundle );
+
+		if( !   activities.isEmpty() )
+		{
+			for(  Activity  activity : activities  )  activity.finish();
+		}
 	}
 
 	public  void  onError(   Throwable   throwable )
@@ -183,12 +189,12 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	}
 
-	public  void  onLogout(  int  rs )
+	public  void  onLogoutComplete( int  code,int  reason )
 	{
 		//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  loginactivity.
-		if( rs ==            DisconnectAckPacket.REASON_REMOTE_SIGNIN  )
+		if( code == 200 &&        ( reason == DisconnectAckPacket.REASON_REMOTE_SIGNIN || reason == DisconnectAckPacket.REASON_CLIENT_LOGOUT   ) )
 		{
-			this.clearStackActivitiesAndStart(new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",rs).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+			this.clearStackActivitiesAndStart(new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",reason).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 
 			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().clear().apply();
 		}

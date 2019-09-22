@@ -43,7 +43,7 @@ public  class  AbstractLifecycleListenerActivity    extends  AbstractActivity  i
 
     }
     @Override
-    public  void  onLogout(   int  reason )
+    public  void  onLogoutComplete( int  code,int  reason )
     {
 
     }

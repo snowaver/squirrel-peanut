@@ -61,7 +61,7 @@ public  class    AbstractLifecycleAndPacketListenerActivity  extends  AbstractAc
 
     }
     @Override
-    public  void  onLogout(   int  reason )
+    public  void  onLogoutComplete( int  code,int  reason )
     {
 
     }

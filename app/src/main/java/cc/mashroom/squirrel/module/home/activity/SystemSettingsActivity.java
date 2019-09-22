@@ -15,8 +15,6 @@
  */
 package cc.mashroom.squirrel.module.home.activity;
 
-import  android.app.Activity;
-import  android.content.Intent;
 import  android.os.Bundle;
 import  android.view.View;
 import  android.widget.AdapterView;
@@ -24,46 +22,42 @@ import  android.widget.Button;
 import  android.widget.ListView;
 import  android.widget.TextView;
 
+import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.google.android.material.bottomsheet.BottomSheetDialog;
 
-import  java.util.ArrayList;
-import  java.util.List;
 import  java.util.Locale;
 
-import  androidx.core.app.ActivityCompat;
-import  androidx.core.app.ActivityOptionsCompat;
+import  androidx.core.content.res.ResourcesCompat;
+
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
-import  cc.mashroom.hedgehog.util.ContextUtils;
+import  cc.mashroom.hedgehog.util.DensityUtils;
+import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import  cc.mashroom.squirrel.http.RetrofitRegistry;
-import  cc.mashroom.squirrel.module.common.services.UserService;
 import  cc.mashroom.squirrel.module.home.adapters.SystemSettingsLanguageAdapter;
-import  cc.mashroom.squirrel.module.system.activity.LoginActivity;
-import  cc.mashroom.squirrel.parent.AbstractActivity;
+import  cc.mashroom.squirrel.parent.AbstractLifecycleListenerActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.ObjectUtils;
-import  cc.mashroom.util.stream.Stream;
 import  cn.refactor.library.SmoothCheckBox;
 import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
-import  retrofit2.Call;
-import  retrofit2.Response;
 
-public  class  SystemSettingsActivity  extends  AbstractActivity  implements  SmoothCheckBox.OnCheckedChangeListener,AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
+public  class  SystemSettingsActivity  extends  AbstractLifecycleListenerActivity  implements  SmoothCheckBox.OnCheckedChangeListener,AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
-	@Accessors( chain=true )
+	@Accessors(   chain = true )
 	@Setter
 	@Getter
 	private  BottomSheetDialog  languagesBottomSheetDialog;
+	@Accessors(   chain = true )
+	@Setter
+	private  UIProgressDialog   progressDialog;
 
 	public  void  onCheckedChanged( SmoothCheckBox  smoothCheckbox,boolean  isChecked )
 	{
 		Locale  locale = ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString().trim().equals("ENGLISH") ? Locale.ENGLISH : Locale.CHINESE;
 
-		LocaleUtils.change( this, locale.toLanguageTag() );
+		LocaleUtils.change(this,locale.toLanguageTag()   );
 
 		this.languagesBottomSheetDialog.hide();
 
@@ -87,7 +81,14 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 
 		ObjectUtils.cast(super.findViewById(R.id.logout_button),Button.class).setText( R.string.logout );
 
-		ObjectUtils.cast(this.languagesBottomSheetDialog.findViewById(R.id.title),TextView.class).setText( R.string.language );
+		ObjectUtils.cast(this.languagesBottomSheetDialog.findViewById(R.id.title),TextView.class).setText(     R.string.language );
+	}
+	@Override
+	public  void  onLogoutComplete( int  code,int  reason )
+	{
+		super.onLogoutComplete( code,reason );
+
+		super.application().getMainLooperHandler().post( ()->progressDialog.cancel() );
 	}
 
 	protected  void  onDestroy()
@@ -105,15 +106,17 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 
 		super.setContentView(  R.layout.activity_system_settings );
 
-		super.findViewById(R.id.logout_button).setOnClickListener(  (view) -> application().getSquirrelClient().disconnect() );
+		super.findViewById(R.id.logout_button).setOnClickListener( (view) -> {this.progressDialog.show();super.application().getSquirrelClient().disconnect();} );
 
-		(this.languagesBottomSheetDialog = new  BottomSheetDialog(this)).setContentView(       R.layout.activity_system_settings_language_bottomsheet );
+		this.setLanguagesBottomSheetDialog(new  BottomSheetDialog(this)).getLanguagesBottomSheetDialog().setContentView( R.layout.activity_system_settings_language_bottomsheet );
 
 		this.languagesBottomSheetDialog.setCanceledOnTouchOutside( true );
 
 		ObjectUtils.cast(super.findViewById(R.id.language_selector),StyleableEditView.class).setOnClickListener( (selector) -> this.languagesBottomSheetDialog.show() );
 
-		ObjectUtils.cast(languagesBottomSheetDialog.findViewById(R.id.languages),ListView.class).setOnItemClickListener(this );
+		this.setProgressDialog( StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) );
+
+		ObjectUtils.cast(this.languagesBottomSheetDialog.findViewById(R.id.languages),ListView.class).setOnItemClickListener(this);
 
 		ObjectUtils.cast(this.languagesBottomSheetDialog.findViewById(R.id.languages),ListView.class).setAdapter( new  SystemSettingsLanguageAdapter(this,this) );
 
