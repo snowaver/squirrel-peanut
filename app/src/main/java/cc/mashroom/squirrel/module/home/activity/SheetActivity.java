@@ -15,7 +15,6 @@
  */
 package cc.mashroom.squirrel.module.home.activity;
 
-import  android.content.DialogInterface;
 import  android.content.Intent;
 import  android.graphics.Typeface;
 import  android.net.Uri;
@@ -23,16 +22,13 @@ import  android.os.Bundle;
 
 import  com.aries.ui.widget.BasisDialog;
 import  com.aries.ui.widget.action.sheet.UIActionSheetDialog;
-import  com.aries.ui.widget.alert.UIAlertDialog;
 import  com.google.android.material.tabs.TabLayout;
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
-import  androidx.core.content.res.ResourcesCompat;
 import  androidx.viewpager.widget.ViewPager;
 
 import  android.view.View;
 import  android.view.WindowManager;
-import  android.widget.EditText;
 import  android.widget.ImageView;
 import  android.widget.LinearLayout;
 import  android.widget.ListView;

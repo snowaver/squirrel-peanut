@@ -37,10 +37,6 @@ public  interface  UserService
 	@GET(  value="/user" )
 	public  Call<User>  get( @Query( value="userId")  long  userId );
 
-	@FormUrlEncoded
-	@POST( value="/user/logout" )
-	public  Call<Void>  logout( @Field(value="userId")  String  userId );
-
 	@Multipart
 	@POST( value="/user" )
 	public  Call<Void>  register( @Part("user")  RequestBody  user,@Part  MultipartBody.Part  portrait );

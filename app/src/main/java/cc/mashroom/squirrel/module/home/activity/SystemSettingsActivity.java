@@ -54,30 +54,6 @@ import  retrofit2.Response;
 
 public  class  SystemSettingsActivity  extends  AbstractActivity  implements  SmoothCheckBox.OnCheckedChangeListener,AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
-	private   void  logout()
-	{
-		RetrofitRegistry.INSTANCE.get(UserService.class).logout(    application().getSquirrelClient().getId()).enqueue
-		(
-			new  AbstractRetrofit2Callback<Void>(this,true)
-			{
-				public  void  onResponse( Call<Void>  call,  Response<Void>  response )
-				{
-					super.onResponse(     call, response );
-
-					application().getSquirrelClient().disconnect();
-
-					SystemSettingsActivity.this.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().clear().commit();
-					//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  login  activity.  the  other  activities  should  be  finished.
-					List<Activity>  stackActivities = new  ArrayList<Activity>( AbstractActivity.STACK );
-
-					ActivityCompat.startActivity( SystemSettingsActivity.this,new Intent(SystemSettingsActivity.this,LoginActivity.class).putExtra("USERNAME",SystemSettingsActivity.this.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",0),ActivityOptionsCompat.makeCustomAnimation(SystemSettingsActivity.this,R.anim.left_in,R.anim.right_out).toBundle() );
-
-					Stream.forEach( stackActivities,(Activity  stackActivity) -> ContextUtils.finish(stackActivity) );
-				}
-			}
-		);
-	}
-
 	@Accessors( chain=true )
 	@Setter
 	@Getter
@@ -129,7 +105,7 @@ public  class  SystemSettingsActivity  extends  AbstractActivity  implements  Sm
 
 		super.setContentView(  R.layout.activity_system_settings );
 
-		super.findViewById(R.id.logout_button).setOnClickListener( (view)-> logout() );
+		super.findViewById(R.id.logout_button).setOnClickListener(  (view) -> application().getSquirrelClient().disconnect() );
 
 		(this.languagesBottomSheetDialog = new  BottomSheetDialog(this)).setContentView(       R.layout.activity_system_settings_language_bottomsheet );
 

@@ -188,7 +188,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  loginactivity.
 		if( rs ==            DisconnectAckPacket.REASON_REMOTE_SIGNIN  )
 		{
-			this.clearStackActivitiesAndStart(new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",1).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+			this.clearStackActivitiesAndStart(new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",rs).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 
 			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().clear().apply();
 		}
