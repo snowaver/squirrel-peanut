@@ -177,7 +177,7 @@ public  class  GroupChatMessageListviewAdapter  extends  BaseAdapter  <GroupChat
 		{
 			File  screenshotFile = new  File( context.application().getCacheDir(), "file/"+groupChatMessage.getMd5()+"$TMB" );
 
-			ObjectUtils.cast(contentSwitcher.setDisplayedChild(1).findViewById(R.id.screenshot),FlexibleSimpleDraweeView.class).setImageURI( screenshotFile.exists() ? Uri.parse(screenshotFile.toURI().toString()) : Uri.parse(context.application().baseUrl().addPathSegments("file/"+groupChatMessage.getMd5()+"$TMB").addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().getUserMetadata().getSecretKey()).build().toString()) );
+			ObjectUtils.cast(contentSwitcher.setDisplayedChild(1).findViewById(R.id.screenshot),FlexibleSimpleDraweeView.class).setCacheFile(screenshotFile).setImageURI( screenshotFile.exists() ? Uri.parse(screenshotFile.toURI().toString()) : Uri.parse(context.application().baseUrl().addPathSegments("file/"+groupChatMessage.getMd5()+"$TMB").addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().getUserMetadata().getSecretKey()).build().toString()) );
 
 			contentSwitcher.findViewById(R.id.upload_progress_bar).setVisibility( TransportState.valueOf(groupChatMessage.getTransportState()) == TransportState.SENDING ? View.VISIBLE : View.GONE );
 

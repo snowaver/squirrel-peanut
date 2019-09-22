@@ -37,9 +37,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'com.google.android.material:material:1.1.0-alpha09'
-    implementation 'com.github.snowaver:hedgehog-parent:v1.0.1-alpha83'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.android.material:material:1.1.0-alpha10'
+    implementation 'com.github.snowaver:hedgehog-parent:v1.0.1-alpha88'
     implementation 'com.squareup.retrofit2:converter-jackson:2.5.0'
     implementation 'com.facebook.fresco:imagepipeline-okhttp3:1.13.0'
     implementation 'cc.mashroom.squirrel:squirrel-client:v1.0.2'

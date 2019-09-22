@@ -20,7 +20,7 @@
     <string  name="change">CHANGE</string>
     <string  name="chat">CHAT</string>
     <string  name="chat_audio_message">VOICE MESSAGE</string>
-    <string  name="chat_create_new_group">NEW CHAT GROUP</string>
+    <string  name="chat_create_new_group">CREATE CHAT GROUP</string>
     <string  name="chat_group">CHAT GROUP</string>
     <string  name="chat_group_exist">CHAT GROUP EXIST</string>
     <string  name="chat_group_leave_or_delete">LEAVE OR DELETE</string>

@@ -38,14 +38,11 @@ import  java.util.List;
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 
-import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.MultimediaUtils;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.widget.ViewSwitcher;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.PacketListener;
-import  cc.mashroom.squirrel.client.storage.model.chat.GroupChatMessage;
-import  cc.mashroom.squirrel.client.storage.repository.chat.GroupChatMessageRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
@@ -222,7 +219,7 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 			{
 				try
 				{
-					File  cachedFile= application().cache( media.getId(),new  File(media.getPath()), media.getType()    == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
+					File  cachedFile= application().cache((int)  media.getId(),new  File(media.getPath()), media.getType()==cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue(): ChatContentType.VIDEO.getValue() );
 
 					application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),groupId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
 				}

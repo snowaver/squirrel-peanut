@@ -9,7 +9,7 @@
 
         <RelativeLayout  android:id="@+id/media_message_layout"  android:layout_width="wrap_content"  android:layout_height="wrap_content"  android:visibility="gone">
 
-            <cc.mashroom.hedgehog.widget.FlexibleSimpleDraweeView  android:id="@+id/screenshot"  android:layout_width="wrap_content"  android:layout_height="90dp"  android:maxHeight="90dp"/>
+            <cc.mashroom.hedgehog.widget.FlexibleSimpleDraweeView  android:id="@+id/screenshot"  android:layout_width="1dp"  android:layout_height="90dp"  android:maxWidth="160dp"  android:maxHeight="90dp"/>
 
             <com.github.ybq.android.spinkit.SpinKitView  android:id="@+id/upload_progress_bar"  android:layout_width="40dp"  android:layout_height="40dp"  android:padding="5dp"      android:layout_centerInParent="true"  app:SpinKit_Style="ChasingDots"  android:visibility="gone"/>
 

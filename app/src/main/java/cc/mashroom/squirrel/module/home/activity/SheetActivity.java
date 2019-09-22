@@ -17,9 +17,12 @@ package cc.mashroom.squirrel.module.home.activity;
 
 import  android.content.DialogInterface;
 import  android.content.Intent;
+import  android.graphics.Typeface;
 import  android.net.Uri;
 import  android.os.Bundle;
 
+import  com.aries.ui.widget.BasisDialog;
+import  com.aries.ui.widget.action.sheet.UIActionSheetDialog;
 import  com.aries.ui.widget.alert.UIAlertDialog;
 import  com.google.android.material.tabs.TabLayout;
 import  androidx.core.app.ActivityCompat;
@@ -43,6 +46,7 @@ import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.StyleUnifier;
+import  cc.mashroom.hedgehog.widget.BottomSheetEditor;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.ConnectState;
@@ -68,19 +72,19 @@ import  java.util.ArrayList;
 import  java.util.List;
 import  java.util.Locale;
 
-public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   implements  TabLayout.OnTabSelectedListener,LocaleChangeEventDispatcher.LocaleChangeListener,HeaderBar.OnItemClickListener,DialogInterface.OnClickListener
+public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   implements  TabLayout.OnTabSelectedListener,LocaleChangeEventDispatcher.LocaleChangeListener,UIActionSheetDialog.OnItemClickListener,BottomSheetEditor.OnEditCompleteListener
 {
 	protected  void  onCreate(  Bundle  savedInstanceState )
 	{
 		LocaleChangeEventDispatcher.addListener(this );
 
-		super.onCreate( savedInstanceState );
+		super.onCreate(   savedInstanceState );
 
 		super.getWindow().clearFlags(    WindowManager.LayoutParams.FLAG_FULLSCREEN );
 
 		super.setContentView(R.layout.activity_sheet );
 
-		ObjectUtils.cast(findViewById(R.id.tab_layout),TabLayout.class).addOnTabSelectedListener( this );
+		ObjectUtils.cast(findViewById(R.id.tab_layout),TabLayout.class).addOnTabSelectedListener(  this );
 
 		onConnectStateChanged(  application().getSquirrelClient().getConnectState() );
 
@@ -88,7 +92,7 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 
 		List<Map<String,Object>>  sidebarDatas = new  ArrayList<Map<String,Object>>();
 
-		for( String  title :  super.getResources().getStringArray( R.array.buddy_settings_menu_titles ) )
+		for( String  title :  super.getResources().getStringArray(  R.array.buddy_settings_menu_titles ) )
 		{
 			sidebarDatas.add( new  HashMap<String,Object>().addEntry("title",title) );
 		}
@@ -103,14 +107,14 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 
 			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.icon),ImageView.class).setImageResource( bottomTabResources.getInteger("icon") );
 
-			ObjectUtils.cast(super.findViewById(R.id.tab_layout),      TabLayout.class).addTab( newTab );
+			ObjectUtils.cast(super.findViewById(R.id.tab_layout),       TabLayout.class).addTab( newTab );
 		}
 
 		ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).setOnClickListener( (logoutButton) -> ActivityCompat.startActivity(this,new  Intent(this,SystemSettingsActivity.class),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+application().getSquirrelClient().getUserMetadata().getId()+"/portrait").build().toString()) );
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).addDropdownItem(R.string.chat_create_new_group,R.color.white,18,super.getResources().getDisplayMetrics().widthPixels/2,DensityUtils.px(this,50)).setOnItemClickListener( this );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).findViewById(R.id.additional_switcher).setOnClickListener( (view) -> StyleUnifier.unify(new  UIActionSheetDialog.ListIOSBuilder(this).setBackgroundRadius(15).addItem(R.string.chat_create_new_group).setItemsTextSize(18).setCancel(cc.mashroom.hedgehog.R.string.close).setCancelTextColorResource(cc.mashroom.hedgehog.R.color.red).setCancelTextSize(18).setItemsMinHeight(DensityUtils.px(this,50)).setPadding(DensityUtils.px(this,10)).setCanceledOnTouchOutside(true).setOnItemClickListener(this).create(),Typeface.createFromAsset(super.getAssets(),"font/droid_sans_mono.ttf")).show() );
 	}
 
 	private  Map<ConnectState,Integer>  connectStateResIds = new  ConcurrentHashMap<ConnectState,Integer>().addEntry(ConnectState.NONE,R.string.connectionless).addEntry(ConnectState.CONNECTED,R.string.squirrel).addEntry(ConnectState.CONNECTING,R.string.connecting).addEntry( ConnectState.DISCONNECTED,R.string.disconnected );
@@ -127,11 +131,12 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 
 	}
 
-	public  void  onItemClick(View  itemView,int  position )
+	@Override
+	public  void  onClick( BasisDialog    actionSheetDialog,View  item,int  position )
 	{
 		if( position  == 0 )
 		{
-			StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.chat_create_new_group).setTitleTextSize(18).setView(R.layout.dlg_editor).setCancelable(false).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(dialog, which) -> {}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,this).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show();
+			new  BottomSheetEditor(this,16).setOnEditCompleteListener( this  ).show();
 		}
 	}
 	
@@ -140,19 +145,17 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 		application().getMainLooperHandler().post( () -> ObjectUtils.cast(SheetActivity.this.findViewById(R.id.title),TextView.class).setText(state == ConnectState.CONNECTED ? ObjectUtils.cast(ObjectUtils.cast(this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).getSelectedTabPosition()).getInteger("title") : connectStateResIds.get(state)) );
 	}
 	
-	public  void  onClick( DialogInterface  dialog, int  i )
+	public  void  onEditComplete(  CharSequence  groupName )
 	{
-		String  createdGroupName = ObjectUtils.cast(ObjectUtils.cast(dialog, UIAlertDialog.class).getContentView().findViewById(R.id.edit_inputor), EditText.class).getText().toString().trim();
-
-		if( StringUtils.isNotBlank( createdGroupName) )
+		if(         StringUtils.isNotBlank(groupName) )
 		{
-			RetrofitRegistry.INSTANCE.get(         ChatGroupService.class ).add(createdGroupName).enqueue
+			RetrofitRegistry.INSTANCE.get(ChatGroupService.class).add(ObjectUtils.cast(groupName)).enqueue
 			(
 				new  AbstractRetrofit2Callback<OoIData>( this,true )
 				{
-					public  void  onResponse(      Call<OoIData>  call    , Response<OoIData>  response )
+					public  void  onResponse(      Call  < OoIData >  call,Response  <OoIData>  response )
 					{
-						super.onResponse( call , response );
+						super.onResponse( call,  response );
 
 						if( response.code()    == 200 )
 						{
@@ -174,11 +177,11 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 
 	public  void  onTabSelected(   TabLayout.Tab  tab )
 	{
-		tab.getCustomView().setBackgroundColor(       super.getResources().getColor(R.color.lightgray) );
+		tab.getCustomView().setBackgroundColor(       super.getResources().getColor(R.color.lightgray ) );
 
 		ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).setCurrentItem( tab.getPosition(), false );
 
-		if(         super.application().getSquirrelClient().getConnectState() == ConnectState.CONNECTED )
+		if(          super.application().getSquirrelClient().getConnectState() == ConnectState.CONNECTED )
 		{
 			ObjectUtils.cast(super.findViewById(R.id.title),TextView.class).setText( ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(tab.getPosition()).getInteger("title") );
 		}
@@ -186,7 +189,7 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 
 	public  void  onTabUnselected( TabLayout.Tab  tab )
 	{
-		tab.getCustomView().setBackgroundColor(super.getResources().getColor(R.color.white)/* COLOR */ );
+		tab.getCustomView().setBackgroundColor(super.getResources().getColor(R.color.white) /* COLOR */ );
 	}
 
 	public  void  onChange( Locale  locale )
@@ -197,7 +200,7 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 
 		List<Map<String,Object>>  sidebarDatas = new  ArrayList<Map<String,Object>>();
 
-		for( String  title :  super.getResources().getStringArray( R.array.buddy_settings_menu_titles ) )
+		for( String  title :  super.getResources().getStringArray(  R.array.buddy_settings_menu_titles ) )
 		{
 			sidebarDatas.add( new  HashMap<String,Object>().addEntry("title",title) );
 		}

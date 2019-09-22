@@ -233,7 +233,7 @@ public  class  ChatActivity  extends AbstractPacketListenerActivity  implements 
 			{
 				try
                 {
-                    File  cachedFile = application().cache(media.getId(),new  File(media.getPath()),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ?        ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
+                    File  cachedFile = application().cache((int) media.getId(), new  File(media.getPath()),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue() : ChatContentType.VIDEO.getValue() );
 
                     application().getSquirrelClient().send( new  ChatPacket(contactId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
                 }
