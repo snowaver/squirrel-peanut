@@ -87,7 +87,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 {
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList(new  PeerConnection.IceServer("stun:47.105.210.154:3478"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302"),new  PeerConnection.IceServer("turn:47.105.210.154:3478","snowaver","snowaver") );
 
-	public  static  String  SERVICE_LIST_REQUEST_URL      = "https://192.168.1.116:8011/system/service?action=1&keyword=0";
+	public  static  String  SERVICE_LIST_REQUEST_URL      = "https://192.168.1.114:8011/system/service?action=1&keyword=0";
 
 	private  Set<Class> authenticateNeedlessActivityClasses  = Sets.newHashSet(LoadingActivity.class,LoginActivity.class,RegisterActivity.class );
 	@Accessors(  chain = true )

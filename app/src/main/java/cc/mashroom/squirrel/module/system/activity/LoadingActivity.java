@@ -58,11 +58,9 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 		this.progressDialog = StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
 
 		super.application().getScheduler().schedule( this,5,TimeUnit.SECONDS );
-
-        super.application().getSquirrelClient().getServiceRouteManager().addListener(    this );
 	}
 
-    private UIProgressDialog  progressDialog;
+	private UIProgressDialog  progressDialog;
 
 	@Override
 	public  void  onRequestComplete( List<Service>  list )
@@ -73,6 +71,13 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 
 			run();
 		}
+	}
+	@Override
+	protected  void       onStart()
+	{
+		super.onStart(  );
+
+		super.application().getSquirrelClient().getServiceRouteManager().addListener(    this );
 	}
     @Override
     protected  void     onDestroy()
@@ -103,7 +108,10 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 	@Override
 	public  void  onBeforeRequest()
 	{
-		super.application().getMainLooperHandler().post( () -> progressDialog.show() );
+		if( !super.isFinishing() && !super.isDestroyed() )
+		{
+			super.application().getMainLooperHandler().post( () -> this.progressDialog.show() );
+		}
 	}
     @Override
     public  void  onChanged( Service  oldService,Service  newService )
