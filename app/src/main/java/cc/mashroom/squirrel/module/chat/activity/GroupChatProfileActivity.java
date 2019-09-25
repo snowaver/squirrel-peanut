@@ -35,11 +35,12 @@ import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepos
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupUserRepository;
 import  cc.mashroom.squirrel.module.chat.adapters.GroupChatProfileMemberGridviewAdapter;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
-import  cc.mashroom.squirrel.parent.AbstractActivity;
+import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
 import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
+import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
@@ -54,7 +55,7 @@ import  java.sql.Connection;
 import  java.util.HashSet;
 import  java.util.Set;
 
-public  class  GroupChatProfileActivity     extends  AbstractActivity
+public  class  GroupChatProfileActivity     extends              AbstractPacketListenerActivity
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle   savedInstanceState )
@@ -65,7 +66,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 		this.setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{ super.getIntent().getLongExtra("CHAT_GROUP_ID", 0) }) );
 
-		this.setChatGroupUser( ChatGroupUserRepository.DAO.lookupOne(ChatGroupUser.class,"SELECT  *  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?",new  Object[]{this.chatGroup.getId(),application().getSquirrelClient().getUserMetadata().getId()}) );
+		this.setChatGroupUser( ChatGroupUserRepository.DAO.lookupOne(ChatGroupUser.class,"SELECT  *  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{this.chatGroup.getId(),application().getSquirrelClient().getUserMetadata().getId()}) );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle(    chatGroup.getName() );
 
@@ -77,7 +78,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 		ObjectUtils.cast(super.findViewById(R.id.more_members_button),ImageView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
-		super.findViewById(R.id.leave_or_delete_button).setOnClickListener((leaveButton)   ->  leaveOrDelete() );
+		super.findViewById(R.id.leave_or_delete_button).setOnClickListener((leaveButton)     ->leaveOrDelete() );
 
         ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).setAdapter( new  GroupChatProfileMemberGridviewAdapter(this,chatGroup.getId()) );
     }
@@ -104,7 +105,6 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 			(
 				new  AbstractRetrofit2Callback<OoIData>(  this,true )
 				{
-					@SneakyThrows
 					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
 					{
 						super.onResponse( call,  response );
@@ -115,7 +115,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
                             ObjectUtils.cast(ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.members),GridView.class).getAdapter(),   GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
 
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,    R.string.added,R.color.white,R.color.limegreen );
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,   R.string.added, R.color.white,R.color.limegreen );
 						}
 						else
 						{
@@ -132,7 +132,6 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 			(
 				new  AbstractRetrofit2Callback<OoIData>(  this,true )
 				{
-					@SneakyThrows
 					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
 					{
 						super.onResponse( call,  response );
@@ -147,7 +146,7 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 
 							ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.header_bar),HeaderBar.class).setTitle(  chatGroup.getName() );
 
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen );
+							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,  R.color.white,R.color.limegreen );
 						}
 						else
 						{
@@ -158,7 +157,14 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 			);
         }
 	}
+	@Override
+	public  void       onReceived(  Packet  packet )
+	{
+		super.onReceived(packet );
 
+		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
+	}
+	
 	private  void  inviteMembers()
 	{
 		Set<Long>  invitedContactIds = new  HashSet<Long>();
@@ -178,7 +184,6 @@ public  class  GroupChatProfileActivity     extends  AbstractActivity
 			(
 				new  AbstractRetrofit2Callback<OoIData>(  this,true )
 				{
-					@SneakyThrows
 					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
 					{
 						super.onResponse( call,  response );

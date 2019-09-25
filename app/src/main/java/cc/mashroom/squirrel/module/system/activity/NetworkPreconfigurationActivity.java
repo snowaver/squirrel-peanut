@@ -41,7 +41,7 @@ import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 
-public  class  LoadingActivity   extends  AbstractActivity implements  Runnable  ,ServiceRouteListener
+public  class NetworkPreconfigurationActivity  extends  AbstractActivity  implements  Runnable , ServiceRouteListener
 {
 	protected  void  onCreate(Bundle  savedInstanceState )
 	{
@@ -53,7 +53,7 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 
 		super.getWindow().setStatusBarColor( super.getResources().getColor(R.color.gainsboro) );
 
-		super.setContentView( R.layout.activity_loading );
+		super.setContentView(     R.layout.activity_network_preconfiguration );
 
 		this.progressDialog = StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
 
@@ -103,7 +103,7 @@ public  class  LoadingActivity   extends  AbstractActivity implements  Runnable 
 			super.application().connect( userId, NetworkUtils.getLocation(this),super.application() );
 		}
 
-		ActivityCompat.startActivity( this,new  Intent(LoadingActivity.this,userId> 0 ? SheetActivity.class : LoginActivity.class),ActivityOptionsCompat.makeCustomAnimation(LoadingActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
+		ActivityCompat.startActivity( this,new  Intent(NetworkPreconfigurationActivity.this,userId> 0 ? SheetActivity.class : SigninActivity.class),ActivityOptionsCompat.makeCustomAnimation(NetworkPreconfigurationActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
 	}
 	@Override
 	public  void  onBeforeRequest()

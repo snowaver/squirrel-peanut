@@ -46,7 +46,7 @@ import  lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 
-public  class  NewsProfileListAdapter   extends  BaseAdapter
+public  class  NewsProfileListAdapter  extends  BaseAdapter
 {
 	protected  NewsProfileFragment  context;
 
@@ -64,40 +64,28 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 
 	public  int  getCount()
 	{
-		return  NewsProfileRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(*)  AS  COUNT  FROM  "+NewsProfileRepository.DAO.getDataSourceBind().table(),new  Object[]{}).intValue();
-	}
-
-	private  String  getProfileMessage( String  content,PAIPPacketType  type )
-	{
-		if( type==PAIPPacketType.SUBSCRIBE )
-		{
-			return  context.getString( Integer.valueOf(content) == 1 ? R.string.subscribe_request_sent : R.string.subscribe_received_a_adding_contact_request );
-		}
-		else
-		{
-			return  NEWS_PROFILE_PLACEHOLDERS.containsKey(content) ? context.getString(NEWS_PROFILE_PLACEHOLDERS.get(content)): content;
-		}
+		return  NewsProfileRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(*)  AS  COUNT  FROM  "+NewsProfileRepository.DAO.getDataSourceBind().table()).intValue();
 	}
 
 	public  View  getView( int  position,View  convertView,ViewGroup  parent )
 	{
 		convertView = convertView != null ? convertView : LayoutInflater.from(context.getContext()).inflate( R.layout.fragment_news_profile_item,parent,false );
 
-		NewsProfile   newsProfile =     getItem( position );
+		NewsProfile   newsProfile =    getItem( position );
 
-		if( newsProfile.getPacketType() == PAIPPacketType.GROUP_CHAT  )
+		if( newsProfile.getPacketType() == PAIPPacketType.GROUP_CHAT )
 		{
 			ObjectUtils.cast(convertView.findViewById(R.id.nickname),TextView.class).setText( ChatGroupRepository.DAO.lookupOne(String.class,"SELECT  NAME  FROM  "+ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{newsProfile.getId()}) );
 
 			ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse("res://" + context.getContext().getPackageName() + "/" + R.drawable.placeholder) );
 
-			if(       newsProfile.getContactId()   == null )
+			if(       newsProfile.getContactId()  == null )
 			{
 				ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( R.string.start_to_chat );
 			}
 			else
 			{
-				ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( ChatGroupUserRepository.DAO.lookupOne(String.class,"SELECT  VCARD  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CONTACT_ID = ?",new  Object[]{newsProfile.getContactId()})+context.getContext().getString(R.string.colon)+(NEWS_PROFILE_PLACEHOLDERS.containsKey(newsProfile.getContent()) ? context.getString(NEWS_PROFILE_PLACEHOLDERS.get(newsProfile.getContent())) : newsProfile.getContent()) );
+				ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( ChatGroupUserRepository.DAO.lookupOne(String.class,"SELECT  VCARD  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{newsProfile.getId(),newsProfile.getContactId()})+context.getContext().getString(R.string.colon)+(NEWS_PROFILE_PLACEHOLDERS.containsKey(newsProfile.getContent()) ? context.getString(NEWS_PROFILE_PLACEHOLDERS.get(newsProfile.getContent())) : newsProfile.getContent()) );
 			}
 		}
 		else
@@ -107,7 +95,7 @@ public  class  NewsProfileListAdapter   extends  BaseAdapter
 
 			ObjectUtils.cast(convertView.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+newsProfile.getContactId()+"/portrait").build().toString()) );
 
-			ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( getProfileMessage(newsProfile.getContent(),newsProfile.getPacketType()) );
+			ObjectUtils.cast(convertView.findViewById(R.id.profile_message),TextView.class).setText( newsProfile.getPacketType() == PAIPPacketType.SUBSCRIBE ? context.getString(Integer.valueOf(newsProfile.getContent()) == 1 ? R.string.subscribe_request_sent : R.string.subscribe_received_a_adding_contact_request) : (NEWS_PROFILE_PLACEHOLDERS.containsKey(newsProfile.getContent()) ? context.getString(NEWS_PROFILE_PLACEHOLDERS.get(newsProfile.getContent())) : newsProfile.getContent()) );
 		}
 
 		ObjectUtils.cast(convertView.findViewById(R.id.remove_button),RelativeLayout.class).setOnClickListener( (removeButton) -> {StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(context.getActivity()).setBackgroundRadius(15).setTitle(R.string.notice).setTitleTextSize(18).setMessage(R.string.message_whether_to_delete).setMessageTextSize(18).setCancelable(true).setCanceledOnTouchOutside(false).setNegativeButtonTextColorResource(R.color.red).setNegativeButtonTextSize(18).setNegativeButton(R.string.cancel,(button, which) ->{}).setPositiveButtonTextSize(18).setPositiveButton(R.string.ok,(dialog, which) -> {NewsProfileRepository.DAO.update("DELETE  FROM  "+NewsProfileRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?  AND  PACKET_TYPE = ?",new  Object[]{newsProfile.getId(),newsProfile.getPacketType()});  NewsProfileListAdapter.this.notifyDataSetChanged();}).create().setWidth((int)  (context.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(context.getActivity(),R.font.droid_sans_mono)).show();} );
