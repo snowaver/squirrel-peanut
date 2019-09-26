@@ -41,7 +41,7 @@ import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 
-public  class NetworkPreinitializeActivity extends  AbstractActivity  implements  Runnable , ServiceRouteListener
+public  class  NetworkPreinitializeActivity extends  AbstractActivity  implements      Runnable,ServiceRouteListener
 {
 	protected  void  onCreate(Bundle  savedInstanceState )
 	{
@@ -53,7 +53,7 @@ public  class NetworkPreinitializeActivity extends  AbstractActivity  implements
 
 		super.getWindow().setStatusBarColor( super.getResources().getColor(R.color.gainsboro) );
 
-		super.setContentView(R.layout.activity_network_preinitialize);
+		super.setContentView( R.layout.activity_network_preinitialize );
 
 		this.progressDialog = StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
 
@@ -114,7 +114,7 @@ public  class NetworkPreinitializeActivity extends  AbstractActivity  implements
 		}
 	}
     @Override
-    public  void  onChanged( Service  oldService,Service  newService )
+    public  void  onChanged( Service  oldService  ,Service  newService )
     {
 
     }
