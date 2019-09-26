@@ -99,7 +99,7 @@ public  class  GroupChatProfileActivity     extends              AbstractPacketL
 			return;
 		}
 
-		if( requestCode ==0 )
+		if( requestCode== 0 )
 		{
 			RetrofitRegistry.INSTANCE.get(ChatGroupUserService.class).add(chatGroup.getId(),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"),",")).enqueue
 			(
@@ -162,7 +162,7 @@ public  class  GroupChatProfileActivity     extends              AbstractPacketL
 	{
 		super.onReceived(packet );
 
-		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
+		super.application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged() );
 	}
 	
 	private  void  inviteMembers()

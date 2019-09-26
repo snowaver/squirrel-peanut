@@ -43,12 +43,12 @@ public  class  GroupChatProfileMemberGridviewAdapter  extends  cc.mashroom.hedge
 	@Setter( value=AccessLevel.PROTECTED )
 	@Accessors( chain=true )
 	protected  long  chatGroupId;
-	@SneakyThrows
+
 	public  int   getCount()
 	{
 		return  Math.min( 6,ChatGroupUserRepository.DAO.lookupOne(Long.class,"SELECT  COUNT(ID)  AS  COUNT  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{chatGroupId}).intValue() );
 	}
-	@SneakyThrows
+
 	public  ChatGroupUser  getItem(int  position )
 	{
 		return  ChatGroupUserRepository.DAO.lookupOne(ChatGroupUser.class,"SELECT  ID,CREATE_TIME,CREATE_BY,LAST_MODIFY_TIME,LAST_MODIFY_BY,CONTACT_ID,VCARD  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE  ORDER  BY  ID  ASC  LIMIT  1  OFFSET  ?",new  Object[]{chatGroupId,position});

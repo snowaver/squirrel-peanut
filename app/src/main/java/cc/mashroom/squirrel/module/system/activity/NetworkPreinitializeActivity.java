@@ -41,7 +41,7 @@ import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 
-public  class  NetworkPreinitializeActivity extends  AbstractActivity  implements      Runnable,ServiceRouteListener
+public  class    NetworkPreinitializeActivity      extends     AbstractActivity  implements  Runnable,ServiceRouteListener
 {
 	protected  void  onCreate(Bundle  savedInstanceState )
 	{
