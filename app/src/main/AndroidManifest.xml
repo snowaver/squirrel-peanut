@@ -16,12 +16,12 @@
     <uses-permission  android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission  android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application   android:name=".parent.Application"  android:allowBackup="true"  android:icon="@mipmap/ic_launcher"  android:label="@string/app_name"  android:supportsRtl="true"  android:theme="@style/DefaultTheme"  android:persistent="true"  tools:replace="android:appComponentFactory"  android:appComponentFactory="A">
-        <activity  android:name=".module.system.activity.NetworkPreconfigurationActivity"  android:screenOrientation="portrait">
+        <activity  android:name=".module.system.activity.NetworkPreinitializeActivity"  android:screenOrientation="portrait">
             <intent-filter><action  android:name="android.intent.action.MAIN"/><category   android:name="android.intent.category.LAUNCHER"/></intent-filter>
         </activity>
         <service   android:name=".push.PushService"></service>
         <receiver  android:name=".push.RunningNotificationClickedReceiver"><intent-filter><action  android:name="cc.mashroom.squirrel.RUNNING_NOTIFICATION_CLICKED"></action></intent-filter></receiver>
-        <activity  android:name=".module.system.activity.LoginActivity"  android:screenOrientation="portrait"  android:windowSoftInputMode="stateHidden|adjustResize"></activity>
+        <activity  android:name=".module.system.activity.LoginActivity"  android:screenOrientation="portrait"  android:windowSoftInputMode="stateHidden|adjustResize" ></activity>
         <activity  android:name=".module.system.activity.RegisterActivity"  android:screenOrientation="portrait"  android:windowSoftInputMode="stateHidden|adjustResize"></activity>
         <activity  android:name=".module.system.activity.TransferActivity"  android:screenOrientation="portrait"/>
         <activity  android:name=".module.home.activity.SheetActivity"  android:screenOrientation="portrait"    android:windowSoftInputMode="adjustNothing|stateHidden"></activity>

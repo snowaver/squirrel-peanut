@@ -51,8 +51,8 @@ import  cc.mashroom.squirrel.http.RetrofitRegistry;
 import  cc.mashroom.squirrel.module.chat.activity.AudioCallActivity;
 import  cc.mashroom.squirrel.module.chat.activity.VideoCallActivity;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
-import cc.mashroom.squirrel.module.system.activity.NetworkPreconfigurationActivity;
-import cc.mashroom.squirrel.module.system.activity.SigninActivity;
+import cc.mashroom.squirrel.module.system.activity.NetworkPreinitializeActivity;
+import  cc.mashroom.squirrel.module.system.activity.LoginActivity;
 import  cc.mashroom.squirrel.module.system.activity.RegisterActivity;
 import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.squirrel.paip.message.call.CallContentType;
@@ -61,7 +61,7 @@ import  cc.mashroom.squirrel.paip.message.connect.DisconnectAckPacket;
 import  cc.mashroom.squirrel.push.PushServiceNotifier;
 
 import  java.sql.Timestamp;
-import java.util.LinkedList;
+import  java.util.LinkedList;
 import  java.util.List;
 import  java.util.Set;
 import  java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -89,7 +89,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  static  String  SERVICE_LIST_REQUEST_URL      = "https://10.208.60.190:8011/system/service?action=1&keyword=0";
 
-	private  Set<Class> authenticateNeedlessActivityClasses  = Sets.newHashSet(NetworkPreconfigurationActivity.class, SigninActivity.class,RegisterActivity.class );
+	private  Set<Class> authenticateNeedlessActivityClasses  = Sets.newHashSet(NetworkPreinitializeActivity.class,LoginActivity.class,RegisterActivity.class );
 	@Accessors(  chain = true )
 	@Getter
 	@Setter
@@ -125,7 +125,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 			if( !AbstractActivity.STACK.isEmpty() && !authenticateNeedlessActivityClasses.contains(AbstractActivity.STACK.getLast().getClass() ) )
 			{
-				this.clearStackActivitiesAndStart( new  Intent(AbstractActivity.STACK.getLast(), SigninActivity.class).putExtra("USERNAME",super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",0),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+				this.clearStackActivitiesAndStart( new  Intent(AbstractActivity.STACK.getLast(),LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",0),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 			}
 		}
 		else
@@ -194,7 +194,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  loginactivity.
 		if( code == 200 &&        ( reason == DisconnectAckPacket.REASON_REMOTE_SIGNIN || reason == DisconnectAckPacket.REASON_CLIENT_LOGOUT   ) )
 		{
-			this.clearStackActivitiesAndStart(new  Intent(this, SigninActivity.class).putExtra("USERNAME",super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",reason).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+			this.clearStackActivitiesAndStart(new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",reason).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 
 			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().clear().apply();
 		}

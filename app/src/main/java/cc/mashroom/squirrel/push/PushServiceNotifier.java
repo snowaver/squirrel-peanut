@@ -28,7 +28,7 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
-import  cc.mashroom.squirrel.module.system.activity.NetworkPreconfigurationActivity;
+import cc.mashroom.squirrel.module.system.activity.NetworkPreinitializeActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  lombok.AccessLevel;
@@ -63,7 +63,7 @@ public  class  PushServiceNotifier
 
 			notification.setTextViewText( R.id.time,format.format(newsProfile.getCreateTime()).toString() );
 
-			notificationManager.notify( 0,new  NotificationCompat.Builder(context,"default").setSmallIcon(R.drawable.app).setTicker(context.getString(R.string.notification_received_a_new_message)).setPriority(NotificationCompat.PRIORITY_DEFAULT).setContent(notification).setContentIntent(PendingIntent.getActivity(context,0,new  Intent(context, NetworkPreconfigurationActivity.class),PendingIntent.FLAG_UPDATE_CURRENT)).build() );
+			notificationManager.notify( 0,new  NotificationCompat.Builder(context,"default").setSmallIcon(R.drawable.app).setTicker(context.getString(R.string.notification_received_a_new_message)).setPriority(NotificationCompat.PRIORITY_DEFAULT).setContent(notification).setContentIntent(PendingIntent.getActivity(context,0,new  Intent(context, NetworkPreinitializeActivity.class),PendingIntent.FLAG_UPDATE_CURRENT)).build() );
 		}
 
 		return    newsProfile;
