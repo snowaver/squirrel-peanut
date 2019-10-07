@@ -104,7 +104,7 @@ public  class  ChatGroupFragment  extends  AbstractFragment  implements  DialogI
 						{
 							response.body().getChatGroupUsers().get(0).setVcard(     application().getSquirrelClient().getUserMetadata().getNickname() );
 
-							Db.tx(String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body()) );
+							Db.tx(String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
 
 							ObjectUtils.cast(ObjectUtils.cast(ChatGroupFragment.this.getView().findViewById(R.id.chat_group_list),ListView.class).getAdapter(),ChatGroupAdapter.class).notifyDataSetChanged();
 						}
