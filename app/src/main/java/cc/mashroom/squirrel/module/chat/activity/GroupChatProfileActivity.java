@@ -26,6 +26,7 @@ import  com.irozon.sneaker.Sneaker;
 
 import  cc.mashroom.hedgehog.module.common.activity.EditorActivity;
 import  cc.mashroom.db.common.Db;
+import  cc.mashroom.hedgehog.widget.BottomSheetEditor;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
@@ -55,7 +56,7 @@ import  java.sql.Connection;
 import  java.util.HashSet;
 import  java.util.Set;
 
-public  class  GroupChatProfileActivity     extends              AbstractPacketListenerActivity
+public  class  GroupChatProfileActivity extends    AbstractPacketListenerActivity  implements  BottomSheetEditor.OnEditCompleteListener
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle   savedInstanceState )
@@ -72,7 +73,7 @@ public  class  GroupChatProfileActivity     extends              AbstractPacketL
 
 		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( chatGroup.getName() );
 
-		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> ActivityCompat.startActivityForResult(this,new  Intent(this,EditorActivity.class).putExtra("CONTENT",chatGroup.getName()).putExtra("TITLE",super.getString(R.string.name)).putExtra("MAX_COUNT",16),1,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> new  BottomSheetEditor(this,16).setOnEditCompleteListener(this).show() );
 
 	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener(    (inviteContactButton) -> inviteMembers() );
 
@@ -125,10 +126,31 @@ public  class  GroupChatProfileActivity     extends              AbstractPacketL
 				}
 			);
 		}
-		else
-		if( requestCode ==1 )
-        {
-			RetrofitRegistry.INSTANCE.get(ChatGroupService.class).update(chatGroup.getId(),data.getStringExtra("EDIT_CONTENT")).enqueue
+	}
+	@Override
+	public  void       onReceived(  Packet  packet )
+	{
+		super.onReceived(packet );
+
+		super.application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged() );
+	}
+	
+	private  void  inviteMembers()
+	{
+		Set<Long>  invitedContactIds = new  HashSet<Long>();
+
+		for( ChatGroupUser  chatGroupUser : ChatGroupUserRepository.DAO.lookup(ChatGroupUser.class,"SELECT  CONTACT_ID  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{chatGroup.getId()}) )
+		{
+			invitedContactIds.add(    chatGroupUser.getContactId() );
+		}
+
+		ActivityCompat.startActivityForResult( this, new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS",ObjectUtils.cast(invitedContactIds,Serializable.class)),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+	}
+	@Override
+	public  void  onEditComplete(  CharSequence  groupName )
+	{
+		{
+			RetrofitRegistry.INSTANCE.get(    ChatGroupService.class).update(this.chatGroup.getId(),    groupName.toString()  ).enqueue
 			(
 				new  AbstractRetrofit2Callback<OoIData>(  this,true )
 				{
@@ -155,26 +177,7 @@ public  class  GroupChatProfileActivity     extends              AbstractPacketL
 					}
 				}
 			);
-        }
-	}
-	@Override
-	public  void       onReceived(  Packet  packet )
-	{
-		super.onReceived(packet );
-
-		super.application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged() );
-	}
-	
-	private  void  inviteMembers()
-	{
-		Set<Long>  invitedContactIds = new  HashSet<Long>();
-
-		for( ChatGroupUser  chatGroupUser : ChatGroupUserRepository.DAO.lookup(ChatGroupUser.class,"SELECT  CONTACT_ID  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{chatGroup.getId()}) )
-		{
-			invitedContactIds.add(    chatGroupUser.getContactId() );
 		}
-
-		ActivityCompat.startActivityForResult( this, new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS",ObjectUtils.cast(invitedContactIds,Serializable.class)),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 	}
 
 	private  void  leaveOrDelete()

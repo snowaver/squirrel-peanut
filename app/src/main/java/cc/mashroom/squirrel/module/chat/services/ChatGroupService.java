@@ -15,17 +15,12 @@
  */
 package cc.mashroom.squirrel.module.chat.services;
 
-import  java.util.List;
-
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
-import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  retrofit2.Call;
 import  retrofit2.http.Field;
 import  retrofit2.http.FormUrlEncoded;
-import  retrofit2.http.GET;
 import  retrofit2.http.POST;
 import  retrofit2.http.PUT;
-import  retrofit2.http.Query;
 
 public  interface  ChatGroupService
 {
@@ -35,8 +30,5 @@ public  interface  ChatGroupService
 
 	@FormUrlEncoded
 	@PUT(  value="/chat/group" )
-	public  Call<OoIData>  update( @Field(value="id")  long  chatGroupId, @Field(value="name")  String  name );
-
-	@GET(  value="/chat/group/lookup" )
-	public  Call<List<ChatGroup>>  lookup( @Query(value="action")  int  action,@Query(value="keyword")  String  keyword,@Query(value="extras",encoded=true)  String  extras );
+	public  Call<OoIData>  update( @Field(value="chatGroupId")  long  chatGroupId,@Field(value="name")  String  name );
 }
