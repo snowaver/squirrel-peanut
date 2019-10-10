@@ -31,7 +31,7 @@ import  retrofit2.converter.jackson.JacksonConverterFactory;
  *  retrofit  service  registry,  which  cache  all  retrofit  service  used.  http  file  uploading  is  a  heavily  time-consuming  io  operation,  so  seperate  it  from  other  data  request  to  avoid  blocking  data  interaction  by  uploading  file  operations  (long-term  occupancy  of  connections  in  okhttp  connection  pool).
  */
 @NoArgsConstructor( access=AccessLevel.PRIVATE )
-public  class  RetrofitRegistry
+public  class  ServiceRegistry
 {
 	private  Retrofit  fileUploadRetrofit;
 
@@ -41,7 +41,7 @@ public  class  RetrofitRegistry
 
 	private  Map<Class<?>,Object>  services = new  ConcurrentHashMap<Class<?>,Object>();
 
-	public   final  static  RetrofitRegistry  INSTANCE = new  RetrofitRegistry();
+	public   final  static ServiceRegistry INSTANCE = new ServiceRegistry();
 
 	public  <T>  T  get( Class<T>  clazz )
 	{

@@ -24,7 +24,6 @@ import  android.widget.ImageView;
 
 import  com.irozon.sneaker.Sneaker;
 
-import  cc.mashroom.hedgehog.module.common.activity.EditorActivity;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.widget.BottomSheetEditor;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
@@ -34,11 +33,12 @@ import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupUserRepository;
+import cc.mashroom.squirrel.http.ResponseRetrofit2Callback;
 import  cc.mashroom.squirrel.module.chat.adapters.GroupChatProfileMemberGridviewAdapter;
-import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
+import cc.mashroom.squirrel.module.chat.services.ChatGroupService;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import  cc.mashroom.squirrel.http.RetrofitRegistry;
+import cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
 import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
@@ -56,32 +56,32 @@ import  java.sql.Connection;
 import  java.util.HashSet;
 import  java.util.Set;
 
-public  class  GroupChatProfileActivity extends    AbstractPacketListenerActivity  implements  BottomSheetEditor.OnEditCompleteListener
+public  class  GroupChatProfileActivity     extends       AbstractPacketListenerActivity
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle   savedInstanceState )
 	{
-		super.onCreate(        savedInstanceState );
+		super.onCreate(  savedInstanceState );
 
-		super.setContentView( R.layout.activity_group_chat_profile );
+		super.setContentView(R.layout.activity_group_chat_profile );
 
 		this.setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{ super.getIntent().getLongExtra("CHAT_GROUP_ID", 0) }) );
 
 		this.setChatGroupUser( ChatGroupUserRepository.DAO.lookupOne(ChatGroupUser.class,"SELECT  *  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{this.chatGroup.getId(),application().getSquirrelClient().getUserMetadata().getId()}) );
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle(    chatGroup.getName() );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar)  ,HeaderBar.class).setTitle( this.chatGroup.getName() );
 
-		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).setText( chatGroup.getName() );
+		ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).setText(  this.chatGroup.getName() );
 
-		ObjectUtils.cast(super.findViewById(R.id.name)  ,StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> new  BottomSheetEditor(this,16).setOnEditCompleteListener(this).show() );
+		ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> new  BottomSheetEditor(this,16).setOnEditCompleteListener((groupName) -> ServiceRegistry.INSTANCE.get(ChatGroupService.class).update(this.chatGroup.getId(),groupName.toString()).enqueue(new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call,response) -> onNameChanged(response)))).show() );
 
-	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener(    (inviteContactButton) -> inviteMembers() );
+	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener( (inviteContactButton) -> inviteMembers() );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_members_button),ImageView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
-		super.findViewById(R.id.leave_or_delete_button).setOnClickListener((leaveButton)     ->leaveOrDelete() );
+		super.findViewById(R.id.leave_or_delete_button).setOnClickListener((leaveButton) -> ServiceRegistry.INSTANCE.get(ChatGroupUserService.class).secede(this.chatGroup.getId(),this.chatGroupUser.getId()).enqueue(new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call,response) -> onLeftAndDeleted(response))) );
 
-        ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).setAdapter( new  GroupChatProfileMemberGridviewAdapter(this,chatGroup.getId()) );
+        ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).setAdapter( new  GroupChatProfileMemberGridviewAdapter(this,this.chatGroup.getId()) );
     }
 
 	@Accessors( chain= true )
@@ -89,121 +89,63 @@ public  class  GroupChatProfileActivity extends    AbstractPacketListenerActivit
 	private  ChatGroup  chatGroup;
 	@Accessors( chain= true )
 	@Setter
-	private  ChatGroupUser  chatGroupUser;
+	private  ChatGroupUser      chatGroupUser;
 
-	protected  void  onActivityResult(        int  requestCode, int  resultCode, Intent  data )
+	protected  void  onActivityResult( int  requestCode, int  resultCode, Intent  data )
 	{
-		super.onActivityResult(requestCode,resultCode,data);
+		super.onActivityResult(        requestCode,resultCode,data);
 
-		if( data    == null )
+		if( data != null && requestCode == 0 )
 		{
-			return;
-		}
-
-		if( requestCode== 0 )
-		{
-			RetrofitRegistry.INSTANCE.get(ChatGroupUserService.class).add(chatGroup.getId(),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"),",")).enqueue
-			(
-				new  AbstractRetrofit2Callback<OoIData>(  this,true )
-				{
-					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
-					{
-						super.onResponse( call,  response );
-
-						if( response.code() == 200 )
-						{
-							Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
-
-                            ObjectUtils.cast(ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.members),GridView.class).getAdapter(),   GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
-
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,   R.string.added, R.color.white,R.color.limegreen );
-						}
-						else
-						{
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
-						}
-					}
-				}
-			);
+			ServiceRegistry.INSTANCE.get(ChatGroupUserService.class).add(this.chatGroup.getId(),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"),",")).enqueue(         new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call,response) -> onMembersInvited(response)) );
 		}
 	}
 	@Override
-	public  void       onReceived(  Packet  packet )
+	public  void  onReceived( Packet  packet )
 	{
 		super.onReceived(packet );
 
-		super.application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged() );
+		super.application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter() ,      GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged() );
 	}
 	
 	private  void  inviteMembers()
 	{
-		Set<Long>  invitedContactIds = new  HashSet<Long>();
+		Set<Long>  inviteeContactIds = new  HashSet<Long>();
 
-		for( ChatGroupUser  chatGroupUser : ChatGroupUserRepository.DAO.lookup(ChatGroupUser.class,"SELECT  CONTACT_ID  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{chatGroup.getId()}) )
+		for( ChatGroupUser  chatGroupUser : ChatGroupUserRepository.DAO.lookup(ChatGroupUser.class,"SELECT  CONTACT_ID  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{ this.chatGroup.getId()}) )
 		{
-			invitedContactIds.add(    chatGroupUser.getContactId() );
+			inviteeContactIds.add(   chatGroupUser.getContactId() );
 		}
 
-		ActivityCompat.startActivityForResult( this, new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS",ObjectUtils.cast(invitedContactIds,Serializable.class)),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
+		ActivityCompat.startActivityForResult(this,new  Intent(this,ContactMultichoiceActivity.class).putExtra("EXCLUDE_CONTACT_IDS",ObjectUtils.cast(inviteeContactIds,Serializable.class)),0,ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
 	}
-	@Override
-	public  void  onEditComplete(  CharSequence  groupName )
+
+	private  void  onMembersInvited( Response  <OoIData>  response )
 	{
-		{
-			RetrofitRegistry.INSTANCE.get(    ChatGroupService.class).update(this.chatGroup.getId(),    groupName.toString()  ).enqueue
-			(
-				new  AbstractRetrofit2Callback<OoIData>(  this,true )
-				{
-					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
-					{
-						super.onResponse( call,  response );
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
 
-						if( response.code() == 200 )
-						{
-							Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
+		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
 
-                            setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{chatGroup.getId()}) );
-
-                            ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.name),StyleableEditView.class).setText( chatGroup.getName() );
-
-							ObjectUtils.cast(GroupChatProfileActivity.this.findViewById(R.id.header_bar),HeaderBar.class).setTitle(  chatGroup.getName() );
-
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,  R.color.white,R.color.limegreen );
-						}
-						else
-						{
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
-						}
-					}
-				}
-			);
-		}
+		super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_success,R.string.added  ,R.color.white,R.color.limegreen );
 	}
 
-	private  void  leaveOrDelete()
+	private  void  onNameChanged(    Response  <OoIData>  response )
+	{
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
+
+		this.chatGroup = ChatGroupRepository.DAO.lookupOne( ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{this.chatGroup.getId()} );
+
+		ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).setText(  this.chatGroup.getName() );
+
+		ObjectUtils.cast(super.findViewById(R.id.header_bar)  ,HeaderBar.class).setTitle( this.chatGroup.getName() );
+
+		super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen );
+	}
+
+	private  void  onLeftAndDeleted( Response  <OoIData>  response )
     {
-		{
-			RetrofitRegistry.INSTANCE.get(ChatGroupUserService.class).secede(this.chatGroup.getId(),this.chatGroupUser.getId()).enqueue
-			(
-				new  AbstractRetrofit2Callback<OoIData>(  this,true )
-				{
-					public  void  onResponse( Call<OoIData>  call,Response<OoIData>  response )
-					{
-						super.onResponse( call,  response );
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
 
-						if( response.code() == 200 )
-						{
-							Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
-
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> {STACK.get(STACK.size()-2).finish();  GroupChatProfileActivity.this.finish();},500)),com.irozon.sneaker.R.drawable.ic_success,R.string.chat_group_left_or_deleted,R.color.white,R.color.limegreen );
-						}
-						else
-						{
-							showSneakerWindow( Sneaker.with(GroupChatProfileActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
-						}
-					}
-				}
-			);
-		}
+		super.showSneakerWindow( Sneaker.with(this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> {STACK.get(STACK.size()-2).finish();  super.finish();},500)),com.irozon.sneaker.R.drawable.ic_success,R.string.chat_group_left_or_deleted,R.color.white,R.color.limegreen );
     }
 }

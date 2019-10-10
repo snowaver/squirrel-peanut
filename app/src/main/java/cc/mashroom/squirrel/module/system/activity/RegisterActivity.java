@@ -28,7 +28,6 @@ import  android.widget.Button;
 
 import  com.aries.ui.widget.BasisDialog;
 import  com.aries.ui.widget.action.sheet.UIActionSheetDialog;
-import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.fasterxml.jackson.core.type.TypeReference;
 import  com.irozon.sneaker.Sneaker;
 
@@ -46,7 +45,7 @@ import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import  cc.mashroom.squirrel.http.RetrofitRegistry;
+import cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.hedgehog.module.common.activity.AlbumMediaMultichoiceActivity;
 import  cc.mashroom.hedgehog.module.common.activity.CamcorderActivity;
 import  cc.mashroom.hedgehog.module.common.activity.ImageCropingActivity;
@@ -93,7 +92,7 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 	{
 		if( StringUtils.isNoneBlank(ObjectUtils.cast(findViewById(R.id.username),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(findViewById(R.id.nickname),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(findViewById(R.id.password),StyleableEditView.class).getText().toString().trim()) && ObjectUtils.cast(findViewById(R.id.password),StyleableEditView.class).getText().toString().trim().equals(ObjectUtils.cast(findViewById(R.id.password_confirm),StyleableEditView.class).getText().toString().trim() ) )
 		{
-			RetrofitRegistry.INSTANCE.get(UserService.class).register(RequestBody.create(MediaType.parse("multipart/form-data"),JsonUtils.toJson(new  HashMap<String,Object>().addEntry("username",ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString().trim()).addEntry("password",ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString().trim()).addEntry("nickname",ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).getText().toString().trim()))),portrait == null ? null : MultipartBody.Part.createFormData("portrait",portrait.getName(),RequestBody.create(MediaType.parse("multipart/form-data"),portrait))).enqueue
+			ServiceRegistry.INSTANCE.get(UserService.class).register(RequestBody.create(MediaType.parse("multipart/form-data"),JsonUtils.toJson(new  HashMap<String,Object>().addEntry("username",ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString().trim()).addEntry("password",ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString().trim()).addEntry("nickname",ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).getText().toString().trim()))),portrait == null ? null : MultipartBody.Part.createFormData("portrait",portrait.getName(),RequestBody.create(MediaType.parse("multipart/form-data"),portrait))).enqueue
 			(
 				new  AbstractRetrofit2Callback<Void>(  this,true )
 				{

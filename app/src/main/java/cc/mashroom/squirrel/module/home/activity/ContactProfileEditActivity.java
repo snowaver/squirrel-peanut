@@ -37,7 +37,7 @@ import  cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.client.storage.model.user.User;
 import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import  cc.mashroom.squirrel.http.RetrofitRegistry;
+import cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.common.services.ContactService;
 import  cc.mashroom.squirrel.module.common.services.UserService;
 import  cc.mashroom.squirrel.module.home.adapters.ContactGroupAdapter;
@@ -86,7 +86,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 
 		if( StringUtils.isBlank( nickname ) )
 		{
-			RetrofitRegistry.INSTANCE.get(UserService.class).get(contact.getId()).enqueue(new  AbstractRetrofit2Callback<User>(this){public  void  onResponse(Call<User>  call,Response<User>  response){ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.nickname),StyleableEditView.class).setText(setNickname(response.body().getNickname()).getNickname());}} );
+			ServiceRegistry.INSTANCE.get(UserService.class).get(contact.getId()).enqueue(new  AbstractRetrofit2Callback<User>(this){public  void  onResponse(Call<User>  call, Response<User>  response){ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.nickname),StyleableEditView.class).setText(setNickname(response.body().getNickname()).getNickname());}} );
 		}
 		else
 		{
@@ -145,7 +145,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 		{
 			if( !ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim().equals(contact.getRemark()) || !ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim().equals(contact.getGroupName()) )
 			{
-				RetrofitRegistry.INSTANCE.get(ContactService.class).update(contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue(new  AbstractRetrofit2Callback<Contact>(this){public  void  onResponse(Call<Contact>  call,Response<Contact>  response){ responsed(response,contact); }} );
+				ServiceRegistry.INSTANCE.get(ContactService.class).update(contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue(new  AbstractRetrofit2Callback<Contact>(this){public  void  onResponse(Call<Contact>  call, Response<Contact>  response){ responsed(response,contact); }} );
 			}
 		}
 	}
@@ -186,7 +186,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
                     }
                     else
                     {
-                        RetrofitRegistry.INSTANCE.get(ContactService.class).changeSubscribeStatus(8,contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
+                        ServiceRegistry.INSTANCE.get(ContactService.class).changeSubscribeStatus(8,contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
 							new  AbstractRetrofit2Callback<Contact>( this,true )
 							{
@@ -221,7 +221,7 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 				{
                     if( StringUtils.isNoneBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),  StyleableEditView.class).getText().toString().trim()) )
                     {
-						RetrofitRegistry.INSTANCE.get(ContactService.class).subscribe(this.contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
+						ServiceRegistry.INSTANCE.get(ContactService.class).subscribe(this.contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
 						(
 							new  AbstractRetrofit2Callback<Contact>( this,true )
 							{

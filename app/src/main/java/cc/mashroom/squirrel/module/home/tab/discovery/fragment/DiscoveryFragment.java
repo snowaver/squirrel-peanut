@@ -29,7 +29,6 @@ import  android.widget.ListView;
 import  android.widget.TextView;
 import  android.widget.Toast;
 
-import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
 import  java.util.List;
@@ -45,7 +44,7 @@ import  cc.mashroom.squirrel.module.home.activity.ContactProfileActivity;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.parent.AbstractFragment;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import  cc.mashroom.squirrel.http.RetrofitRegistry;
+import cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.home.tab.discovery.adapters.DiscoveryUserListAdapter;
 import  cc.mashroom.squirrel.module.common.services.UserService;
 import  cc.mashroom.util.ObjectUtils;
@@ -92,7 +91,7 @@ public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextVi
 		{
 			if( StringUtils.isNotBlank(ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim()) )
 			{
-				RetrofitRegistry.INSTANCE.get(UserService.class).lookup(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim(), "{}").enqueue
+				ServiceRegistry.INSTANCE.get(UserService.class).lookup(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim(), "{}").enqueue
 				(
 					new  AbstractRetrofit2Callback<List<User>>(ObjectUtils.cast(this.getActivity()),true )
 					{

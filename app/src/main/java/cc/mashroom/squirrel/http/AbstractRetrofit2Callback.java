@@ -20,7 +20,7 @@ import  androidx.core.content.res.ResourcesCompat;
 import  com.aries.ui.widget.progress.UIProgressDialog;
 import  com.irozon.sneaker.Sneaker;
 
-import java.net.ConnectException;
+import  java.net.ConnectException;
 import  java.net.SocketTimeoutException;
 
 import  cc.mashroom.hedgehog.util.DensityUtils;
@@ -39,45 +39,42 @@ import  retrofit2.Response;
 
 public  abstract    class  AbstractRetrofit2Callback<T>  implements  Callback<T>
 {
-	public  AbstractRetrofit2Callback( AbstractActivity  context,boolean  isShowWaitingProgressDialog )
-	{
-		this.setContext(context).setWaitingProgressDailog( !isShowWaitingProgressDialog? null : StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(context).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(context,R.font.droid_sans_mono)).setWidth(DensityUtils.px(context,220)).setHeight(DensityUtils.px(context,150)) );
-
-		if( isShowWaitingProgressDialog   )   this.waitingProgressDailog.show();
-	}
-
 	public  AbstractRetrofit2Callback( AbstractActivity  context  )
 	{
-		this(context,false );
+		this(context,false);
 	}
 
-	@Accessors( chain= true )
-	@Setter
-	@Getter
-	protected  AbstractActivity    context;
-	@Accessors( chain= true )
-	@Setter
-	@Getter
-	protected  UIProgressDialog    waitingProgressDailog;
-
-	public  void  onResponse(Call<T>  call,Response<T>  response  )
+	public  AbstractRetrofit2Callback( AbstractActivity  context,boolean  isShowWaitingDialog )
 	{
-		if( waitingProgressDailog != null )
-		{
-			waitingProgressDailog.cancel();
-		}
+		this.setContext(context).setShowWaitingDialog(isShowWaitingDialog).setWaitingDailog( !isShowWaitingDialog ? null : StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(context).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(context,R.font.droid_sans_mono)).setWidth(DensityUtils.px(context,220)).setHeight(DensityUtils.px(context,150)) );
+
+		if(isShowWaitingDialog )this.waitingDailog.show();
+	}
+	@Accessors( chain=true )
+	@Setter
+	@Getter
+	protected  boolean     isShowWaitingDialog;
+	@Accessors( chain=true )
+	@Setter
+	@Getter
+	protected  AbstractActivity  context;
+	@Accessors( chain=true )
+	@Setter
+	@Getter
+	protected  UIProgressDialog  waitingDailog;
+
+	public  void  onResponse( Call<T>  call,Response<T>  response )
+	{
+		if( this.isShowWaitingDialog)  this.waitingDailog.cancel();
 	}
 
-	public  void  onFailure( Call<T>  call,Throwable ie )
+	public  void  onFailure(  Call<T>  call,Throwable  e )
 	{
-		if( ie instanceof ConnectException)  context.application().getSquirrelClient().getServiceRouteManager().tryNext( Schema.HTTPS );
+		if( e instanceof ConnectException||e instanceof SocketTimeoutException )  this.context.application().getSquirrelClient().getServiceRouteManager().tryNext( Schema.HTTPS );
 
-		ie.printStackTrace();
+		if( this.isShowWaitingDialog)  this.waitingDailog.cancel();
 
-		if( waitingProgressDailog != null )
-		{
-			waitingProgressDailog.cancel();
-		}
+		e.printStackTrace();
 
 		ObjectUtils.cast(context,AbstractActivity.class).showSneakerWindow( Sneaker.with(context),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
 	}

@@ -49,7 +49,7 @@ import  cc.mashroom.squirrel.client.connect.ConnectState;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import  cc.mashroom.squirrel.http.RetrofitRegistry;
+import cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.fragment.NewsProfileFragment;
@@ -145,7 +145,7 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 	{
 		if(         StringUtils.isNotBlank(groupName) )
 		{
-			RetrofitRegistry.INSTANCE.get(ChatGroupService.class).add(ObjectUtils.cast(groupName)).enqueue
+			ServiceRegistry.INSTANCE.get(ChatGroupService.class).add(ObjectUtils.cast(groupName)).enqueue
 			(
 				new  AbstractRetrofit2Callback<OoIData>( this,true )
 				{

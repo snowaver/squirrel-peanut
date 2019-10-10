@@ -45,7 +45,7 @@ import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepos
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.parent.AbstractFragment;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import  cc.mashroom.squirrel.http.RetrofitRegistry;
+import cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.chat.activity.GroupChatActivity;
 import  cc.mashroom.squirrel.module.home.tab.contact.adapters.ChatGroupAdapter;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
@@ -94,7 +94,7 @@ public  class  ChatGroupFragment  extends  AbstractFragment  implements  DialogI
 
 		if( StringUtils.isNotBlank(addingGroupName) )
 		{
-			RetrofitRegistry.INSTANCE.get(ChatGroupService.class).add(     addingGroupName).enqueue
+			ServiceRegistry.INSTANCE.get(ChatGroupService.class).add(     addingGroupName).enqueue
 			(
 				new  AbstractRetrofit2Callback<OoIData>(     ObjectUtils.cast(super.getActivity()))
 				{

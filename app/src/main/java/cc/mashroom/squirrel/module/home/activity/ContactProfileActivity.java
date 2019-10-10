@@ -38,7 +38,7 @@ import  cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.client.storage.model.user.User;
 import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import  cc.mashroom.squirrel.http.RetrofitRegistry;
+import cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.chat.activity.ChatActivity;
 import  cc.mashroom.squirrel.module.common.services.UserService;
 import  cc.mashroom.squirrel.paip.message.Packet;
@@ -72,7 +72,7 @@ public  class  ContactProfileActivity  extends          AbstractPacketListenerAc
 
 		if( StringUtils.isBlank(   nickname) )
 		{
-		    RetrofitRegistry.INSTANCE.get(UserService.class).get(contact.getId()).enqueue( new  AbstractRetrofit2Callback<User>(this){public  void  onResponse(Call<User>  call,Response<User>  response){ObjectUtils.cast(ContactProfileActivity.this.findViewById(R.id.nickname),StyleableEditView.class).setText(setNickname(response.body().getNickname()).getNickname());}} );
+		    ServiceRegistry.INSTANCE.get(UserService.class).get(contact.getId()).enqueue(new  AbstractRetrofit2Callback<User>(this){public  void  onResponse(Call<User>  call, Response<User>  response){ObjectUtils.cast(ContactProfileActivity.this.findViewById(R.id.nickname),StyleableEditView.class).setText(setNickname(response.body().getNickname()).getNickname());}} );
 		}
 		else
 		{
