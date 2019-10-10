@@ -20,7 +20,7 @@ import  android.widget.Toast;
 
 import  androidx.annotation.Nullable;
 
-import java.util.Locale;
+import  java.util.Locale;
 
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.util.ObjectUtils;
