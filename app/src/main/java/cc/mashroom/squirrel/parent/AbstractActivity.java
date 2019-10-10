@@ -15,35 +15,51 @@
  */
 package cc.mashroom.squirrel.parent;
 
-import  android.app.Activity;
-import  android.content.Intent;
+import  android.os.Bundle;
 import  android.widget.Toast;
 
+import  androidx.annotation.Nullable;
+
+import java.util.Locale;
+
+import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  es.dmoral.toasty.Toasty;
 
-public  abstract  class  AbstractActivity  extends  cc.mashroom.hedgehog.parent.AbstractActivity
+public  abstract  class  AbstractActivity  extends  cc.mashroom.hedgehog.parent.AbstractActivity  implements  LocaleChangeEventDispatcher.LocaleChangeListener
 {
-	public  void  putResultDataAndFinish( Activity  context,int  resultCode,Intent  resultData )
-	{
-		context.setResult( resultCode,resultData );
-
-		context.finish();
-	}
-
-	public  void  error( Throwable  e )
-	{
-		e.printStackTrace();  application().getMainLooperHandler().post( () -> Toasty.error(AbstractActivity.this,e.getMessage(),Toast.LENGTH_LONG,false).show() );  ContextUtils.finish( this );
-	}
-
 	public  Application   application()
 	{
 		return  ObjectUtils.cast( super.getApplication() );
+	}
+	@Override
+	public  void  onCreate(    @Nullable  Bundle  savedInstanceState )
+	{
+		LocaleChangeEventDispatcher.addListener(    this );
+
+		super.onCreate( savedInstanceState );
 	}
 
 	public  void  onBackPressed()
 	{
 
+	}
+	@Override
+	public  void  onChange( Locale  locale  )
+	{
+
+	}
+
+	public  void  error( Throwable  e )
+	{
+		super.error(  e );  super.application().getMainLooperHandler().post( () -> Toasty.error(AbstractActivity.this,e.getMessage(),Toast.LENGTH_LONG,false).show() );  ContextUtils.finish( this );
+	}
+	@Override
+	public  void  onDestroy()
+	{
+		super.onDestroy();
+
+		LocaleChangeEventDispatcher.removeListener( this );
 	}
 }

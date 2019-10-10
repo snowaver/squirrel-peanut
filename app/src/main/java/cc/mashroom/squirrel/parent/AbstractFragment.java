@@ -15,14 +15,40 @@
  */
 package cc.mashroom.squirrel.parent;
 
-import androidx.fragment.app.Fragment;
+import  android.os.Bundle;
 
+import  androidx.annotation.Nullable;
+import  androidx.fragment.app.Fragment;
+
+import  java.util.Locale;
+
+import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.util.ObjectUtils;
 
-public  abstract  class  AbstractFragment  extends  Fragment
+public  abstract  class  AbstractFragment  extends  Fragment  implements  LocaleChangeEventDispatcher.LocaleChangeListener
 {
 	public  Application  application()
 	{
 		return  ObjectUtils.cast( getActivity().getApplication(),Application.class );
+	}
+
+	@Override
+	public  void  onCreate( @Nullable  Bundle  savedInstanceState )
+	{
+		super.onCreate( savedInstanceState );
+
+		LocaleChangeEventDispatcher.addListener(    this  );
+	}
+	@Override
+	public  void  onChange( Locale  locale  )
+	{
+
+	}
+	@Override
+	public  void  onDestroy()
+	{
+		super.onDestroy();
+
+		LocaleChangeEventDispatcher.removeListener( this  );
 	}
 }
