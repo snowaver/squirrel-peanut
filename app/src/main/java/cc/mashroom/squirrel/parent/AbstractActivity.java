@@ -29,12 +29,12 @@ import  es.dmoral.toasty.Toasty;
 
 public  abstract  class  AbstractActivity  extends  cc.mashroom.hedgehog.parent.AbstractActivity  implements  LocaleChangeEventDispatcher.LocaleChangeListener
 {
-	public  Application   application()
+	public  Application  application()
 	{
 		return  ObjectUtils.cast( super.getApplication() );
 	}
 	@Override
-	public  void  onCreate(    @Nullable  Bundle  savedInstanceState )
+	protected  void  onCreate( @Nullable  Bundle  savedInstanceState )
 	{
 		LocaleChangeEventDispatcher.addListener(    this );
 
@@ -46,17 +46,17 @@ public  abstract  class  AbstractActivity  extends  cc.mashroom.hedgehog.parent.
 
 	}
 	@Override
-	public  void  onChange( Locale  locale  )
+	public  void  onChange(Locale   locale  )
 	{
 
 	}
 
-	public  void  error( Throwable  e )
+	public  void  error(Throwable  e )
 	{
 		super.error(  e );  super.application().getMainLooperHandler().post( () -> Toasty.error(AbstractActivity.this,e.getMessage(),Toast.LENGTH_LONG,false).show() );  ContextUtils.finish( this );
 	}
 	@Override
-	public  void  onDestroy()
+	protected   void  onDestroy()
 	{
 		super.onDestroy();
 

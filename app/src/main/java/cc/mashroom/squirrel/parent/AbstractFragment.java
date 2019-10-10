@@ -29,7 +29,7 @@ public  abstract  class  AbstractFragment  extends  Fragment  implements  Locale
 {
 	public  Application  application()
 	{
-		return  ObjectUtils.cast( getActivity().getApplication(),Application.class );
+		return  ObjectUtils.cast( super.getActivity().getApplication());
 	}
 
 	@Override
