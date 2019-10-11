@@ -133,7 +133,7 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 		}
 	}
 
-	public  void    onChatOrSubscribeButtonClicked()
+	private  void   onChatOrSubscribeButtonClicked()
 	{
 		Contact  contact = ContactRepository.DAO.getContactDirect().get( this.contact.getId() );
 
@@ -187,6 +187,12 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 	{
 		ContactRepository.DAO.upsert( old.clone().setLastModifyTime(response.body().getLastModifyTime()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true );
 
+		contact = ContactRepository.DAO.getContactDirect().get(old.getId() );
+
+		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText(this.contact.getGroupName());
+
+		ObjectUtils.cast(super.findViewById(R.id.remark  ),StyleableEditView.class).setText(this.contact.getRemark()   );
+
 		super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen );
 	}
 
@@ -197,7 +203,7 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 	@SneakyThrows
 	private  void  onAgreeSubscribe(            Response<Contact>  response )
 	{
-		ContactRepository.DAO.upsert( contact.clone().setLastModifyTime(response.body().getLastModifyTime()).setSubscribeStatus(response.body().getSubscribeStatus()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()), true );
+		ContactRepository.DAO.upsert( contact.clone().setLastModifyTime(response.body().getLastModifyTime()).setSubscribeStatus(response.body().getSubscribeStatus()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),false );
 
 		super.findViewById(R.id.chat_or_subscribe_button).setBackgroundColor(    super.getResources().getColor(R.color.limegreen) );
 
