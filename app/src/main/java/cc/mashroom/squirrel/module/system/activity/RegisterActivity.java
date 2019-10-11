@@ -43,9 +43,10 @@ import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
+import  cc.mashroom.squirrel.http.Hint;
+import  cc.mashroom.squirrel.http.ResponseRetrofit2Callback;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
-import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import cc.mashroom.squirrel.http.ServiceRegistry;
+import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.hedgehog.module.common.activity.AlbumMediaMultichoiceActivity;
 import  cc.mashroom.hedgehog.module.common.activity.CamcorderActivity;
 import  cc.mashroom.hedgehog.module.common.activity.ImageCropingActivity;
@@ -56,17 +57,14 @@ import  cc.mashroom.util.JsonUtils;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
-import  cc.mashroom.util.collection.map.Map;
 
 import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
-import  retrofit2.Call;
-import  retrofit2.Response;
 
 public  class  RegisterActivity   extends  AbstractActivity  implements  View.OnClickListener,UIActionSheetDialog.OnItemClickListener,KeyboardVisibilityEventListener
 {
-	protected  void  onCreate( Bundle  savedInstanceState )
+	protected  void  onCreate(        Bundle  savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
 
@@ -79,46 +77,31 @@ public  class  RegisterActivity   extends  AbstractActivity  implements  View.On
 		ObjectUtils.cast(super.findViewById(R.id.register_button),Button.class).setOnClickListener( this );
 	}
 
-	protected  Map<Integer,Integer>  failures = new  HashMap<Integer,Integer>().addEntry(0,R.string.network_or_internal_server_error).addEntry(601,R.string.register_username_registered );
+	protected  File     portrait;
 
-	protected  File   portrait;
-
-	public  void  onVisibilityChanged( boolean  softinputVisible )
+	public  void  onClick(View  registerBtn )
 	{
-		ObjectUtils.cast(super.findViewById(R.id.collapsing_bar_layout),AppBarLayout.class).setExpanded( !softinputVisible,true );
-	}
-
-	public  void  onClick( View  v )
-	{
-		if( StringUtils.isNoneBlank(ObjectUtils.cast(findViewById(R.id.username),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(findViewById(R.id.nickname),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(findViewById(R.id.password),StyleableEditView.class).getText().toString().trim()) && ObjectUtils.cast(findViewById(R.id.password),StyleableEditView.class).getText().toString().trim().equals(ObjectUtils.cast(findViewById(R.id.password_confirm),StyleableEditView.class).getText().toString().trim() ) )
+		if( StringUtils.isNoneBlank(ObjectUtils.cast(findViewById(R.id.username),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(findViewById(R.id.nickname),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(findViewById(R.id.password),StyleableEditView.class).getText().toString().trim()) && ObjectUtils.cast(findViewById(R.id.password),StyleableEditView.class).getText().toString().trim().equals(ObjectUtils.cast(findViewById(R.id.password_confirm),StyleableEditView.class).getText().toString().trim()) )
 		{
-			ServiceRegistry.INSTANCE.get(UserService.class).register(RequestBody.create(MediaType.parse("multipart/form-data"),JsonUtils.toJson(new  HashMap<String,Object>().addEntry("username",ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString().trim()).addEntry("password",ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString().trim()).addEntry("nickname",ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).getText().toString().trim()))),portrait == null ? null : MultipartBody.Part.createFormData("portrait",portrait.getName(),RequestBody.create(MediaType.parse("multipart/form-data"),portrait))).enqueue
-			(
-				new  AbstractRetrofit2Callback<Void>(  this,true )
-				{
-					public  void  onResponse(   Call<Void>  call,Response<Void>  response )
-					{
-						super.onResponse(       call , response );
-
-						if( response.code() != 200 )
-						{
-							showSneakerWindow(Sneaker.with(RegisterActivity.this),com.irozon.sneaker.R.drawable.ic_warning,                failures.containsKey(response.code()) ? failures.get(response.code()) : failures.get(0),R.color.black,R.color.orange );
-						}
-						else
-						{
-							showSneakerWindow(Sneaker.with(RegisterActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(RegisterActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success,R.string.register_registered,  R.color.white,R.color.limegreen );
-						}
-					}
-				}
-			);
+			ServiceRegistry.INSTANCE.get(UserService.class).register(RequestBody.create(MediaType.parse("multipart/form-data"),JsonUtils.toJson(new  HashMap<String,Object>().addEntry("username",ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString().trim()).addEntry("password",ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString().trim()).addEntry("nickname",ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).getText().toString().trim()))),portrait == null ? null : MultipartBody.Part.createFormData("portrait",portrait.getName(),RequestBody.create(MediaType.parse("multipart/form-data"),portrait))).enqueue( new  ResponseRetrofit2Callback<Void>(this,true).addResponseHandler(200,(call,response) -> onRegistered()).addHint(new  Hint(601,R.string.register_registered,R.color.white,com.irozon.sneaker.R.drawable.ic_error,R.color.red)) );
 		}
 		else
 		{
 			/*
 			Toast.makeText(this,R.string.registration_form_error,Toast.LENGTH_LONG).show();
 			*/
-			showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.register_form_error,R.color.white,R.color.red );
+			super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.register_form_error,R.color.white,R.color.red );
 		}
+	}
+
+	private  void  onRegistered()
+	{
+		super.showSneakerWindow(Sneaker.with(this).setOnSneakerDismissListener(()-> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(RegisterActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success,R.string.register_registered,R.color.white,R.color.limegreen );
+	}
+
+	public  void  onVisibilityChanged( boolean  softinputVisible )
+	{
+		ObjectUtils.cast(super.findViewById(R.id.collapsing_bar_layout),AppBarLayout.class).setExpanded( !softinputVisible,true );
 	}
 
 	public  void  onClick( BasisDialog  dialog,View  item,int  i )

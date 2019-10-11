@@ -20,7 +20,6 @@ import  android.os.Bundle;
 import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 import  android.widget.GridView;
-import  android.widget.ImageView;
 
 import  com.irozon.sneaker.Sneaker;
 
@@ -33,12 +32,11 @@ import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupUserRepository;
-import cc.mashroom.squirrel.http.ResponseRetrofit2Callback;
+import  cc.mashroom.squirrel.http.ResponseRetrofit2Callback;
 import  cc.mashroom.squirrel.module.chat.adapters.GroupChatProfileMemberGridviewAdapter;
-import cc.mashroom.squirrel.module.chat.services.ChatGroupService;
+import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
 import  cc.mashroom.squirrel.paip.message.Packet;
-import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import cc.mashroom.squirrel.http.ServiceRegistry;
+import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
 import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
@@ -75,9 +73,9 @@ public  class  GroupChatProfileActivity     extends       AbstractPacketListener
 
 		ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> new  BottomSheetEditor(this,16).setOnEditCompleteListener((groupName) -> ServiceRegistry.INSTANCE.get(ChatGroupService.class).update(this.chatGroup.getId(),groupName.toString()).enqueue(new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call,response) -> onNameChanged(response)))).show() );
 
-	    ObjectUtils.cast(super.findViewById(R.id.invite_button),StyleableEditView.class).setOnClickListener( (inviteContactButton) -> inviteMembers() );
+	    super.findViewById(R.id.invite_button).setOnClickListener((v)->inviteMembers());
 
-		ObjectUtils.cast(super.findViewById(R.id.more_members_button),ImageView.class).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
+		super.findViewById(R.id.more_members_button).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
 		super.findViewById(R.id.leave_or_delete_button).setOnClickListener((leaveButton) -> ServiceRegistry.INSTANCE.get(ChatGroupUserService.class).secede(this.chatGroup.getId(),this.chatGroupUser.getId()).enqueue(new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call,response) -> onLeftAndDeleted(response))) );
 
@@ -93,7 +91,7 @@ public  class  GroupChatProfileActivity     extends       AbstractPacketListener
 
 	protected  void  onActivityResult( int  requestCode, int  resultCode, Intent  data )
 	{
-		super.onActivityResult(        requestCode,resultCode,data);
+		super.onActivityResult( requestCode  ,   resultCode, data );
 
 		if( data != null && requestCode == 0 )
 		{
@@ -112,7 +110,7 @@ public  class  GroupChatProfileActivity     extends       AbstractPacketListener
 	{
 		Set<Long>  inviteeContactIds = new  HashSet<Long>();
 
-		for( ChatGroupUser  chatGroupUser : ChatGroupUserRepository.DAO.lookup(ChatGroupUser.class,"SELECT  CONTACT_ID  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{ this.chatGroup.getId()}) )
+		for( ChatGroupUser  chatGroupUser : ChatGroupUserRepository.DAO.lookup(ChatGroupUser.class,"SELECT  CONTACT_ID  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{this.chatGroup.getId()}) )
 		{
 			inviteeContactIds.add(   chatGroupUser.getContactId() );
 		}

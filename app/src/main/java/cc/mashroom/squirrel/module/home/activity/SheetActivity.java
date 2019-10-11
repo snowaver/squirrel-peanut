@@ -36,7 +36,6 @@ import  android.widget.SimpleAdapter;
 import  android.widget.TextView;
 
 import  com.facebook.drawee.view.SimpleDraweeView;
-import  com.irozon.sneaker.Sneaker;
 
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
@@ -48,8 +47,8 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.ConnectState;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
-import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import cc.mashroom.squirrel.http.ServiceRegistry;
+import  cc.mashroom.squirrel.http.ResponseRetrofit2Callback;
+import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.fragment.NewsProfileFragment;
@@ -60,7 +59,6 @@ import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.HashMap;
 import  cc.mashroom.util.collection.map.Map;
 import  cc.mashroom.util.ObjectUtils;
-import  retrofit2.Call;
 import  retrofit2.Response;
 
 import  java.sql.Connection;
@@ -145,30 +143,17 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 	{
 		if(         StringUtils.isNotBlank(groupName) )
 		{
-			ServiceRegistry.INSTANCE.get(ChatGroupService.class).add(ObjectUtils.cast(groupName)).enqueue
-			(
-				new  AbstractRetrofit2Callback<OoIData>( this,true )
-				{
-					public  void  onResponse(      Call  < OoIData >  call,Response  <OoIData>  response )
-					{
-						super.onResponse( call,  response );
-
-						if( response.code()    == 200 )
-						{
-							response.body().getChatGroupUsers().get(0).setVcard(   application().getSquirrelClient().getUserMetadata().getNickname() );
-
-							Db.tx(String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
-
-							ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(SheetActivity.this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().get("news_profile").get("fragment.instance"),NewsProfileFragment.class).getContentView().findViewById(R.id.profile_list),ListView.class).getAdapter(),NewsProfileListAdapter.class).notifyDataSetChanged();
-						}
-						else
-						{
-							showSneakerWindow( Sneaker.with(SheetActivity.this),com.irozon.sneaker.R.drawable.ic_error,response.code() == 601 ? R.string.chat_group_exist :     R.string.network_or_internal_server_error,R.color.white,R.color.red );
-						}
-					}
-				}
-			);
+			ServiceRegistry.INSTANCE.get(ChatGroupService.class).add(ObjectUtils.cast(groupName)).enqueue( new  ResponseRetrofit2Callback<OoIData>(this,true).addResponseHandler(200,(call, response) -> onCreateNewChatGroup(response)) );
 		}
+	}
+
+	private  void  onCreateNewChatGroup( Response<OoIData>  response )
+	{
+		response.body().getChatGroupUsers().get(0).setVcard(   application().getSquirrelClient().getUserMetadata().getNickname() );
+
+		Db.tx(String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
+
+		ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(SheetActivity.this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().get("news_profile").get("fragment.instance"),NewsProfileFragment.class).getContentView().findViewById(R.id.profile_list),ListView.class).getAdapter(),NewsProfileListAdapter.class).notifyDataSetChanged();
 	}
 
 	public  void  onTabSelected(   TabLayout.Tab  tab )

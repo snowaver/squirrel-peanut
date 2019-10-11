@@ -40,25 +40,22 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.client.storage.model.user.User;
 import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
+import  cc.mashroom.squirrel.http.ResponseRetrofit2Callback;
 import  cc.mashroom.squirrel.module.home.activity.ContactProfileActivity;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.parent.AbstractFragment;
-import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import cc.mashroom.squirrel.http.ServiceRegistry;
+import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.home.tab.discovery.adapters.DiscoveryUserListAdapter;
 import  cc.mashroom.squirrel.module.common.services.UserService;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  es.dmoral.toasty.Toasty;
-import  retrofit2.Call;
 import  retrofit2.Response;
 
 public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextView.OnEditorActionListener,   LocaleChangeEventDispatcher.LocaleChangeListener
 {
 	public  View  onCreateView( LayoutInflater  inflater,ViewGroup  container,Bundle  savedInstanceState )
 	{
-		LocaleChangeEventDispatcher.addListener(    DiscoveryFragment.this );
-
 		if( contentView == null )
 		{
 			contentView = inflater.inflate( R.layout.fragment_discovery,container,false );
@@ -73,48 +70,28 @@ public  class   DiscoveryFragment  extends  AbstractFragment  implements  TextVi
 
 	protected  View  contentView;
 
-	public  void  onDestroy()
-	{
-		super.onDestroy();
-
-		LocaleChangeEventDispatcher.removeListener( DiscoveryFragment.this );
-	}
-
 	public  void  onChange( Locale  locale )
 	{
 		ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor).findViewById(cc.mashroom.hedgehog.R.id.edit_inputor),EditText.class).setHint( R.string.discovery_input_keyword );
 	}
 
+	private  void  onSearched( Response<List<User>>  response )
+	{
+		if(      response.body().isEmpty() )
+		{
+			Toasty.warning(super.getActivity(),super.getString(R.string.discovery_searched_nothing),Toast.LENGTH_LONG,false).show();
+		}
+
+		ObjectUtils.cast(this.contentView.findViewById(R.id.discovery_list),ListView.class).setAdapter(new  DiscoveryUserListAdapter(this,response.body()) );
+	}
+
 	public  boolean  onEditorAction( TextView  view,int  editorActionId, KeyEvent  event )
 	{
-		if( editorActionId == EditorInfo.IME_ACTION_DONE )
+		if( editorActionId      == EditorInfo.IME_ACTION_DONE )
 		{
 			if( StringUtils.isNotBlank(ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim()) )
 			{
-				ServiceRegistry.INSTANCE.get(UserService.class).lookup(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim(), "{}").enqueue
-				(
-					new  AbstractRetrofit2Callback<List<User>>(ObjectUtils.cast(this.getActivity()),true )
-					{
-						public  void  onResponse( Call<List<User>>  call, Response<List<User>>  response )
-						{
-							super.onResponse( call, response );
-
-							if( response.code()   != 200 )
-							{
-								ObjectUtils.cast(DiscoveryFragment.this.getActivity(),AbstractActivity.class).showSneakerWindow( Sneaker.with(DiscoveryFragment.this.getActivity()),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
-							}
-							else
-							{
-                                if( response.body().isEmpty() )
-                                {
-                                    Toasty.warning(DiscoveryFragment.this.getActivity(),DiscoveryFragment.this.getString(R.string.discovery_searched_nothing),Toast.LENGTH_LONG,false).show();
-                                }
-
-                                ObjectUtils.cast(contentView.findViewById(R.id.discovery_list),ListView.class).setAdapter( new  DiscoveryUserListAdapter(DiscoveryFragment.this,response.body()) );
-							}
-						}
-					}
-				);
+				ServiceRegistry.INSTANCE.get(UserService.class).lookup(0,ObjectUtils.cast(contentView.findViewById(R.id.keyword_editor),StyleableEditView.class).getText().toString().trim(), "{}").enqueue( new  ResponseRetrofit2Callback<List<User>>(ObjectUtils.cast(this.getActivity()),true).addResponseHandler(200,(call,response) -> onSearched(response)) );
 			}
 			else
 			{

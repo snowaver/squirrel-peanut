@@ -18,12 +18,9 @@ package cc.mashroom.squirrel.module.home.activity;
 import  android.content.Intent;
 import  android.os.Bundle;
 import  android.view.LayoutInflater;
-import  android.view.View;
 import  android.widget.Button;
 import  android.widget.ListView;
 import  android.widget.TextView;
-
-import  androidx.annotation.Nullable;
 
 import  com.google.android.material.bottomsheet.BottomSheetBehavior;
 import  com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -36,8 +33,8 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.client.storage.model.user.User;
 import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
-import  cc.mashroom.squirrel.http.AbstractRetrofit2Callback;
-import cc.mashroom.squirrel.http.ServiceRegistry;
+import  cc.mashroom.squirrel.http.ResponseRetrofit2Callback;
+import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.common.services.ContactService;
 import  cc.mashroom.squirrel.module.common.services.UserService;
 import  cc.mashroom.squirrel.module.home.adapters.ContactGroupAdapter;
@@ -53,7 +50,7 @@ import  lombok.experimental.Accessors;
 import  retrofit2.Call;
 import  retrofit2.Response;
 
-public  class  ContactProfileEditActivity             extends  AbstractActivity  implements  SmoothCheckBox.OnCheckedChangeListener, View.OnClickListener
+public  class  ContactProfileEditActivity   extends  AbstractActivity  implements  SmoothCheckBox.OnCheckedChangeListener
 {
 	@Accessors( chain = true )
 	@Setter
@@ -78,225 +75,161 @@ public  class  ContactProfileEditActivity             extends  AbstractActivity 
 	{
 		super.onCreate( savedInstanceState );
 
-		this.setContact(ObjectUtils.cast(super.getIntent().getSerializableExtra("CONTACT"))).setNickname(super.getIntent().getStringExtra("NICKNAME") );
+		this.setContact(         ObjectUtils.cast(super.getIntent().getSerializableExtra("CONTACT"))).setNickname(super.getIntent().getStringExtra("NICKNAME") );
 
-		super.setContentView( R.layout.activity_contact_profile_edit );
+		super.setContentView(       R.layout.activity_contact_profile_edit );
 
-		ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).setText(     contact.getUsername() );
+		ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).setText(this.contact.getUsername() );
 
 		if( StringUtils.isBlank( nickname ) )
 		{
-			ServiceRegistry.INSTANCE.get(UserService.class).get(contact.getId()).enqueue(new  AbstractRetrofit2Callback<User>(this){public  void  onResponse(Call<User>  call, Response<User>  response){ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.nickname),StyleableEditView.class).setText(setNickname(response.body().getNickname()).getNickname());}} );
+			ServiceRegistry.INSTANCE.get(UserService.class).get(contact.getId()).enqueue( new  ResponseRetrofit2Callback<User>(this,true).addResponseHandler(200,(call,response) -> ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText(this.nickname = response.body().getNickname())) );
 		}
 		else
 		{
-			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText( nickname );
+			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText(         this.nickname );
 		}
 
-		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( contact != null && StringUtils.isNotBlank(contact.getGroupName()) ? contact.getGroupName() : "" );
+		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( this.contact != null && StringUtils.isNotBlank(contact.getGroupName()) ? contact.getGroupName() : "" );
 
-		if( contact  != null &&  contact.getSubscribeStatus() != null )
+		if( contact  != null &&  contact.getSubscribeStatus()       != null )
 		{
 			if(      this.contact.getSubscribeStatus() == 1 )
 			{
-				ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor( super.getResources().getColor(R.color.gainsboro) );
+				ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(   super.getResources().getColor( R.color.gainsboro ) );
 			}
 
-			ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText(   buttonTexts.get(contact.getSubscribeStatus()) );
+			ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText(  this.buttonTexts.get(this.contact.getSubscribeStatus()) );
 		}
 
-        super.findViewById(R.id.chat_or_subscribe_button).setOnClickListener(           this );
+        super.findViewById(R.id.chat_or_subscribe_button).setOnClickListener( (b) ->  onChatOrSubscribeButtonClicked() );
 
         this.addBottomSheet();
 
-		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setOnClickListener( (btn)-> bottomSheet.show() );
+		ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setOnClickListener((bsdialog)  -> this.bottomSheet.show() );
 
-		ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setText( StringUtils.isBlank(contact.getRemark()) ?  nickname : contact.getRemark() );
+		ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setText( StringUtils.isBlank(contact.getRemark()) ? this.nickname : contact.getRemark() );
 
 		this.remarkBottomSheetEditor = new  BottomSheetEditor(this,16).withText(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText()).setOnEditCompleteListener( (remark) -> onActivityResult(0,0,new  Intent().putExtra("EDIT_CONTENT", remark.toString())) );
 
-		this.newGroupBottomSheetEditor = new  BottomSheetEditor(this,16).withText("").setOnEditCompleteListener( (groupName) -> onNewGroupAdded(groupName.toString()) );
+		this.newGroupBottomSheetEditor = new  BottomSheetEditor(this,16).withText("").setOnEditCompleteListener(     (groupName) -> onNewGroupAdded(groupName.toString()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setOnClickListener( (editorView) -> this.remarkBottomSheetEditor.withText(ObjectUtils.cast(editorView,StyleableEditView.class).getText()).show() );
 	}
 
-	protected  void  onActivityResult(int requestCode,int  resultCode,@Nullable  Intent  data )
+	private  void  onNewGroupAdded(   String  addedNewGroup )
 	{
-		super.onActivityResult(requestCode,resultCode,data );
-
-		if( data     == null )
+		if( StringUtils.isNotBlank(addedNewGroup) && !ObjectUtils.cast(ObjectUtils.cast(bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter() , ContactGroupAdapter.class).getGroups().contains(addedNewGroup) )
 		{
-			return;
-		}
+			ObjectUtils.cast(ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).addNewGroup(addedNewGroup , true).notifyDataSetChanged();
 
-		Contact  contact = ContactRepository.DAO.getContactDirect().get(this.contact.getId() );
+			this.newGroupBottomSheetEditor.cancel();
 
-		if( requestCode == 0 )
-		{
-			ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).setText( data.getStringExtra("EDIT_CONTENT") );
+			this.update( ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getChoiceListener().getChecked().get() );
 		}
 		else
-		if( requestCode == 1 )
 		{
-			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( data.getStringExtra("GROUP_NAME") );
+			super.showSneakerWindow( new  Sneaker(this),com.irozon.sneaker.R.drawable.ic_warning,StringUtils.isBlank( addedNewGroup ) ? R.string.content_empty : R.string.contact_group_exist,R.color.white,R.color.red );
 		}
+	}
 
-		if( contact  != null )
+	public  void    onChatOrSubscribeButtonClicked()
+	{
+		Contact  contact = ContactRepository.DAO.getContactDirect().get( this.contact.getId() );
+
+		if( contact  == null )
 		{
-			if( !ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim().equals(contact.getRemark()) || !ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim().equals(contact.getGroupName()) )
 			{
-				ServiceRegistry.INSTANCE.get(ContactService.class).update(contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue(new  AbstractRetrofit2Callback<Contact>(this){public  void  onResponse(Call<Contact>  call, Response<Contact>  response){ responsed(response,contact); }} );
+				if( StringUtils.isNoneBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),  StyleableEditView.class).getText().toString().trim()) )
+				{
+					ServiceRegistry.INSTANCE.get(ContactService.class).subscribe(this.contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue( new  ResponseRetrofit2Callback<Contact>(this,true).addResponseHandler(200,(call,response) -> onSubscribed(response)) );
+				}
+				else
+				{
+					super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.subscribe_form_error,R.color.white,R.color.red );
+				}
+			}
+		}
+		else
+		{
+			if( contact.getSubscribeStatus()  == 1 )
+			{
+				super.showSneakerWindow(  Sneaker.with(this), com.irozon.sneaker.R.drawable.ic_success, R.string.subscribe_request_sent, R.color.white, R.color.limegreen );
+			}
+			else
+			if( contact.getSubscribeStatus()  == 2 )
+			{
+				if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),   StyleableEditView.class).getText().toString().trim()) )
+				{
+					super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.subscribe_form_error,R.color.white,R.color.red );
+				}
+				else
+				{
+					ServiceRegistry.INSTANCE.get(ContactService.class).changeSubscribeStatus(8,contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue( new  ResponseRetrofit2Callback<Contact>(this,true).addResponseHandler(200,(call,response) -> onAgreeSubscribe(response)) );
+				}
 			}
 		}
 	}
 
 	@SneakyThrows
-	public  void  responsed( Response<Contact>  response,Contact  old )
+	private  void  onSubscribed(Response<Contact>  response )
 	{
-		if( response.code() == 200 )
-		{
-			ContactRepository.DAO.upsert( old.clone().setLastModifyTime(response.body().getLastModifyTime()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true );
+		ContactRepository.DAO.upsert( response.body(),true );
 
-			super.showSneakerWindow( Sneaker.with(this),   com.irozon.sneaker.R.drawable.ic_success, R.string.updated,R.color.white,R.color.limegreen );
-		}
-		else
-		{
-			super.showSneakerWindow( Sneaker.with(this),   com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
-		}
+		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(  super.getResources().getColor(R.color.gainsboro) );
+
+		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( this.buttonTexts.get(ContactRepository.DAO.getContactDirect().get(this.contact.getId()).getSubscribeStatus()) );
+
+		super.showSneakerWindow( Sneaker.with(this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(ContactProfileEditActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_request_sent,R.color.white,R.color.limegreen );
 	}
-	
-	public  void  onClick(    View   button )
+	@SneakyThrows
+	private  void  onGroupUpdated( Contact  old,Response<Contact>  response )
 	{
-		if( button.getId() == R.id.chat_or_subscribe_button )
-		{
-			Contact  contact         = ContactRepository.DAO.getContactDirect().get( this.contact.getId() );
+		ContactRepository.DAO.upsert( old.clone().setLastModifyTime(response.body().getLastModifyTime()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true );
 
-			if( contact!=null)
-			{
-				if(       contact.getSubscribeStatus() == 1 )
-				{
-					super.showSneakerWindow(  Sneaker.with(this) , com.irozon.sneaker.R.drawable.ic_success,  R.string.subscribe_request_sent , R.color.white, R.color.limegreen );
-				}
-				else
-				if(       contact.getSubscribeStatus() == 2 )
-				{
-				    if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),   StyleableEditView.class).getText().toString().trim()) )
-                    {
-						super.showSneakerWindow( Sneaker.with(this),   com.irozon.sneaker.R.drawable.ic_error,R.string.subscribe_form_error,R.color.white,R.color.red );
-                    }
-                    else
-                    {
-                        ServiceRegistry.INSTANCE.get(ContactService.class).changeSubscribeStatus(8,contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
-						(
-							new  AbstractRetrofit2Callback<Contact>( this,true )
-							{
-								@SneakyThrows
-								public  void  onResponse( Call<Contact>  call, Response<Contact>  response )
-								{
-									super.onResponse(  call,response );
-
-									if( response.code()==200)
-									{
-										//  only  last  modify  time,  subscribe  status,  remark  and  group  name  are  updated,  so  update  them  on  local  storage
-										ContactRepository.DAO.upsert( contact.clone().setLastModifyTime(response.body().getLastModifyTime()).setSubscribeStatus(response.body().getSubscribeStatus()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()), true );
-
-										ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button).setBackgroundColor(       ContactProfileEditActivity.this.getResources().getColor(R.color.limegreen) );
-
-										ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( buttonTexts.get(ContactRepository.DAO.getContactDirect().get(contact.getId()).getSubscribeStatus()) );
-
-										ContactProfileEditActivity.this.showSneakerWindow( Sneaker.with(ContactProfileEditActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(ContactProfileEditActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success ,R.string.subscribe_contact_added,R.color.white,R.color.limegreen );
-									}
-									else
-									{
-										ContactProfileEditActivity.this.showSneakerWindow( Sneaker.with(ContactProfileEditActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
-									}
-								}
-							}
-						);
-                    }
-				}
-			}
-			else
-			{
-				{
-                    if( StringUtils.isNoneBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),  StyleableEditView.class).getText().toString().trim()) )
-                    {
-						ServiceRegistry.INSTANCE.get(ContactService.class).subscribe(this.contact.getId(),ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()).enqueue
-						(
-							new  AbstractRetrofit2Callback<Contact>( this,true )
-							{
-								@SneakyThrows
-                                public  void  onResponse( Call<Contact>  call, Response<Contact>  response )
-								{
-									super.onResponse(  call,response );
-
-									if( response.code()==200)
-									{
-										ContactRepository.DAO.upsert( response.body() , true );
-
-										ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(   ContactProfileEditActivity.this.getResources().getColor(R.color.gainsboro) );
-
-										ObjectUtils.cast(ContactProfileEditActivity.this.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( buttonTexts.get(ContactRepository.DAO.getContactDirect().get(ContactProfileEditActivity.this.contact.getId()).getSubscribeStatus()) );
-
-										ContactProfileEditActivity.this.showSneakerWindow( Sneaker.with(ContactProfileEditActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(ContactProfileEditActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success  ,R.string.subscribe_request_sent,R.color.white,R.color.limegreen );
-									}
-									else
-									{
-										ContactProfileEditActivity.this.showSneakerWindow( Sneaker.with(ContactProfileEditActivity.this),com.irozon.sneaker.R.drawable.ic_error,R.string.network_or_internal_server_error,R.color.white,R.color.red );
-									}
-								}
-							}
-						);
-                    }
-                    else
-					{
-						super.showSneakerWindow( Sneaker.with(this),   com.irozon.sneaker.R.drawable.ic_error,R.string.subscribe_form_error,R.color.white,R.color.red );
-					}
-				}
-			}
-		}
+		super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_success,R.string.updated,R.color.white,R.color.limegreen );
 	}
 
-    public  void  onCheckedChanged( SmoothCheckBox  smoothCheckbox,boolean  isNewGroupChecked )
+	private  void  update( String  remark, String  newGroup )
+	{
+		ServiceRegistry.INSTANCE.get(ContactService.class).update(contact.getId(),remark,newGroup).enqueue( new  ResponseRetrofit2Callback<Contact>(this,true).addResponseHandler(200,(call,response) -> onGroupUpdated(ContactRepository.DAO.getContactDirect().get(this.contact.getId()),response)) );
+	}
+	@SneakyThrows
+	private  void  onAgreeSubscribe(            Response<Contact>  response )
+	{
+		ContactRepository.DAO.upsert( contact.clone().setLastModifyTime(response.body().getLastModifyTime()).setSubscribeStatus(response.body().getSubscribeStatus()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()), true );
+
+		super.findViewById(R.id.chat_or_subscribe_button).setBackgroundColor(    super.getResources().getColor(R.color.limegreen) );
+
+		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( this.buttonTexts.get(ContactRepository.DAO.getContactDirect().get(this.contact.getId()).getSubscribeStatus()) );
+
+		super.showSneakerWindow( Sneaker.with(ContactProfileEditActivity.this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(ContactProfileEditActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success ,R.string.subscribe_contact_added,R.color.white,R.color.limegreen );
+	}
+
+    public   void  onCheckedChanged( SmoothCheckBox  smoothCheckbox,boolean  isNewGroupChecked )
     {
         if( isNewGroupChecked)
         {
             this.bottomSheet.hide();
 
-            this.onActivityResult( 1,0,new  Intent().putExtra("GROUP_NAME",ObjectUtils.cast(ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getChoiceListener().getChecked().get()) );
-        }
-    }
-
-    private  void   onNewGroupAdded( String  addedGroupName )
-    {
-        if( StringUtils.isNotBlank(addedGroupName) && !ObjectUtils.cast(ObjectUtils.cast(bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getGroups().contains(addedGroupName) )
-        {
-            ObjectUtils.cast(ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).addNewGroup(addedGroupName,true).notifyDataSetChanged();
-
-            this.newGroupBottomSheetEditor.cancel();
-
-            this.onActivityResult( 1, 0, new  Intent().putExtra("GROUP_NAME",addedGroupName) );
-        }
-        else
-        {
-            super.showSneakerWindow( new  Sneaker(this),com.irozon.sneaker.R.drawable.ic_warning,StringUtils.isBlank( addedGroupName ) ? R.string.content_empty : R.string.contact_group_exist,R.color.white,R.color.red );
+            this.update( ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getChoiceListener().getChecked().get() );
         }
     }
 
 	private  void   addBottomSheet()
     {
-        Contact  contact = ContactRepository.DAO.getContactDirect().get(this.contact.getId() );
-
-        (this.bottomSheet = new  BottomSheetDialog(this)).setContentView(            LayoutInflater.from(this).inflate(R.layout.activity_switch_contact_group, null ) );
-        //  swiping  down  event  on  bottom  sheet  dialog  is  conflict  with  sliding  down  event  on  listview,  so  set  bottom  sheet  dialog's  behavior  as  non-hideable.
+        (this.bottomSheet = new  BottomSheetDialog(this)).setContentView(     LayoutInflater.from(this).inflate(R.layout.activity_switch_contact_group, null ) );
+        //  swiping  down  event  on  bottom  sheet  dialog  is  conflict  with  sliding  down  event  on  the  listview,  so  set  bottom  sheet  dialog's  behavior  as  non-hideable.
         BottomSheetBehavior.from(bottomSheet.findViewById(R.id.design_bottom_sheet )).setHideable(  false );
 
-        ObjectUtils.cast(this.bottomSheet.findViewById(R.id.add_to_new_group_button),TextView.class).setOnClickListener( (addToNewGroupButton) -> {  bottomSheet.hide();      this.newGroupBottomSheetEditor.withText("").show();} );
+        ObjectUtils.cast(this.bottomSheet.findViewById(R.id.add_to_new_group_button),TextView.class).setOnClickListener((addToNewGroupButton) ->   {this.bottomSheet.hide();  this.newGroupBottomSheetEditor.withText("").show();} );
 
-        ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).setAdapter( new  ContactGroupAdapter(this,this) );
+        ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).setAdapter(   new  ContactGroupAdapter(this,this) );
 
         ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).setOnItemClickListener( (parent , view , position , id) -> ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked(   true ) );
-    
+
+		Contact  contact = ContactRepository.DAO.getContactDirect().get( this.contact.getId() );
+
 		ObjectUtils.cast(ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).getAdapter(),ContactGroupAdapter.class).getChoiceListener().getChecked().set( contact != null && StringUtils.isNotBlank(contact.getGroupName()) ? contact.getGroupName() : super.getString(R.string.contact_group_default_name) );
 	}
 }
