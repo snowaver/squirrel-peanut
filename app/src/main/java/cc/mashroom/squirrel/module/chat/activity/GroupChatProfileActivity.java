@@ -21,6 +21,7 @@ import  androidx.core.app.ActivityCompat;
 import  androidx.core.app.ActivityOptionsCompat;
 import  android.widget.GridView;
 
+import  com.fasterxml.jackson.core.type.TypeReference;
 import  com.irozon.sneaker.Sneaker;
 
 import  cc.mashroom.db.common.Db;
@@ -39,6 +40,7 @@ import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
+import  cc.mashroom.squirrel.paip.message.chat.GroupChatEventPacket;
 import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
@@ -46,7 +48,6 @@ import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  lombok.Setter;
 import  lombok.SneakyThrows;
 import  lombok.experimental.Accessors;
-import  retrofit2.Call;
 import  retrofit2.Response;
 
 import  java.io.Serializable;
@@ -63,17 +64,20 @@ public  class  GroupChatProfileActivity     extends       AbstractPacketListener
 
 		super.setContentView(R.layout.activity_group_chat_profile );
 
-		this.setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{ super.getIntent().getLongExtra("CHAT_GROUP_ID", 0) }) );
+		this.setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{super.getIntent().getLongExtra("CHAT_GROUP_ID",0)}) );
 
 		this.setChatGroupUser( ChatGroupUserRepository.DAO.lookupOne(ChatGroupUser.class,"SELECT  *  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{this.chatGroup.getId(),application().getSquirrelClient().getUserMetadata().getId()}) );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar)  ,HeaderBar.class).setTitle( this.chatGroup.getName() );
 
+		super.findViewById(R.id.invite_button).setOnClickListener((v)->inviteMembers());
+		
 		ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).setText(  this.chatGroup.getName() );
 
-		ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> new  BottomSheetEditor(this,16).setOnEditCompleteListener((groupName) -> ServiceRegistry.INSTANCE.get(ChatGroupService.class).update(this.chatGroup.getId(),groupName.toString()).enqueue(new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call,response) -> onNameChanged(response)))).show() );
-
-	    super.findViewById(R.id.invite_button).setOnClickListener((v)->inviteMembers());
+		if( chatGroup.getCreateBy() == super.application().getSquirrelClient().getUserMetadata().getId() )
+        {
+            ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> new  BottomSheetEditor(this,16).setOnEditCompleteListener((groupName) -> ServiceRegistry.INSTANCE.get(ChatGroupService.class).update(this.chatGroup.getId(),groupName.toString()).enqueue(new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call,response) -> onNameChanged(response)))).show() );
+        }
 
 		super.findViewById(R.id.more_members_button).setOnClickListener( (seeMoreGroupMemberButton) -> ActivityCompat.startActivity(this,new  Intent(this,ChatGroupContactActivity.class).putExtra("CHAT_GROUP_ID",chatGroup.getId()),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
@@ -88,23 +92,37 @@ public  class  GroupChatProfileActivity     extends       AbstractPacketListener
 	@Accessors( chain= true )
 	@Setter
 	private  ChatGroupUser      chatGroupUser;
+	@Override
+	public  void  onReceived( Packet  packet )
+	{
+		super.onReceived(packet );
 
+		if( packet instanceof GroupChatEventPacket && ObjectUtils.cast(packet,GroupChatEventPacket.class).getGroupId()==this.chatGroup.getId() )
+        {
+            super.application().getMainLooperHandler().post(  ()  ->   this.refresh() );
+        }
+	}
+	
 	protected  void  onActivityResult( int  requestCode, int  resultCode, Intent  data )
 	{
 		super.onActivityResult( requestCode  ,   resultCode, data );
 
 		if( data != null && requestCode == 0 )
 		{
-			ServiceRegistry.INSTANCE.get(ChatGroupUserService.class).add(this.chatGroup.getId(),StringUtils.join((Set<Long>)  data.getSerializableExtra("SELECTED_CONTACT_IDS"),",")).enqueue(         new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call,response) -> onMembersInvited(response)) );
+			ServiceRegistry.INSTANCE.get(ChatGroupUserService.class).add(this.chatGroup.getId(),StringUtils.join(ObjectUtils.cast(data.getSerializableExtra("SELECTED_CONTACT_IDS"),new  TypeReference<Set<Long>>(){}),",")).enqueue( new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call, response) -> onMembersInvited(response)) );
 		}
 	}
-	@Override
-	public  void  onReceived( Packet  packet )
-	{
-		super.onReceived(packet );
 
-		super.application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter() ,      GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged() );
-	}
+	private  void  refresh( )
+    {
+        this.setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{super.getIntent().getLongExtra("CHAT_GROUP_ID",0)}) );
+
+        ObjectUtils.cast(super.findViewById(R.id.header_bar)  ,HeaderBar.class).setTitle( this.chatGroup.getName() );
+
+        ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).setText(  this.chatGroup.getName() );
+
+        ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
+    }
 	
 	private  void  inviteMembers()
 	{
@@ -131,9 +149,9 @@ public  class  GroupChatProfileActivity     extends       AbstractPacketListener
 	{
 		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
 
-		this.chatGroup = ChatGroupRepository.DAO.lookupOne( ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{this.chatGroup.getId()} );
-
-		ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).setText(  this.chatGroup.getName() );
+		this.setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{super.getIntent().getLongExtra("CHAT_GROUP_ID",0)}) );
+		
+        ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).setText(  this.chatGroup.getName() );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar)  ,HeaderBar.class).setTitle( this.chatGroup.getName() );
 
