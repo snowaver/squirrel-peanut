@@ -25,12 +25,11 @@ import  com.facebook.drawee.view.SimpleDraweeView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroupUser;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupUserRepository;
-import  cc.mashroom.squirrel.module.chat.activity.GroupChatProfileActivity;
+import cc.mashroom.squirrel.module.chat.activity.ChatGroupProfileActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  lombok.AccessLevel;
 import  lombok.AllArgsConstructor;
 import  lombok.Setter;
-import  lombok.SneakyThrows;
 import  lombok.experimental.Accessors;
 
 @AllArgsConstructor
@@ -39,7 +38,7 @@ public  class  GroupChatProfileMemberGridviewAdapter  extends  cc.mashroom.hedge
 {
 	@Setter( value=AccessLevel.PROTECTED )
 	@Accessors( chain=true )
-	protected  GroupChatProfileActivity   context;
+	protected ChatGroupProfileActivity context;
 	@Setter( value=AccessLevel.PROTECTED )
 	@Accessors( chain=true )
 	protected  long  chatGroupId;

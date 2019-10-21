@@ -32,7 +32,7 @@ import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.group.ChatGroup;
 import  cc.mashroom.squirrel.parent.AbstractFragment;
-import  cc.mashroom.squirrel.module.chat.activity.GroupChatActivity;
+import cc.mashroom.squirrel.module.chat.activity.ChatGroupActivity;
 import  cc.mashroom.squirrel.module.home.tab.contact.adapters.ChatGroupAdapter;
 import  cc.mashroom.util.ObjectUtils;
 
@@ -48,7 +48,7 @@ public  class  ChatGroupFragment  extends  AbstractFragment  implements  LocaleC
 
 			ObjectUtils.cast(contentView.findViewById(R.id.chat_group_list),ListView.class).setAdapter( new  ChatGroupAdapter(this ) );
 
-			ObjectUtils.cast(contentView.findViewById(R.id.chat_group_list),ListView.class).setOnItemClickListener( (parent,view,position,id) -> ActivityCompat.startActivity(super.getActivity(),new  Intent(this.getActivity(),GroupChatActivity.class).putExtra("CHAT_GROUP_ID",ObjectUtils.cast(parent.getAdapter().getItem(position),ChatGroup.class).getId()),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle()) );
+			ObjectUtils.cast(contentView.findViewById(R.id.chat_group_list),ListView.class).setOnItemClickListener( (parent,view,position,id) -> ActivityCompat.startActivity(super.getActivity(),new  Intent(this.getActivity(), ChatGroupActivity.class).putExtra("CHAT_GROUP_ID",ObjectUtils.cast(parent.getAdapter().getItem(position),ChatGroup.class).getId()),ActivityOptionsCompat.makeCustomAnimation(super.getActivity(),R.anim.right_in,R.anim.left_out).toBundle()) );
 		}
 
 		return  this.contentView;

@@ -209,7 +209,7 @@ public  class  ChatActivity  extends AbstractPacketListenerActivity  implements 
 	{
 		super.onPause(  );
 
-		Db.tx(  String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection)-> NewsProfileRepository.DAO.clearBadgeCount(contactId,PAIPPacketType.CHAT.getValue()) );
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection)-> NewsProfileRepository.DAO.clearBadgeCount(contactId, PAIPPacketType.CHAT.getValue()) );
 	}
 
 	protected  void  onDestroy()

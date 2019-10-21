@@ -26,6 +26,9 @@ import  com.google.android.material.bottomsheet.BottomSheetBehavior;
 import  com.google.android.material.bottomsheet.BottomSheetDialog;
 import  com.irozon.sneaker.Sneaker;
 
+import  java.sql.Connection;
+
+import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  cc.mashroom.hedgehog.widget.BottomSheetEditor;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
@@ -45,9 +48,7 @@ import  cc.mashroom.util.collection.map.HashMap;
 import  cn.refactor.library.SmoothCheckBox;
 import  lombok.Getter;
 import  lombok.Setter;
-import  lombok.SneakyThrows;
 import  lombok.experimental.Accessors;
-import  retrofit2.Call;
 import  retrofit2.Response;
 
 public  class  ContactProfileEditActivity   extends  AbstractActivity  implements  SmoothCheckBox.OnCheckedChangeListener
@@ -132,6 +133,13 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 			super.showSneakerWindow( new  Sneaker(this),com.irozon.sneaker.R.drawable.ic_warning,StringUtils.isBlank( addedNewGroup ) ? R.string.content_empty : R.string.contact_group_exist,R.color.white,R.color.red );
 		}
 	}
+	@Override
+	protected void onDestroy()
+	{
+		bottomSheet.dismiss();
+
+		super.onDestroy();
+	}
 
 	private  void   onChatOrSubscribeButtonClicked()
 	{
@@ -159,7 +167,7 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 			else
 			if( contact.getSubscribeStatus()  == 2 )
 			{
-				if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),   StyleableEditView.class).getText().toString().trim()) )
+				if( StringUtils.isAnyBlank(ObjectUtils.cast(super.findViewById(R.id.remark),StyleableEditView.class).getText().toString().trim(),ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).getText().toString().trim()) )
 				{
 					super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.subscribe_form_error,R.color.white,R.color.red );
 				}
@@ -171,21 +179,20 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 		}
 	}
 
-	@SneakyThrows
 	private  void  onSubscribed(Response<Contact>  response )
 	{
-		ContactRepository.DAO.upsert( response.body(),true );
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ContactRepository.DAO.upsert(response.body(),true) );
 
 		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(  super.getResources().getColor(R.color.gainsboro) );
 
 		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setText( this.buttonTexts.get(ContactRepository.DAO.getContactDirect().get(this.contact.getId()).getSubscribeStatus()) );
 
-		super.showSneakerWindow( Sneaker.with(this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(ContactProfileEditActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_request_sent,R.color.white,R.color.limegreen );
+		super.showSneakerWindow( Sneaker.with(this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> ContextUtils.finish(ContactProfileEditActivity.this),500)),com.irozon.sneaker.R.drawable.ic_success,R.string.subscribe_request_sent,R.color.white,  R.color.limegreen );
 	}
-	@SneakyThrows
+
 	private  void  onGroupUpdated( Contact  old,Response<Contact>  response )
 	{
-		ContactRepository.DAO.upsert( old.clone().setLastModifyTime(response.body().getLastModifyTime()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true );
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ContactRepository.DAO.upsert(old.clone().setLastModifyTime(response.body().getLastModifyTime()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true) );
 
 		contact = ContactRepository.DAO.getContactDirect().get(old.getId() );
 
@@ -198,12 +205,21 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 
 	private  void  update( String  remark, String  newGroup )
 	{
-		ServiceRegistry.INSTANCE.get(ContactService.class).update(contact.getId(),remark,newGroup).enqueue( new  ResponseRetrofit2Callback<Contact>(this,true).addResponseHandler(200,(call,response) -> onGroupUpdated(ContactRepository.DAO.getContactDirect().get(this.contact.getId()),response)) );
+		if( ContactRepository.DAO.getContactDirect().containsKey(       this.contact.getId() ) )
+		{
+			ServiceRegistry.INSTANCE.get(ContactService.class).update(this.contact.getId(),remark,newGroup).enqueue( new  ResponseRetrofit2Callback<Contact>(this,true).addResponseHandler(200,(call,  response)->    onGroupUpdated(ContactRepository.DAO.getContactDirect().get(this.contact.getId()),response)) );
+		}
+		else
+		{
+			ObjectUtils.cast(super.findViewById(R.id.grouping),StyleableEditView.class).setText( newGroup );
+
+			ObjectUtils.cast(super.findViewById(R.id.remark  ),StyleableEditView.class).setText(   remark );
+		}
 	}
-	@SneakyThrows
+
 	private  void  onAgreeSubscribe(            Response<Contact>  response )
 	{
-		ContactRepository.DAO.upsert( contact.clone().setLastModifyTime(response.body().getLastModifyTime()).setSubscribeStatus(response.body().getSubscribeStatus()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),false );
+		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ContactRepository.DAO.upsert(ContactRepository.DAO.getContactDirect().get(this.contact.getId()).clone().setLastModifyTime(response.body().getLastModifyTime()).setSubscribeStatus(response.body().getSubscribeStatus()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true) );
 
 		super.findViewById(R.id.chat_or_subscribe_button).setBackgroundColor(    super.getResources().getColor(R.color.limegreen) );
 
@@ -232,7 +248,7 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 
         ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).setAdapter(   new  ContactGroupAdapter(this,this) );
 
-        ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).setOnItemClickListener( (parent , view , position , id) -> ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked(   true ) );
+        ObjectUtils.cast(this.bottomSheet.findViewById(R.id.contact_groups),ListView.class).setOnItemClickListener( (parent, view, position ,id) -> ObjectUtils.cast(view.findViewById(R.id.checkbox),SmoothCheckBox.class).setChecked(true) );
 
 		Contact  contact = ContactRepository.DAO.getContactDirect().get( this.contact.getId() );
 

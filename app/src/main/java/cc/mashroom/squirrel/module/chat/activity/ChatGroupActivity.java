@@ -45,8 +45,8 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.PacketListener;
 import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
-import cc.mashroom.squirrel.http.ServiceRegistry;
-import  cc.mashroom.squirrel.module.chat.adapters.GroupChatMessageListviewAdapter;
+import  cc.mashroom.squirrel.http.ServiceRegistry;
+import  cc.mashroom.squirrel.module.chat.adapters.ChatGroupMessageListviewAdapter;
 import  cc.mashroom.squirrel.module.chat.adapters.MoreInputsAdapter;
 import  cc.mashroom.squirrel.module.chat.listener.AudioTouchRecoder;
 import  cc.mashroom.squirrel.module.common.services.FileService;
@@ -69,7 +69,7 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class GroupChatActivity extends  AbstractPacketListenerActivity  implements  PacketListener  ,View.OnKeyListener
+public  class ChatGroupActivity extends  AbstractPacketListenerActivity  implements  PacketListener  ,View.OnKeyListener
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )
@@ -88,7 +88,7 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 
 		ObjectUtils.cast(super.findViewById(R.id.voice_recording_button),Button.class).setOnTouchListener( new  AudioTouchRecoder(this,application().getCacheDir(),(audioFile) -> send(audioFile)) );
 
-		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  GroupChatMessageListviewAdapter(this,groupId) );
+		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  ChatGroupMessageListviewAdapter(this,groupId) );
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).post(     ()->this.configStackFromDirect() );
 
@@ -98,7 +98,7 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setAdapter( new  MoreInputsAdapter(this,groupId,Lists.newArrayList(new  HashMap<String,Integer>().addEntry("image",R.drawable.camera),new  HashMap<String,Integer>().addEntry("image",R.drawable.album))) );
 
-		ObjectUtils.cast(super.findViewById(R.id.additional_switcher),ViewSwitcher.class).setOnClickListener( (view) -> ActivityCompat.startActivity( this , new  Intent(this, GroupChatProfileActivity.class).putExtra("CHAT_GROUP_ID",groupId) , ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() ) );
+		ObjectUtils.cast(super.findViewById(R.id.additional_switcher),ViewSwitcher.class).setOnClickListener( (view) -> ActivityCompat.startActivity( this , new  Intent(this, ChatGroupProfileActivity.class).putExtra("CHAT_GROUP_ID",groupId) , ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() ) );
 	}
 
 	public  void  send(       File  audioFile )
@@ -142,7 +142,7 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 	{
 		if( packet instanceof GroupChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).upsert(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatGroupActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatGroupMessageListviewAdapter.class).upsert(packet.getId()) );
 		}
 	}
 
@@ -150,7 +150,7 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 	{
 		if( packet instanceof GroupChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).upsert(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatGroupActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatGroupMessageListviewAdapter.class).upsert(packet.getId()) );
 		}
 	}
 
@@ -158,7 +158,7 @@ public  class GroupChatActivity extends  AbstractPacketListenerActivity  impleme
 	{
 		if( packet instanceof GroupChatPacket )
 		{
-			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(GroupChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),GroupChatMessageListviewAdapter.class).upsert(packet.getId()) );
+			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatGroupActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatGroupMessageListviewAdapter.class).upsert(packet.getId()) );
 
 			if( ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{

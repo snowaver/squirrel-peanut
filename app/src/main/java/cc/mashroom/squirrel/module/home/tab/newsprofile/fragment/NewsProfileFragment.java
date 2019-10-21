@@ -35,7 +35,7 @@ import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.module.home.activity.ContactProfileEditActivity;
 import  cc.mashroom.squirrel.parent.AbstractPacketListenerFragment;
 import  cc.mashroom.squirrel.module.chat.activity.ChatActivity;
-import  cc.mashroom.squirrel.module.chat.activity.GroupChatActivity;
+import cc.mashroom.squirrel.module.chat.activity.ChatGroupActivity;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
@@ -76,7 +76,7 @@ public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  imp
 		else
 		if( newsProfile.getPacketType() == PAIPPacketType.GROUP_CHAT )
 		{
-			ActivityCompat.startActivity( super.getActivity(),new  Intent(this.getActivity(),GroupChatActivity.class).putExtra("CHAT_GROUP_ID",newsProfile.getId()),ActivityOptionsCompat.makeCustomAnimation(this.getContext(),R.anim.right_in,R.anim.left_out).toBundle() );
+			ActivityCompat.startActivity( super.getActivity(),new  Intent(this.getActivity(), ChatGroupActivity.class).putExtra("CHAT_GROUP_ID",newsProfile.getId()),ActivityOptionsCompat.makeCustomAnimation(this.getContext(),R.anim.right_in,R.anim.left_out).toBundle() );
 		}
 		else
 		if( newsProfile.getPacketType() == PAIPPacketType.SUBSCRIBE && Integer.parseInt(newsProfile.getContent()) == 2 )

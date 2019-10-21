@@ -79,7 +79,7 @@ public  class  ContactProfileActivity  extends  AbstractPacketListenerActivity
 	    ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).findViewById(R.id.additional_switcher).setOnClickListener( (button) -> ActivityCompat.startActivity(this,new  Intent(this,ContactProfileEditActivity.class).putExtra("CONTACT",contact),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 	}
 
-	private  Map<Integer,Integer>  buttonTexts = new  HashMap<Integer,Integer>().addEntry(0,R.string.subscribe_add_contact).addEntry(1,R.string.subscribe_accept_request).addEntry(6,R.string.message).addEntry( 7,R.string.message );
+	private  Map<Integer,Integer>  buttonTexts = new  HashMap<Integer,Integer>().addEntry(1,R.string.subscribe_add_contact).addEntry(2,R.string.subscribe_accept_request).addEntry(7,R.string.message).addEntry( 8,R.string.message );
 	@Accessors(  chain = true )
 	@Setter
     @Getter

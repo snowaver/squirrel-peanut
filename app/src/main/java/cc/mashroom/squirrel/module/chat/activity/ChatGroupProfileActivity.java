@@ -40,7 +40,7 @@ import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
-import  cc.mashroom.squirrel.paip.message.chat.GroupChatEventPacket;
+import  cc.mashroom.squirrel.paip.message.chat.ChatGroupEventPacket;
 import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
@@ -55,7 +55,7 @@ import  java.sql.Connection;
 import  java.util.HashSet;
 import  java.util.Set;
 
-public  class  GroupChatProfileActivity     extends       AbstractPacketListenerActivity
+public  class ChatGroupProfileActivity extends            AbstractPacketListenerActivity
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle   savedInstanceState )
@@ -97,7 +97,7 @@ public  class  GroupChatProfileActivity     extends       AbstractPacketListener
 	{
 		super.onReceived(packet );
 
-		if( packet instanceof GroupChatEventPacket && ObjectUtils.cast(packet,GroupChatEventPacket.class).getGroupId()==this.chatGroup.getId() )
+		if( packet instanceof ChatGroupEventPacket && ObjectUtils.cast(packet,ChatGroupEventPacket.class).getGroupId()==this.chatGroup.getId() )
         {
             super.application().getMainLooperHandler().post(  ()  ->   this.refresh() );
         }
