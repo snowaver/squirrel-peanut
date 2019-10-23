@@ -70,10 +70,10 @@ public  class  ChatGroupMessageListviewAdapter  extends  BaseAdapter  <ChatGroup
     protected  long groupId;
 	@Setter( value=AccessLevel.PROTECTED )
 	@Accessors( chain=true )
-	protected ChatGroupActivity context;
+	protected  ChatGroupActivity  context;
 	@Setter( value=AccessLevel.PROTECTED )
 	@Accessors( chain=true )
-	protected  int  totalCount;
+	protected  int   totalCount;
 	@Setter( value=   AccessLevel.PUBLIC )
 	@Accessors( chain=true )
 	protected  boolean  isStackFromBottom;

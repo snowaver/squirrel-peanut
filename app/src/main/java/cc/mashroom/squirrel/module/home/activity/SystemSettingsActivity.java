@@ -86,13 +86,17 @@ public  class  SystemSettingsActivity  extends  AbstractLifecycleListenerActivit
 	@Override
 	public  void  onLogoutComplete( int  code,int  reason )
 	{
-		super.onLogoutComplete( code,reason );
+		super.onLogoutComplete( code, reason );
 
 		super.application().getMainLooperHandler().post( ()->progressDialog.cancel() );
 	}
 
 	protected  void  onDestroy()
 	{
+		this.languagesBottomSheetDialog.cancel(/*CANCEL*/);
+
+		progressDialog.cancel();
+
 		super.onDestroy();
 
 		LocaleChangeEventDispatcher.removeListener( this );
@@ -102,7 +106,7 @@ public  class  SystemSettingsActivity  extends  AbstractLifecycleListenerActivit
 	{
 		LocaleChangeEventDispatcher.addListener(    this );
 
-		super.onCreate(  savedInstanceState );
+		super.onCreate(   savedInstanceState );
 
 		super.setContentView(  R.layout.activity_system_settings );
 
