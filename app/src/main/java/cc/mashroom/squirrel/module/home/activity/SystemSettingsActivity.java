@@ -57,7 +57,7 @@ public  class  SystemSettingsActivity  extends  AbstractLifecycleListenerActivit
 	{
 		Locale  locale = ObjectUtils.cast(ObjectUtils.cast(smoothCheckbox.getParent(),View.class).findViewById(R.id.name),TextView.class).getText().toString().trim().equals("ENGLISH") ? Locale.ENGLISH : Locale.CHINESE;
 
-		LocaleUtils.change(this,locale.toLanguageTag()   );
+		LocaleUtils.change(this , locale.toLanguageTag() );
 
 		this.languagesBottomSheetDialog.hide();
 
@@ -83,12 +83,13 @@ public  class  SystemSettingsActivity  extends  AbstractLifecycleListenerActivit
 
 		ObjectUtils.cast(this.languagesBottomSheetDialog.findViewById(R.id.title),TextView.class).setText(     R.string.language );
 	}
+
 	@Override
 	public  void  onLogoutComplete( int  code,int  reason )
 	{
 		super.onLogoutComplete( code, reason );
 
-		super.application().getMainLooperHandler().post( ()->progressDialog.cancel() );
+		super.application().getMainLooperHandler().post( () -> progressDialog.hide() );
 	}
 
 	protected  void  onDestroy()

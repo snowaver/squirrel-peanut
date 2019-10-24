@@ -47,11 +47,11 @@ import  cc.mashroom.squirrel.client.connect.ConnectState;
 import  cc.mashroom.squirrel.client.PacketListener;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
-import cc.mashroom.squirrel.http.ServiceRegistry;
+import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.chat.activity.AudioCallActivity;
 import  cc.mashroom.squirrel.module.chat.activity.VideoCallActivity;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
-import cc.mashroom.squirrel.module.system.activity.NetworkPreinitializeActivity;
+import  cc.mashroom.squirrel.module.system.activity.NetworkPreinitializeActivity;
 import  cc.mashroom.squirrel.module.system.activity.LoginActivity;
 import  cc.mashroom.squirrel.module.system.activity.RegisterActivity;
 import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
@@ -141,7 +141,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		this.squirrelClient.release();
 
-		scheduler.shutdown(  );
+		this.scheduler.shutdown(/**/);
 	}
 
 	public  void  connect( String  username,  String  password,Location  geometryLoc,LifecycleListener  lifecycleListener )
@@ -168,15 +168,15 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	{
 		if( newService != null && oldService  != newService     && Schema.valueOf(StringUtils.upperCase(newService.getSchema())) == Schema.HTTPS )
 		{
-			ServiceRegistry.INSTANCE.initialize(   this );
+			ServiceRegistry.INSTANCE.initialize(    this );
 		}
 	}
 
-	public  void  clearStackActivitiesAndStart( Intent  intent ,  Bundle bundle )
+	public  void  clearStackActivitiesAndStart( Intent  intent,Bundle  bundle )
 	{
 		LinkedList<Activity>  activities  = new  LinkedList<Activity>( AbstractActivity.STACK );
 
-		ActivityCompat.startActivity(  activities.isEmpty()  ? Application.this :   activities.getLast(), intent, bundle );
+		ActivityCompat.startActivity(  activities.isEmpty()? Application.this :     activities.getLast(), intent, bundle );
 
 		if( !   activities.isEmpty() )
 		{
@@ -194,13 +194,13 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  loginactivity.
 		if( code == 200 &&        ( reason == DisconnectAckPacket.REASON_REMOTE_SIGNIN || reason == DisconnectAckPacket.REASON_CLIENT_LOGOUT   ) )
 		{
-			this.clearStackActivitiesAndStart(new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",reason).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
-
 			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().clear().apply();
+
+			super.getMainLooperHandler().post( () -> clearStackActivitiesAndStart(new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",reason).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 		}
 	}
 
-	public  void  onConnectStateChanged(    ConnectState  connectState )
+	public  void  onConnectStateChanged(     ConnectState connectState )
 	{
 
 	}
@@ -210,6 +210,11 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
     }
 
+	public  boolean  onBeforeSend(  Packet  packet )
+	{
+		return  true;
+	}
+	
 	public  HttpUrl.Builder  baseUrl()
 	{
 		Service  service = this.squirrelClient.getServiceRouteManager().current( Schema.HTTPS );
@@ -217,12 +222,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		return  new  HttpUrl.Builder().scheme(      service.getSchema()).host(service.getHost()).port( service.getPort() );
 	}
 
-	public  boolean  onBeforeSend(  Packet  packet )//throws   Throwable
-	{
-		return  true;
-	}
-
-	public  void  onSent(     Packet  sentPacket,TransportState  transportState )
+	public  void  onSent(   Packet  sentPacket,TransportState  transportState )
 	{
 
 	}
