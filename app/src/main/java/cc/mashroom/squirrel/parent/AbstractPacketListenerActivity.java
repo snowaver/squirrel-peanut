@@ -17,31 +17,31 @@ package cc.mashroom.squirrel.parent;
 
 import  android.os.Bundle;
 
-import  cc.mashroom.squirrel.client.PacketListener;
+import  cc.mashroom.squirrel.client.event.PacketEventListener;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 
-public  class  AbstractPacketListenerActivity  extends  AbstractActivity  implements  PacketListener
+public  class  AbstractPacketListenerActivity  extends  AbstractActivity  implements  PacketEventListener
 {
     @Override
     protected  void  onCreate( Bundle  savedInstanceState )
     {
-        super.application().getSquirrelClient().addPacketListener(this);
+        super.application().getSquirrelClient().getPacketEventDispatcher().addListener(    this );
 
-        super.onCreate(savedInstanceState);
+        super.onCreate( savedInstanceState );
     }
     @Override
-    public  boolean  onBeforeSend(   Packet  packet )  throws  Throwable
-    {
-        return  true;
-    }
-    @Override
-    public  void  onSent(Packet packet,TransportState  transportState  )
+    public  void  onBeforeSend( Packet  packet )
     {
 
     }
     @Override
-    public  void  onReceived(        Packet  packet )
+    public  void  onSent( Packet  packet,TransportState  transportState  )
+    {
+
+    }
+    @Override
+    public  void  onReceived(   Packet  packet )
     {
 
     }
@@ -50,6 +50,6 @@ public  class  AbstractPacketListenerActivity  extends  AbstractActivity  implem
     {
         super.onDestroy();
 
-        application().getSquirrelClient().removePacketListener(  this );
+        super.application().getSquirrelClient().getPacketEventDispatcher().removeListener( this );
     }
 }

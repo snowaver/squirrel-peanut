@@ -16,6 +16,7 @@
 package cc.mashroom.squirrel.module.system.activity;
 
 import  android.content.Intent;
+import  android.content.SharedPreferences;
 import  android.graphics.Color;
 import  android.os.Bundle;
 import  androidx.core.app.ActivityCompat;
@@ -25,6 +26,7 @@ import  android.view.WindowManager;
 
 import  com.aries.ui.widget.alert.UIAlertDialog;
 import  com.aries.ui.widget.progress.UIProgressDialog;
+import  com.google.common.collect.Lists;
 
 import  java.util.List;
 import  java.util.concurrent.TimeUnit;
@@ -35,13 +37,22 @@ import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.router.Service;
-import  cc.mashroom.router.ServiceRouteListener;
+import  cc.mashroom.router.ServiceListRequestEventListener;
+import  cc.mashroom.router.impl.DefaultServiceListRequestStrategy;
 import  cc.mashroom.squirrel.R;
+import  cc.mashroom.squirrel.client.SquirrelClient;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
+import  cc.mashroom.squirrel.parent.Application;
 import  cc.mashroom.squirrel.util.LocaleUtils;
+import  cc.mashroom.util.NoopHostnameVerifier;
+import  cc.mashroom.util.NoopX509TrustManager;
+import  cc.mashroom.util.StringUtils;
+import  java8.util.stream.Collectors;
+import  java8.util.stream.StreamSupport;
+import  okhttp3.OkHttpClient;
 
-public  class    NetworkPreinitializeActivity      extends     AbstractActivity  implements  Runnable,ServiceRouteListener
+public  class    NetworkPreinitializeActivity      extends     AbstractActivity  implements  Runnable,ServiceListRequestEventListener
 {
 	protected  void  onCreate(Bundle  savedInstanceState )
 	{
@@ -55,67 +66,49 @@ public  class    NetworkPreinitializeActivity      extends     AbstractActivity 
 
 		super.setContentView( R.layout.activity_network_preinitialize );
 
+		super.application().getSquirrelClient().route(new  DefaultServiceListRequestStrategy(new  OkHttpClient.Builder().hostnameVerifier(new NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new NoopX509TrustManager()).connectTimeout(5,TimeUnit.SECONDS).writeTimeout(5,TimeUnit.SECONDS).readTimeout(10,TimeUnit.SECONDS).build(),Lists.newArrayList(Application.SERVICE_LIST_REQUEST_URL),StreamSupport.stream(Lists.newArrayList(super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("HOSTS","").split(","))).filter((host) -> StringUtils.isNotBlank(host)).map((host) -> new  Service().setHost(host)).collect(Collectors.toList())),this );
+
 		this.progressDialog = StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
 
-		super.application().getScheduler().schedule( this,5,TimeUnit.SECONDS );
+		super.application().getScheduler().schedule( this, 5 , TimeUnit.SECONDS );
 	}
 
 	private UIProgressDialog  progressDialog;
-
 	@Override
 	public  void  onRequestComplete( List<Service>  list )
 	{
 		if( this.progressDialog.isShowing() )
 		{
-			super.application().getMainLooperHandler().post(()-> this.progressDialog.cancel() );
-
-			run();
+			super.application().getMainLooperHandler().post(()-> this.progressDialog.cancel() );run();
 		}
 	}
 	@Override
-	protected  void       onStart()
+	public  void  onBeforeRequest()
 	{
-		super.onStart(  );
-
-		super.application().getSquirrelClient().getServiceRouteManager().addListener(    this );
+		if( !super.isFinishing() && !super.isDestroyed() )  super.application().getMainLooperHandler().post( () -> this.progressDialog.show() );
 	}
     @Override
     protected  void     onDestroy()
     {
         super.onDestroy();
 
-        super.application().getSquirrelClient().getServiceRouteManager().removeListener( this );
+        super.application().getSquirrelClient().getServiceRouteManager().getServiceListRequestEventDispatcher().removeListener(this);
     }
 
     public  void     run()
 	{
-		if( application().getSquirrelClient().getServiceRouteManager().getServices().isEmpty() )
+		if( super.application().getSquirrelClient().service()  != null )
 		{
-			application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> {this.progressDialog.show();  application().getSquirrelClient().reroute();}).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );
-
-			return;
+			super.application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> {this.progressDialog.show();  application().getSquirrelClient().reroute();}).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );  return;
 		}
 
-		Long  userId = super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getLong("ID" ,0 );
+		SharedPreferences  sharedPrf = super.getSharedPreferences( "LATEST_LOGIN_FORM",MODE_PRIVATE );
 
-		if( userId   > 0 )
+		if( sharedPrf.getLong(      "USER_ID" , 0L ) > 0 )
 		{
-			super.application().connect( userId, NetworkUtils.getLocation(this),super.application() );
+			super.application().connect( sharedPrf.getString("USERNAME",""),sharedPrf.getString("ENCRYPT_PASSWORD",""),NetworkUtils.getLocation(NetworkPreinitializeActivity.this) );
 		}
 
-		ActivityCompat.startActivity( this,new  Intent(NetworkPreinitializeActivity.this,userId > 0  ? SheetActivity.class : LoginActivity.class),ActivityOptionsCompat.makeCustomAnimation(NetworkPreinitializeActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
+		ActivityCompat.startActivity( this,new  Intent(NetworkPreinitializeActivity.this,sharedPrf.getLong("USER_ID",0L) > 0 ? SheetActivity.class : LoginActivity.class),ActivityOptionsCompat.makeCustomAnimation(NetworkPreinitializeActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
 	}
-	@Override
-	public  void  onBeforeRequest()
-	{
-		if( !super.isFinishing() && !super.isDestroyed() )
-		{
-			super.application().getMainLooperHandler().post( () -> this.progressDialog.show() );
-		}
-	}
-    @Override
-    public  void  onChanged( Service  oldService  ,Service  newService )
-    {
-
-    }
 }

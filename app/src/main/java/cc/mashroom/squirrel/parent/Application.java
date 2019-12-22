@@ -36,15 +36,12 @@ import  org.joda.time.DateTime;
 import  org.webrtc.PeerConnection;
 
 import  cc.mashroom.hedgehog.util.NetworkUtils;
-import  cc.mashroom.router.DefaultServiceListRequestStrategy;
-import  cc.mashroom.router.Schema;
 import  cc.mashroom.router.Service;
-import  cc.mashroom.router.ServiceRouteListener;
+import  cc.mashroom.router.ServiceChangeEventListener;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.client.LifecycleListener;
 import  cc.mashroom.squirrel.client.SquirrelClient;
-import  cc.mashroom.squirrel.client.connect.ConnectState;
-import  cc.mashroom.squirrel.client.PacketListener;
+import  cc.mashroom.squirrel.client.event.LifecycleEventListener;
+import  cc.mashroom.squirrel.client.event.PacketEventListener;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
 import  cc.mashroom.squirrel.http.ServiceRegistry;
@@ -65,7 +62,6 @@ import  java.util.LinkedList;
 import  java.util.List;
 import  java.util.Set;
 import  java.util.concurrent.ScheduledThreadPoolExecutor;
-import  java.util.concurrent.TimeUnit;
 
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
@@ -74,39 +70,35 @@ import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.FileUtils;
 import  cc.mashroom.util.ObjectUtils;
-import  cc.mashroom.util.StringUtils;
+import cc.mashroom.util.StringUtils;
 import  es.dmoral.toasty.Toasty;
 import  io.netty.util.concurrent.DefaultThreadFactory;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.SneakyThrows;
 import  lombok.experimental.Accessors;
 import  okhttp3.HttpUrl;
 
-public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  LifecycleListener,PacketListener,   ServiceRouteListener
+public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  LifecycleEventListener,PacketEventListener,ServiceChangeEventListener
 {
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList(new  PeerConnection.IceServer("stun:47.105.210.154:3478"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302"),new  PeerConnection.IceServer("turn:47.105.210.154:3478","snowaver","snowaver") );
 
 	public  static  String  SERVICE_LIST_REQUEST_URL      = "https://10.208.60.190:8011/system/service?action=1&keyword=0";
 
 	private  Set<Class> authenticateNeedlessActivityClasses  = Sets.newHashSet(NetworkPreinitializeActivity.class,LoginActivity.class,RegisterActivity.class );
-	@Accessors(  chain = true )
-	@Getter
-	@Setter
-	private  SquirrelClient  squirrelClient  = null;
 	@Getter
 	private  ScheduledThreadPoolExecutor   scheduler  = new  ScheduledThreadPoolExecutor( 1,new  DefaultThreadFactory("DEFAULT-TASK-SCHEDULER") );
 
 	@SneakyThrows
-	public   void    onCreate()
+	public  void     onCreate()
 	{
 		super.onCreate();
 
 		LocaleUtils.change(this,null);
 
-		this.squirrelClient = new  SquirrelClient(this,super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir()).route(new  DefaultServiceListRequestStrategy(Lists.newArrayList(SERVICE_LIST_REQUEST_URL),SquirrelClient.SSL_CONTEXT.getSocketFactory(),5,TimeUnit.SECONDS)).addPacketListener(     this );
-
-		this.squirrelClient.getServiceRouteManager().addListener(this );
+		setSquirrelClient(new  SquirrelClient( this,super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir())).getSquirrelClient().getLifecycleEventDispatcher().addListener( this );
 
 		PushServiceNotifier.INSTANCE.initialize(    this );
 
@@ -116,6 +108,10 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		ObjectUtils.cast(super.getSystemService(Context.CONNECTIVITY_SERVICE),ConnectivityManager.class).requestNetwork( new  NetworkRequest.Builder().build(),new  ConnectivityStateListener( this ) );
 	}
+	@Accessors(  chain = true )
+	@Getter
+	@Setter
+	private  SquirrelClient  squirrelClient  = null;
 
 	public  void  onAuthenticateComplete( int  returnCode )
 	{
@@ -131,10 +127,10 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		else
 		if( returnCode == 200 )
 		{
-			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().putLong("ID",squirrelClient.getUserMetadata().getId()).putString("USERNAME",squirrelClient.getUserMetadata().getUsername()).putString("NAME",squirrelClient.getUserMetadata().getName()).putString("NICKNAME",squirrelClient.getUserMetadata().getNickname()).putString("HTTPS_BASE_URL",baseUrl().toString()).apply();
+			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().putLong("ID",squirrelClient.userMetadata().getId()).putString("USERNAME",squirrelClient.userMetadata().getUsername()).putString("NAME",squirrelClient.userMetadata().getName()).putString("NICKNAME",squirrelClient.userMetadata().getNickname()).putString("HTTPS_BASE_URL",baseUrl().toString()).apply();
 		}
 	}
-
+	@Override
 	public  void  onTerminate()
 	{
 		super.onTerminate();
@@ -144,31 +140,16 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		this.scheduler.shutdown(/**/);
 	}
 
-	public  void  connect( String  username,  String  password,Location  geometryLoc,LifecycleListener  lifecycleListener )
+	public  void  connect( String  username,String  password,Location  geoLoc )
 	{
-		this.squirrelClient.connect( username,password,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null ? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
-	}
-
-	public  void  connect( Long  id,Location  geometryLoc,LifecycleListener  lifecycleListener )
-	{
-		this.squirrelClient.connect( id,geometryLoc == null ? null : geometryLoc.getLongitude(),geometryLoc == null? null : geometryLoc.getLatitude(),NetworkUtils.getMac(),Lists.newArrayList(this,lifecycleListener) );
+		this.squirrelClient.connect( username,true ,password,geoLoc == null ? null : geoLoc.getLongitude(),     geoLoc == null ? null : geoLoc.getLatitude(),NetworkUtils.getMac() );
 	}
 	@Override
-	public  void     onBeforeRequest()
+	public  void  onChange( Service  oldService,   Service  newService )
 	{
-
-	}
-	@Override
-	public  void  onRequestComplete( List  <Service> list )
-	{
-
-	}
-	@Override
-	public  void  onChanged( Service  oldService ,  Service newService )
-	{
-		if( newService != null && oldService  != newService     && Schema.valueOf(StringUtils.upperCase(newService.getSchema())) == Schema.HTTPS )
+		if( oldService != newService )
 		{
-			ServiceRegistry.INSTANCE.initialize(    this );
+		ServiceRegistry.INSTANCE.initialize( this );
 		}
 	}
 
@@ -200,29 +181,27 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		}
 	}
 
-	public  void  onConnectStateChanged(     ConnectState connectState )
+	public  void  onBeforeSend(     Packet  packet )
 	{
 
 	}
 
-    public  void  onReceivedOfflineData( OoIData  offline )
-    {
-
-    }
-
-	public  boolean  onBeforeSend(  Packet  packet )
+	public  void  onReceivedOfflineData( OoIData  offline )
 	{
-		return  true;
+
 	}
-	
+
 	public  HttpUrl.Builder  baseUrl()
 	{
-		Service  service = this.squirrelClient.getServiceRouteManager().current( Schema.HTTPS );
-
-		return  new  HttpUrl.Builder().scheme(      service.getSchema()).host(service.getHost()).port( service.getPort() );
+		return  new  HttpUrl.Builder().scheme(System.getProperty("squirrel.dt.server.schema","https")).host(this.squirrelClient.service().getHost()).port( Integer.parseInt(System.getProperty("squirrel.dt.server.port","8011")) );
 	}
 
 	public  void  onSent(   Packet  sentPacket,TransportState  transportState )
+	{
+
+	}
+
+	public  void  onConnectStateChanged(     ConnectState connectState )
 	{
 
 	}

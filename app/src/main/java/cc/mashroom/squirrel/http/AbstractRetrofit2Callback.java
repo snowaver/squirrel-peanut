@@ -25,7 +25,6 @@ import  java.net.SocketTimeoutException;
 
 import  cc.mashroom.hedgehog.util.DensityUtils;
 import  cc.mashroom.hedgehog.util.StyleUnifier;
-import  cc.mashroom.router.Schema;
 import  cc.mashroom.squirrel.R;
 
 import  cc.mashroom.squirrel.parent.AbstractActivity;
@@ -70,7 +69,7 @@ public  abstract    class  AbstractRetrofit2Callback<T>  implements  Callback<T>
 
 	public  void  onFailure(  Call<T>  call,Throwable  e )
 	{
-		if( e instanceof ConnectException||e instanceof SocketTimeoutException )  this.context.application().getSquirrelClient().getServiceRouteManager().tryNext( Schema.HTTPS );
+		if( e instanceof ConnectException||e instanceof SocketTimeoutException )  this.context.application().getSquirrelClient().getServiceRouteManager().tryNext();
 
 		if( this.isShowWaitingDialog)  this.waitingDailog.cancel();
 
