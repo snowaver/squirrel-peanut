@@ -30,7 +30,7 @@ import  cc.mashroom.hedgehog.system.LocaleChangeEventDispatcher;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.module.home.activity.ContactProfileActivity;
-import  cc.mashroom.squirrel.parent.AbstractPacketListenerFragment;
+import cc.mashroom.squirrel.parent.AbstractPacketEventListenerFragment;
 import  cc.mashroom.squirrel.module.home.tab.contact.adapters.ContactGroupAdapter;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
@@ -38,7 +38,7 @@ import  cc.mashroom.squirrel.paip.message.subscribes.SubscribeAckPacket;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.hedgehog.widget.PinnedHeaderExpandableListViewLayout;
 
-public  class  ContactGroupFragment  extends  AbstractPacketListenerFragment  implements  LocaleChangeEventDispatcher.LocaleChangeListener
+public  class  ContactGroupFragment  extends AbstractPacketEventListenerFragment implements  LocaleChangeEventDispatcher.LocaleChangeListener
 {
 	public  View  onCreateView( LayoutInflater  inflater,ViewGroup  container,Bundle  savedInstanceState )
 	{

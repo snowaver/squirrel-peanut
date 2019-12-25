@@ -47,7 +47,7 @@ import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.hedgehog.system.Media;
-import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
+import cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -65,7 +65,7 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class  ChatActivity  extends AbstractPacketListenerActivity  implements  View.OnKeyListener
+public  class  ChatActivity  extends AbstractPacketEventListenerActivity implements  View.OnKeyListener
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{

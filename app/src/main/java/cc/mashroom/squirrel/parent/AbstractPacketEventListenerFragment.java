@@ -16,39 +16,46 @@
 package cc.mashroom.squirrel.parent;
 
 import  android.os.Bundle;
+import  android.view.LayoutInflater;
+import  android.view.View;
+import  android.view.ViewGroup;
+
+import  androidx.annotation.NonNull;
+import  androidx.annotation.Nullable;
 
 import  cc.mashroom.squirrel.client.event.PacketEventListener;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 
-public  class  AbstractPacketListenerActivity  extends  AbstractActivity  implements  PacketEventListener
+public  class  AbstractPacketEventListenerFragment  extends   AbstractFragment  implements  PacketEventListener
 {
+    @Nullable
     @Override
-    protected  void  onCreate( Bundle  savedInstanceState )
+    public  View  onCreateView( @NonNull  LayoutInflater  inflater,@Nullable  ViewGroup  container,@Nullable  Bundle  savedInstanceState )
     {
         super.application().getSquirrelClient().getPacketEventDispatcher().addListener(    this );
 
-        super.onCreate( savedInstanceState );
+        return  super.onCreateView( inflater,container,savedInstanceState );
     }
     @Override
-    public  void  onBeforeSend( Packet  packet )
+    public  void  onBeforeSend(Packet  packet )
     {
 
     }
     @Override
-    public  void  onSent( Packet  packet,TransportState  transportState  )
+    public  void  onSent(   Packet  packet, TransportState  transportState )
     {
 
     }
     @Override
-    public  void  onReceived(   Packet  packet )
+    public  void  onReceived(  Packet  packet )
     {
 
     }
     @Override
-    protected  void  onDestroy()
+    public  void  onDestroyView()
     {
-        super.onDestroy();
+        super.onDestroyView();
 
         super.application().getSquirrelClient().getPacketEventDispatcher().removeListener( this );
     }

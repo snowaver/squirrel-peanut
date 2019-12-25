@@ -33,7 +33,7 @@ import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
 import  cc.mashroom.squirrel.module.home.activity.ContactProfileEditActivity;
-import  cc.mashroom.squirrel.parent.AbstractPacketListenerFragment;
+import cc.mashroom.squirrel.parent.AbstractPacketEventListenerFragment;
 import  cc.mashroom.squirrel.module.chat.activity.ChatActivity;
 import cc.mashroom.squirrel.module.chat.activity.ChatGroupActivity;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
@@ -42,7 +42,7 @@ import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.util.ObjectUtils;
 import  lombok.Getter;
 
-public  class  NewsProfileFragment  extends  AbstractPacketListenerFragment  implements  AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
+public  class  NewsProfileFragment  extends AbstractPacketEventListenerFragment implements  AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
 	public  View  onCreateView( LayoutInflater  inflater,ViewGroup  container,Bundle  savedInstanceState )
 	{

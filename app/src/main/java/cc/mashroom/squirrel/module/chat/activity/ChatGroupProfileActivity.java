@@ -41,7 +41,7 @@ import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
 import  cc.mashroom.squirrel.paip.message.chat.ChatGroupEventPacket;
-import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
+import cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
@@ -55,7 +55,7 @@ import  java.sql.Connection;
 import  java.util.HashSet;
 import  java.util.Set;
 
-public  class ChatGroupProfileActivity extends            AbstractPacketListenerActivity
+public  class ChatGroupProfileActivity extends AbstractPacketEventListenerActivity
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle   savedInstanceState )

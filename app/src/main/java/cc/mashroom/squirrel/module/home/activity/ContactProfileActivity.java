@@ -42,7 +42,7 @@ import  cc.mashroom.squirrel.module.chat.activity.ChatActivity;
 import  cc.mashroom.squirrel.module.common.services.UserService;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.subscribes.SubscribeAckPacket;
-import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
+import cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -51,7 +51,7 @@ import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
 
-public  class  ContactProfileActivity  extends  AbstractPacketListenerActivity
+public  class  ContactProfileActivity  extends AbstractPacketEventListenerActivity
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{

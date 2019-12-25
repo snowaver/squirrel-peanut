@@ -56,7 +56,7 @@ import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.chat.ChatContentType;
 import  cc.mashroom.squirrel.paip.message.chat.GroupChatPacket;
 import  cc.mashroom.hedgehog.system.Media;
-import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
+import cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -69,7 +69,7 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class ChatGroupActivity extends  AbstractPacketListenerActivity  implements  PacketListener  ,View.OnKeyListener
+public  class ChatGroupActivity extends AbstractPacketEventListenerActivity implements  PacketListener  ,View.OnKeyListener
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )

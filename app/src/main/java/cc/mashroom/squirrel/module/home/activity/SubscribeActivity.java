@@ -17,9 +17,9 @@ package cc.mashroom.squirrel.module.home.activity;
 
 import  android.os.Bundle;
 
-import  cc.mashroom.squirrel.parent.AbstractPacketListenerActivity;
+import cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
 
-public  class  SubscribeActivity  extends  AbstractPacketListenerActivity
+public  class  SubscribeActivity  extends AbstractPacketEventListenerActivity
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
