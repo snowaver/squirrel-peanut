@@ -15,13 +15,10 @@
  */
 package cc.mashroom.squirrel.parent;
 
-import  android.content.SharedPreferences;
 import  android.net.ConnectivityManager;
 import  android.net.Network;
 
 import  lombok.AllArgsConstructor;
-
-import  static  android.content.Context.MODE_PRIVATE;
 
 @AllArgsConstructor
 
@@ -32,12 +29,5 @@ public  class  ConnectivityStateListener  extends  ConnectivityManager.NetworkCa
     public  void  onAvailable(    Network  network )
     {
         super.onAvailable(  network );
-
-        SharedPreferences  sharedPreferences  = application.getSharedPreferences( "LATEST_LOGIN_FORM",MODE_PRIVATE );
-
-        if( sharedPreferences.getLong("ID",0) >= 1 && !application.getSquirrelClient().isAuthenticated() )
-        {
-
-        }
     }
 }

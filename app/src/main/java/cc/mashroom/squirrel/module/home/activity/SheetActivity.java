@@ -44,7 +44,6 @@ import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.BottomSheetEditor;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.client.connect.ConnectState;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.http.ResponseRetrofit2Callback;
@@ -53,7 +52,8 @@ import  cc.mashroom.squirrel.module.chat.services.ChatGroupService;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.adapters.NewsProfileListAdapter;
 import  cc.mashroom.squirrel.module.home.tab.newsprofile.fragment.NewsProfileFragment;
 import  cc.mashroom.squirrel.module.home.adapters.SheetPagerAdapter;
-import  cc.mashroom.squirrel.parent.AbstractLifecycleListenerActivity;
+import  cc.mashroom.squirrel.parent.AbstractLifecycleEventListenerActivity;
+import  cc.mashroom.squirrel.transport.ConnectState;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.ConcurrentHashMap;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -66,7 +66,7 @@ import  java.util.ArrayList;
 import  java.util.List;
 import  java.util.Locale;
 
-public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   implements  TabLayout.OnTabSelectedListener,LocaleChangeEventDispatcher.LocaleChangeListener,UIActionSheetDialog.OnItemClickListener,BottomSheetEditor.OnEditCompleteListener
+public  class  SheetActivity  extends AbstractLifecycleEventListenerActivity implements  TabLayout.OnTabSelectedListener,LocaleChangeEventDispatcher.LocaleChangeListener,UIActionSheetDialog.OnItemClickListener,BottomSheetEditor.OnEditCompleteListener
 {
 	protected  void  onCreate(  Bundle  savedInstanceState )
 	{
@@ -95,7 +95,7 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 
 		for( Map<String,Object>  bottomTabResources : ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().values() )
 		{
-			TabLayout.Tab  newTab = ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).newTab().setCustomView(  R.layout.activity_sheet_tab_indicator );
+			TabLayout.Tab  newTab = ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).newTab().setCustomView( R.layout.activity_sheet_tab_indicator );
 
 			ObjectUtils.cast(newTab.getCustomView().findViewById(R.id.title),TextView.class).setText( bottomTabResources.getInteger("title") );
 
@@ -106,7 +106,7 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 
 		ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).setOnClickListener( (logoutButton) -> ActivityCompat.startActivity(this,new  Intent(this,SystemSettingsActivity.class),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
 
-		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+application().getSquirrelClient().getUserMetadata().getId()+"/portrait").build().toString()) );
+		ObjectUtils.cast(super.findViewById(R.id.portrait),SimpleDraweeView.class).setImageURI( Uri.parse(application().baseUrl().addPathSegments("user/"+application().getSquirrelClient().userMetadata().getId()+"/portrait").build().toString()) );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).findViewById(R.id.additional_switcher).setOnClickListener( (view) -> StyleUnifier.unify(new  UIActionSheetDialog.ListIOSBuilder(this).setBackgroundRadius(15).addItem(R.string.chat_create_new_group).setItemsTextSize(18).setCancel(cc.mashroom.hedgehog.R.string.close).setCancelTextColorResource(cc.mashroom.hedgehog.R.color.red).setCancelTextSize(18).setItemsMinHeight(DensityUtils.px(this,50)).setPadding(DensityUtils.px(this,10)).setCanceledOnTouchOutside(true).setOnItemClickListener(this).create(),Typeface.createFromAsset(super.getAssets(),"font/droid_sans_mono.ttf")).show() );
 	}
@@ -143,15 +143,16 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 	{
 		if(         StringUtils.isNotBlank(groupName) )
 		{
-			ServiceRegistry.INSTANCE.get(ChatGroupService.class).add(ObjectUtils.cast(groupName)).enqueue( new  ResponseRetrofit2Callback<OoIData>(this,true).addResponseHandler(200,(call, response) -> onCreateNewChatGroup(response)) );
+			ServiceRegistry.INSTANCE.get(ChatGroupService.class).add(ObjectUtils.cast(groupName)).enqueue( new  ResponseRetrofit2Callback<OoIData>(this,true).addResponseHandler(200,(call, response) -> onCreateNewChatGroup(  response)));
 		}
 	}
 
 	private  void  onCreateNewChatGroup( Response<OoIData>  response )
 	{
-		response.body().getChatGroupUsers().get(0).setVcard(   application().getSquirrelClient().getUserMetadata().getNickname() );
-
-		Db.tx(String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
+		if( Db.tx(String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false)) )
+		{
+			response.body().getChatGroupUsers().get(0).setVcard(super.application().getSquirrelClient().userMetadata().getNickname() );
+		}
 
 		ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(ObjectUtils.cast(SheetActivity.this.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().get("news_profile").get("fragment.instance"),NewsProfileFragment.class).getContentView().findViewById(R.id.profile_list),ListView.class).getAdapter(),NewsProfileListAdapter.class).notifyDataSetChanged();
 	}
@@ -177,7 +178,7 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 	{
 		onConnectStateChanged(  application().getSquirrelClient().getConnectState() );
 
-		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).getChildAt(1),TextView.class).setText(   R.string.system_settings );
+		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.settings_button),LinearLayout.class).getChildAt(1),TextView.class).setText(  R.string.system_settings );
 
 		List<Map<String,Object>>  sidebarDatas = new  ArrayList<Map<String,Object>>();
 
@@ -193,7 +194,7 @@ public  class  SheetActivity  extends   AbstractLifecycleListenerActivity   impl
 			ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_layout),TabLayout.class).getTabAt(i).getCustomView().findViewById(R.id.title),TextView.class).setText( ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.tab_content),ViewPager.class).getAdapter(),SheetPagerAdapter.class).getTabs().getValue(i).getInteger("title") );
 		}
 
-		ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.additional_text),           TextView.class).setText( R.string.option );
+		ObjectUtils.cast(super.findViewById(R.id.header_bar).findViewById(cc.mashroom.hedgehog.R.id.additional_text),          TextView.class).setText( R.string.option );
 
 		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).getAddtionalDropdownContent().getChildAt(0),TextView.class).setText( R.string.chat_create_new_group );
 	}

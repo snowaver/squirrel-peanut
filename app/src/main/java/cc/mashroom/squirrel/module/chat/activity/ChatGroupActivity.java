@@ -42,7 +42,7 @@ import  cc.mashroom.hedgehog.util.MultimediaUtils;
 import  cc.mashroom.db.common.Db;
 import  cc.mashroom.hedgehog.widget.ViewSwitcher;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.client.PacketListener;
+import cc.mashroom.squirrel.client.event.PacketEventListener;
 import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.group.ChatGroupRepository;
 import  cc.mashroom.squirrel.http.ServiceRegistry;
@@ -56,7 +56,7 @@ import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.chat.ChatContentType;
 import  cc.mashroom.squirrel.paip.message.chat.GroupChatPacket;
 import  cc.mashroom.hedgehog.system.Media;
-import cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
+import  cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -69,7 +69,7 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class ChatGroupActivity extends AbstractPacketEventListenerActivity implements  PacketListener  ,View.OnKeyListener
+public  class  ChatGroupActivity  extends  AbstractPacketEventListenerActivity           implements  PacketEventListener, View.OnKeyListener
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle  savedInstanceState )
@@ -112,7 +112,7 @@ public  class ChatGroupActivity extends AbstractPacketEventListenerActivity impl
 
 		if( voiceDuration >200 )
 		{
-			application().getSquirrelClient().send(  new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),this.groupId, audioFile.getName(),ChatContentType.AUDIO,String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
+			application().getSquirrelClient().send(  new  GroupChatPacket(application().getSquirrelClient().userMetadata().getId(),this.groupId, audioFile.getName(),ChatContentType.AUDIO,String.valueOf(voiceDuration < 1000 ? 1000 : voiceDuration).getBytes()) );
 		}
 		else
 		{
@@ -154,24 +154,31 @@ public  class ChatGroupActivity extends AbstractPacketEventListenerActivity impl
 		}
 	}
 
-	public  boolean  onBeforeSend(  Packet  packet )  throws  Throwable
+	public  void  onBeforeSend(Packet  packet )
 	{
 		if( packet instanceof GroupChatPacket )
 		{
 			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatGroupActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatGroupMessageListviewAdapter.class).upsert(packet.getId()) );
 
+			try
+			{
 			if( ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{
-				if( ServiceRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )  return  false;
+				if( ServiceRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )  throw  new  IllegalStateException( "SQUIRREL-PEANUT:  ** CHAT  GROUP  ACTIVITY **  error  while  uploading  thumbnail  and  file." );
 			}
 			else
 			if( ObjectUtils.cast(packet,GroupChatPacket.class).getContentType() == ChatContentType.AUDIO && ServiceRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,GroupChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,GroupChatPacket.class).getMd5()))))).execute().code() != 200 )
 			{
-				return    false;
+				throw  new  IllegalStateException( "SQUIRREL-PEANUT:  ** CHAT  GROUP  ACTIVITY **  error  while  uploading  audio  file." );
+			}
+			}
+			catch( Throwable e )
+			{
+				{
+					super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,  R.string.io_exception, R.color.white,R.color.red );
+				}
 			}
 		}
-
-		return  true ;
 	}
 
 	public  boolean  onKey( View  view, int  keyCode, KeyEvent  event )
@@ -180,7 +187,7 @@ public  class ChatGroupActivity extends AbstractPacketEventListenerActivity impl
 		{
 			if( StringUtils.isNotBlank(ObjectUtils.cast(      super.findViewById(R.id.editor),EditText.class).getText().toString().trim()) )
 			{
-				application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),this.groupId,"",ChatContentType.WORDS,ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim().getBytes()) );
+				application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().userMetadata().getId(),this.groupId,"",ChatContentType.WORDS,ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().toString().trim().getBytes()) );
 
 				ObjectUtils.cast(super.findViewById(R.id.editor),EditText.class).getText().clear();
 			}
@@ -206,7 +213,7 @@ public  class ChatGroupActivity extends AbstractPacketEventListenerActivity impl
 	{
 		super.onPause(  );
 
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
+		Db.tx( String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
 	}
 
 	protected  void  onActivityResult(    int  requestCode , int  resultCode , Intent  resultData )
@@ -221,7 +228,7 @@ public  class ChatGroupActivity extends AbstractPacketEventListenerActivity impl
 				{
 					File  cachedFile= application().cache((int)  media.getId(),new  File(media.getPath()), media.getType()==cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE.getValue(): ChatContentType.VIDEO.getValue() );
 
-					application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().getUserMetadata().getId(),groupId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
+					application().getSquirrelClient().send( new  GroupChatPacket(application().getSquirrelClient().userMetadata().getId(),groupId,cachedFile.getName(),media.getType() == cc.mashroom.hedgehog.system.MediaType.IMAGE ? ChatContentType.IMAGE : ChatContentType.VIDEO,cachedFile.getName().getBytes()) );
 				}
 				catch(       IOException  ioe )
 				{
@@ -237,6 +244,6 @@ public  class ChatGroupActivity extends AbstractPacketEventListenerActivity impl
 	{
 		super.onDestroy();
 
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
+		Db.tx( String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection) -> NewsProfileRepository.DAO.clearBadgeCount(this.groupId, PAIPPacketType.GROUP_CHAT.getValue()) );
 	}
 }

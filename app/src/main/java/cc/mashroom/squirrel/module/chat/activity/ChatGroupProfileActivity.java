@@ -41,7 +41,7 @@ import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.common.activity.ContactMultichoiceActivity;
 import  cc.mashroom.squirrel.module.chat.services.ChatGroupUserService;
 import  cc.mashroom.squirrel.paip.message.chat.ChatGroupEventPacket;
-import cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
+import  cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
@@ -55,7 +55,7 @@ import  java.sql.Connection;
 import  java.util.HashSet;
 import  java.util.Set;
 
-public  class ChatGroupProfileActivity extends AbstractPacketEventListenerActivity
+public  class  ChatGroupProfileActivity     extends  AbstractPacketEventListenerActivity
 {
 	@SneakyThrows
 	protected  void  onCreate( Bundle   savedInstanceState )
@@ -66,7 +66,7 @@ public  class ChatGroupProfileActivity extends AbstractPacketEventListenerActivi
 
 		this.setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{super.getIntent().getLongExtra("CHAT_GROUP_ID",0)}) );
 
-		this.setChatGroupUser( ChatGroupUserRepository.DAO.lookupOne(ChatGroupUser.class,"SELECT  *  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{this.chatGroup.getId(),application().getSquirrelClient().getUserMetadata().getId()}) );
+		this.setChatGroupUser( ChatGroupUserRepository.DAO.lookupOne(ChatGroupUser.class,"SELECT  *  FROM  "+ChatGroupUserRepository.DAO.getDataSourceBind().table()+"  WHERE  CHAT_GROUP_ID = ?  AND  CONTACT_ID = ?  AND  IS_DELETED = FALSE",new  Object[]{this.chatGroup.getId(),super.application().getSquirrelClient().userMetadata().getId()}) );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar)  ,HeaderBar.class).setTitle( this.chatGroup.getName() );
 
@@ -74,7 +74,7 @@ public  class ChatGroupProfileActivity extends AbstractPacketEventListenerActivi
 		
 		ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).setText(  this.chatGroup.getName() );
 
-		if( chatGroup.getCreateBy() == super.application().getSquirrelClient().getUserMetadata().getId() )
+		if( chatGroup.getCreateBy() == super.application().getSquirrelClient().userMetadata().getId() )
         {
             ObjectUtils.cast(super.findViewById(R.id.name),StyleableEditView.class).getContentSwitcher().getDisplayedChild().setOnClickListener( (v) -> new  BottomSheetEditor(this,16).setOnEditCompleteListener((groupName) -> ServiceRegistry.INSTANCE.get(ChatGroupService.class).update(this.chatGroup.getId(),groupName.toString()).enqueue(new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call,response) -> onNameChanged(response)))).show() );
         }
@@ -109,7 +109,7 @@ public  class ChatGroupProfileActivity extends AbstractPacketEventListenerActivi
 
 		if( data != null && requestCode == 0 )
 		{
-			ServiceRegistry.INSTANCE.get(ChatGroupUserService.class).add(this.chatGroup.getId(),StringUtils.join(ObjectUtils.cast(data.getSerializableExtra("SELECTED_CONTACT_IDS"),new  TypeReference<Set<Long>>(){}),",")).enqueue( new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call, response) -> onMembersInvited(response)) );
+			ServiceRegistry.INSTANCE.get(ChatGroupUserService.class).add(this.chatGroup.getId(),StringUtils.join(ObjectUtils.cast(data.getSerializableExtra("SELECTED_CONTACT_IDS"),new  TypeReference<Set<Long>>(){}),",")).enqueue( new  ResponseRetrofit2Callback(this,true).addResponseHandler(200,(call,response) -> onMembersInvited(response)) );
 		}
 	}
 
@@ -138,7 +138,7 @@ public  class ChatGroupProfileActivity extends AbstractPacketEventListenerActivi
 
 	private  void  onMembersInvited( Response  <OoIData>  response )
 	{
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
+		Db.tx( String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),   response.body(),false) );
 
 		ObjectUtils.cast(ObjectUtils.cast(super.findViewById(R.id.members),GridView.class).getAdapter(),GroupChatProfileMemberGridviewAdapter.class).notifyDataSetChanged();
 
@@ -147,7 +147,7 @@ public  class ChatGroupProfileActivity extends AbstractPacketEventListenerActivi
 
 	private  void  onNameChanged(    Response  <OoIData>  response )
 	{
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
+		Db.tx( String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),   response.body(),false) );
 
 		this.setChatGroup( ChatGroupRepository.DAO.lookupOne(ChatGroup.class,"SELECT  *  FROM  "+ ChatGroupRepository.DAO.getDataSourceBind().table()+"  WHERE  ID = ?",new  Object[]{super.getIntent().getLongExtra("CHAT_GROUP_ID",0)}) );
 		
@@ -160,7 +160,7 @@ public  class ChatGroupProfileActivity extends AbstractPacketEventListenerActivi
 
 	private  void  onLeftAndDeleted( Response  <OoIData>  response )
     {
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),response.body(),false) );
+		Db.tx( String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ChatGroupRepository.DAO.attach(application().getSquirrelClient(),   response.body(),false) );
 
 		super.showSneakerWindow( Sneaker.with(this).setOnSneakerDismissListener(() -> application().getMainLooperHandler().postDelayed(() -> {STACK.get(STACK.size()-2).finish();  super.finish();},500)),com.irozon.sneaker.R.drawable.ic_success,R.string.chat_group_left_or_deleted,R.color.white,R.color.limegreen );
     }

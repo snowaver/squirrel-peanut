@@ -181,7 +181,7 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 
 	private  void  onSubscribed(Response<Contact>  response )
 	{
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ContactRepository.DAO.upsert(response.body(),true) );
+		Db.tx( String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ContactRepository.DAO.upsert(response.body(),true) );
 
 		ObjectUtils.cast(super.findViewById(R.id.chat_or_subscribe_button),Button.class).setBackgroundColor(  super.getResources().getColor(R.color.gainsboro) );
 
@@ -192,7 +192,7 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 
 	private  void  onGroupUpdated( Contact  old,Response<Contact>  response )
 	{
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ContactRepository.DAO.upsert(old.clone().setLastModifyTime(response.body().getLastModifyTime()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true) );
+		Db.tx( String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ContactRepository.DAO.upsert(old.clone().setLastModifyTime(response.body().getLastModifyTime()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true) );
 
 		contact = ContactRepository.DAO.getContactDirect().get(old.getId() );
 
@@ -219,7 +219,7 @@ public  class  ContactProfileEditActivity   extends  AbstractActivity  implement
 
 	private  void  onAgreeSubscribe(            Response<Contact>  response )
 	{
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ContactRepository.DAO.upsert(ContactRepository.DAO.getContactDirect().get(this.contact.getId()).clone().setLastModifyTime(response.body().getLastModifyTime()).setSubscribeStatus(response.body().getSubscribeStatus()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true) );
+		Db.tx( String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_REPEATABLE_READ,(connection) -> ContactRepository.DAO.upsert(ContactRepository.DAO.getContactDirect().get(this.contact.getId()).clone().setLastModifyTime(response.body().getLastModifyTime()).setSubscribeStatus(response.body().getSubscribeStatus()).setRemark(response.body().getRemark()).setGroupName(response.body().getGroupName()),true) );
 
 		super.findViewById(R.id.chat_or_subscribe_button).setBackgroundColor(    super.getResources().getColor(R.color.limegreen) );
 

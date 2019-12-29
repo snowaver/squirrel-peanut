@@ -67,14 +67,12 @@ import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.call.CallPacket;
 import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
+import  cc.mashroom.squirrel.transport.ConnectState;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.FileUtils;
 import  cc.mashroom.util.ObjectUtils;
-import  cc.mashroom.util.StringUtils;
 import  es.dmoral.toasty.Toasty;
 import  io.netty.util.concurrent.DefaultThreadFactory;
-import  java8.util.stream.Collectors;
-import  java8.util.stream.StreamSupport;
 import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.SneakyThrows;
@@ -85,7 +83,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 {
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList(new  PeerConnection.IceServer("stun:47.105.210.154:3478"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302"),new  PeerConnection.IceServer("turn:47.105.210.154:3478","snowaver","snowaver") );
 
-	public  static  String  SERVICE_LIST_REQUEST_URL      = "https://10.208.60.190:8011/system/service?action=1&keyword=0";
+	public  static  String  SERVICE_LIST_REQUEST_URL      = "https://192.168.1.116:8011/system/service?action=1&keyword=0";
 
 	private  Set<Class> authenticateNeedlessActivityClasses  = Sets.newHashSet(NetworkPreinitializeActivity.class,LoginActivity.class,RegisterActivity.class );
 	@Getter
@@ -103,8 +101,6 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		PushServiceNotifier.INSTANCE.initialize(    this );
 
 		Toasty.Config.getInstance().allowQueue(true).setTextSize(14).setToastTypeface(Typeface.createFromAsset(super.getResources().getAssets(),"font/droid_sans_mono.ttf")).apply();
-
-		Fresco.initialize( Application.this,OkHttpImagePipelineConfigFactory.newBuilder(this, this.squirrelClient.okhttpClient(5,5,10)).build() );
 
 		ObjectUtils.cast(super.getSystemService(Context.CONNECTIVITY_SERVICE),ConnectivityManager.class).requestNetwork( new  NetworkRequest.Builder().build(),new  ConnectivityStateListener( this ) );
 	}
@@ -149,6 +145,8 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	{
 		if( oldService != newService )
 		{
+		Fresco.initialize( Application.this,OkHttpImagePipelineConfigFactory.newBuilder(this, this.squirrelClient.okhttpClient(5,5,10)).build() );
+
 		ServiceRegistry.INSTANCE.initialize( this );
 		}
 	}

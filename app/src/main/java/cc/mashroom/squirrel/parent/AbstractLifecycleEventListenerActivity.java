@@ -17,28 +17,28 @@ package cc.mashroom.squirrel.parent;
 
 import  android.os.Bundle;
 
-import  cc.mashroom.squirrel.client.LifecycleListener;
-import  cc.mashroom.squirrel.client.connect.ConnectState;
+import  cc.mashroom.squirrel.client.event.LifecycleEventListener;
 import  cc.mashroom.squirrel.client.storage.model.OoIData;
+import  cc.mashroom.squirrel.transport.ConnectState;
 
-public  class  AbstractLifecycleListenerActivity    extends  AbstractActivity  implements  LifecycleListener
+public  class  AbstractLifecycleEventListenerActivity  extends  AbstractActivity  implements  LifecycleEventListener
 {
     @Override
     protected  void  onCreate( Bundle  savedInstanceState )
     {
-        application().getSquirrelClient().addLifecycleListener(  this );
+        super.application().getSquirrelClient().getLifecycleEventDispatcher().addListener(    this );
 
-        super.onCreate(savedInstanceState);
+        super.onCreate( savedInstanceState );
     }
     @Override
     protected  void  onDestroy()
     {
         super.onDestroy();
 
-        application().getSquirrelClient().removeLifecycleListener(this);
+        super.application().getSquirrelClient().getLifecycleEventDispatcher().removeListener( this );
     }
     @Override
-    public  void  onError(    Throwable   throwable )
+    public  void  onError(    Throwable  throwable  )
     {
 
     }
@@ -53,7 +53,7 @@ public  class  AbstractLifecycleListenerActivity    extends  AbstractActivity  i
 
     }
     @Override
-    public  void  onAuthenticateComplete( int  code )
+    public  void  onAuthenticateComplete(int   code )
     {
 
     }

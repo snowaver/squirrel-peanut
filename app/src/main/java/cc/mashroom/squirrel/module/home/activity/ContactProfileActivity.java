@@ -42,7 +42,7 @@ import  cc.mashroom.squirrel.module.chat.activity.ChatActivity;
 import  cc.mashroom.squirrel.module.common.services.UserService;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.squirrel.paip.message.subscribes.SubscribeAckPacket;
-import cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
+import  cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -51,7 +51,7 @@ import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
 
-public  class  ContactProfileActivity  extends AbstractPacketEventListenerActivity
+public  class  ContactProfileActivity  extends  AbstractPacketEventListenerActivity
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
@@ -67,7 +67,7 @@ public  class  ContactProfileActivity  extends AbstractPacketEventListenerActivi
 
 		if( StringUtils.isNotBlank(this.nickname) )
 		{
-			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText(this.nickname );
+			ObjectUtils.cast(super.findViewById(R.id.nickname),StyleableEditView.class).setText(        this.nickname );
 		}
 		else
 		{
@@ -95,7 +95,7 @@ public  class  ContactProfileActivity  extends AbstractPacketEventListenerActivi
 
 		Contact  contact = ContactRepository.DAO.getContactDirect().get( this.contact.getId() );
 
-		if( contact != null  && super.application().getSquirrelClient().getUserMetadata().getId().longValue() != contact.getId() )
+		if( contact != null  && super.application().getSquirrelClient().userMetadata().getId().longValue() != contact.getId() )
 		{
 			if( contact.getSubscribeStatus() == 1 )
 			{
@@ -108,11 +108,11 @@ public  class  ContactProfileActivity  extends AbstractPacketEventListenerActivi
 
 			ObjectUtils.cast(super.findViewById(R.id.remark),  StyleableEditView.class).setText(  contact.getRemark() );
 
-			ObjectUtils.cast(super.findViewById(R.id.grouping)        ,StyleableEditView.class).setText( contact.getGroupName() );
+			ObjectUtils.cast(super.findViewById(R.id.grouping)     ,StyleableEditView.class).setText( contact.getGroupName() );
 		}
 		else
 		{
-			ContextUtils.setVisibility( View.INVISIBLE,contact != null && super.application().getSquirrelClient().getUserMetadata().getId().longValue() == contact.getId() ? new  View[]{super.findViewById(R.id.remark),super.findViewById(R.id.grouping),super.findViewById(R.id.chat_or_subscribe_button)} : new  View[]{super.findViewById(R.id.remark),super.findViewById(R.id.grouping)} );
+			ContextUtils.setVisibility( View.INVISIBLE,contact != null && super.application().getSquirrelClient().userMetadata().getId().longValue() == contact.getId() ? new  View[]{super.findViewById(R.id.remark),super.findViewById(R.id.grouping),super.findViewById(R.id.chat_or_subscribe_button)} : new  View[]{super.findViewById(R.id.remark),super.findViewById(R.id.grouping)} );
 		}
 	}
 

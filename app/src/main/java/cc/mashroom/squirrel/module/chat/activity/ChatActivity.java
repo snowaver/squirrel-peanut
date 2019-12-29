@@ -40,14 +40,14 @@ import  cc.mashroom.squirrel.module.chat.listener.AudioTouchRecoder;
 import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.chat.ChatContentType;
 import  cc.mashroom.squirrel.R;
-import cc.mashroom.squirrel.http.ServiceRegistry;
+import  cc.mashroom.squirrel.http.ServiceRegistry;
 import  cc.mashroom.squirrel.module.chat.adapters.ChatMessageListviewAdapter;
 import  cc.mashroom.squirrel.module.common.services.FileService;
 import  cc.mashroom.squirrel.paip.message.PAIPPacketType;
 import  cc.mashroom.squirrel.paip.message.chat.ChatPacket;
 import  cc.mashroom.squirrel.paip.message.Packet;
 import  cc.mashroom.hedgehog.system.Media;
-import cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
+import  cc.mashroom.squirrel.parent.AbstractPacketEventListenerActivity;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
 import  cc.mashroom.util.collection.map.HashMap;
@@ -65,11 +65,11 @@ import  okhttp3.MediaType;
 import  okhttp3.MultipartBody;
 import  okhttp3.RequestBody;
 
-public  class  ChatActivity  extends AbstractPacketEventListenerActivity implements  View.OnKeyListener
+public  class  ChatActivity  extends                AbstractPacketEventListenerActivity  implements  View.OnKeyListener
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
-		super.onCreate(         savedInstanceState );
+		super.onCreate(    savedInstanceState );
 
 		super.setContentView(     R.layout.activity_chat );
 
@@ -85,7 +85,7 @@ public  class  ChatActivity  extends AbstractPacketEventListenerActivity impleme
 
 		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).setAdapter( new  ChatMessageListviewAdapter(this,contactId) );
 
-		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).post( () -> this.configStackFromDirect() );
+		ObjectUtils.cast(super.findViewById(R.id.messages),ListView.class).post( () -> this.configStackFromDirect()  );
 
 		ObjectUtils.cast(super.findViewById(R.id.more_inputs_button),ImageView.class).setOnClickListener( (view) -> ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).setVisibility(ObjectUtils.cast(super.findViewById(R.id.more_inputs),GridView.class).getVisibility() == View.GONE ? View.VISIBLE : View.GONE) );
 
@@ -139,7 +139,7 @@ public  class  ChatActivity  extends AbstractPacketEventListenerActivity impleme
 		}
 	}
 
-	public  void  onReceived( final  Packet  packet )
+	public  void  onReceived(   Packet  packet )
 	{
 		if( packet instanceof ChatPacket )
 		{
@@ -147,24 +147,31 @@ public  class  ChatActivity  extends AbstractPacketEventListenerActivity impleme
 		}
 	}
 
-	public  boolean  onBeforeSend(   Packet  packet ) throws  Throwable
+	public  void  onBeforeSend( Packet  packet )
 	{
 		if( packet instanceof ChatPacket )
 		{
 			application().getMainLooperHandler().post( () -> ObjectUtils.cast(ObjectUtils.cast(ChatActivity.this.findViewById(R.id.messages),ListView.class).getAdapter(),ChatMessageListviewAdapter.class).upsert(packet.getId()) );
 
+			try
+			{
 			if( ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.IMAGE || ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.VIDEO )
 			{
-				if( ServiceRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )  return  false;
+				if( ServiceRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))),MultipartBody.Part.createFormData("thumbnailFile",ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB",RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()+"$TMB"))))).execute().code() != 200 )  throw  new  IllegalStateException( "SQUIRREL-PEANUT:  ** CHAT  ACTIVITY **  error  while  uploading  thumbnail  and  file." );
 			}
 			else
-			if( ObjectUtils.cast(packet,ChatPacket.class).getContentType()==ChatContentType.AUDIO )
+			if( ObjectUtils.cast(packet,ChatPacket.class).getContentType() == ChatContentType.AUDIO && ServiceRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))))).execute().code() != 200 )
 			{
-				if( ServiceRegistry.INSTANCE.get(FileService.class).add(Lists.newArrayList(MultipartBody.Part.createFormData("file",ObjectUtils.cast(packet,ChatPacket.class).getMd5(),RequestBody.create(MediaType.parse("application/otcet-stream"),new  File(application().getCacheDir(),"file/"+ObjectUtils.cast(packet,ChatPacket.class).getMd5()))))).execute().code() != 200 )  return  false;
+				throw  new  IllegalStateException(     "SQUIRREL-PEANUT:  ** CHAT  ACTIVITY **  error  while  uploading  audio  file." );
+			}
+			}
+			catch( Throwable e )
+			{
+				{
+					super.showSneakerWindow( Sneaker.with(this),  com.irozon.sneaker.R.drawable.ic_error,  R.string.io_exception, R.color.white,R.color.red );
+				}
 			}
 		}
-
-		return  true ;
 	}
 
 	public  boolean  onKey( View  view, int  keyCode, KeyEvent  event )
@@ -209,14 +216,14 @@ public  class  ChatActivity  extends AbstractPacketEventListenerActivity impleme
 	{
 		super.onPause(  );
 
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection)-> NewsProfileRepository.DAO.clearBadgeCount(contactId, PAIPPacketType.CHAT.getValue()) );
+		Db.tx( String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection)-> NewsProfileRepository.DAO.clearBadgeCount(contactId, PAIPPacketType.CHAT.getValue()) );
 	}
 
 	protected  void  onDestroy()
 	{
 		super.onDestroy();
 
-		Db.tx( String.valueOf(application().getSquirrelClient().getUserMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection)-> NewsProfileRepository.DAO.clearBadgeCount(contactId, PAIPPacketType.CHAT.getValue()) );
+		Db.tx( String.valueOf(application().getSquirrelClient().userMetadata().getId()),Connection.TRANSACTION_SERIALIZABLE,(connection)-> NewsProfileRepository.DAO.clearBadgeCount(contactId, PAIPPacketType.CHAT.getValue()) );
 	}
 
 	protected  void  onActivityResult(    int  requestCode , int  resultCode , Intent  resultData )
@@ -237,7 +244,7 @@ public  class  ChatActivity  extends AbstractPacketEventListenerActivity impleme
                 {
                     error(ioe );
 
-                    this.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.io_exception, R.color.white,R.color.red );
+                    super.showSneakerWindow( Sneaker.with(this),com.irozon.sneaker.R.drawable.ic_error,R.string.io_exception,     R.color.white,R.color.red );
                 }
 			}
 		}

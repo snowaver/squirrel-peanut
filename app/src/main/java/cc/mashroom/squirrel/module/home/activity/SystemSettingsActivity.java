@@ -35,7 +35,7 @@ import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.module.home.adapters.SystemSettingsLanguageAdapter;
-import  cc.mashroom.squirrel.parent.AbstractLifecycleListenerActivity;
+import cc.mashroom.squirrel.parent.AbstractLifecycleEventListenerActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.ObjectUtils;
 import  cn.refactor.library.SmoothCheckBox;
@@ -43,7 +43,7 @@ import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
 
-public  class  SystemSettingsActivity  extends  AbstractLifecycleListenerActivity  implements  SmoothCheckBox.OnCheckedChangeListener,AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
+public  class  SystemSettingsActivity  extends AbstractLifecycleEventListenerActivity implements  SmoothCheckBox.OnCheckedChangeListener,AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
 	@Accessors(   chain = true )
 	@Setter

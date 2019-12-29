@@ -169,7 +169,7 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 
 		ChatMessage   chatMessage = this.getItem(position );
 
-		ObjectUtils.cast(convertView.findViewById(TransportState.valueOf(chatMessage.getTransportState()) == TransportState.RECEIVED ? R.id.other_portrait : R.id.owner_portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+(TransportState.valueOf(chatMessage.getTransportState()) == TransportState.RECEIVED ? contactId : context.application().getSquirrelClient().getUserMetadata().getId())+"/portrait").build().toString()) );
+		ObjectUtils.cast(convertView.findViewById(TransportState.valueOf(chatMessage.getTransportState()) == TransportState.RECEIVED ? R.id.other_portrait : R.id.owner_portrait),SimpleDraweeView.class).setImageURI( Uri.parse(context.application().baseUrl().addPathSegments("user/"+(TransportState.valueOf(chatMessage.getTransportState()) == TransportState.RECEIVED ? contactId : context.application().getSquirrelClient().userMetadata().getId())+"/portrait").build().toString()) );
 
 		ObjectUtils.cast(convertView.findViewById(R.id.message_vest_to_switcher),ViewSwitcher.class).setDisplayedChild( TransportState.valueOf(chatMessage.getTransportState()) == TransportState.RECEIVED ? 0 : 1 );
 
@@ -185,13 +185,13 @@ public  class  ChatMessageListviewAdapter  extends  BaseAdapter  <ChatMessage>
 		{
 			File  screenshotFile = new  File( context.application().getCacheDir(),"file/"+chatMessage.getMd5()+"$TMB" );
 
-			ObjectUtils.cast(contentSwitcher.setDisplayedChild(1).findViewById(R.id.screenshot),FlexibleSimpleDraweeView.class).setCacheFile(screenshotFile).setImageURI( screenshotFile.exists() ? Uri.parse(screenshotFile.toURI().toString()) : Uri.parse(context.application().baseUrl().addPathSegments("file/"+chatMessage.getMd5()+"$TMB").addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().getUserMetadata().getSecretKey()).build().toString()) );
+			ObjectUtils.cast(contentSwitcher.setDisplayedChild(1).findViewById(R.id.screenshot),FlexibleSimpleDraweeView.class).setCacheFile(screenshotFile).setImageURI( screenshotFile.exists() ? Uri.parse(screenshotFile.toURI().toString()) : Uri.parse(context.application().baseUrl().addPathSegments("file/"+chatMessage.getMd5()+"$TMB").addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().userMetadata().getSecretKey()).build().toString()) );
 
 			contentSwitcher.findViewById(R.id.upload_progress_bar).setVisibility(     TransportState.valueOf(chatMessage.getTransportState()) ==TransportState.SENDING ? View.VISIBLE : View.GONE );
 
 			ObjectUtils.cast(contentSwitcher.findViewById(R.id.play_button),ImageView.class).setVisibility( TransportState.valueOf(chatMessage.getTransportState()) == TransportState.SENDING||ChatContentType.valueOf(chatMessage.getContentType()) == ChatContentType.IMAGE ? View.GONE : View.VISIBLE );
 
-			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> ActivityCompat.startActivity(context,new  Intent(context,ChatContentType.valueOf(chatMessage.getContentType()) == ChatContentType.IMAGE ? ImagePreviewActivity.class : VideoPreviewActivity.class).putExtra("CACHE_FILE_PATH",new  File(context.application().getCacheDir(),"file/"+chatMessage.getMd5()).getPath()).putExtra("URL",context.application().baseUrl().addPathSegments("file/"+chatMessage.getMd5()).addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().getUserMetadata().getSecretKey()).build().toString()),ActivityOptionsCompat.makeCustomAnimation(context,R.anim.right_in,R.anim.left_out).toBundle()) );
+			contentSwitcher.getDisplayedChild().setOnClickListener( (view) -> ActivityCompat.startActivity(context,new  Intent(context,ChatContentType.valueOf(chatMessage.getContentType()) == ChatContentType.IMAGE ? ImagePreviewActivity.class : VideoPreviewActivity.class).putExtra("CACHE_FILE_PATH",new  File(context.application().getCacheDir(),"file/"+chatMessage.getMd5()).getPath()).putExtra("URL",context.application().baseUrl().addPathSegments("file/"+chatMessage.getMd5()).addQueryParameter("SECRET_KEY",context.application().getSquirrelClient().userMetadata().getSecretKey()).build().toString()),ActivityOptionsCompat.makeCustomAnimation(context,R.anim.right_in,R.anim.left_out).toBundle()) );
 		}
 		else
 		if( ChatContentType.valueOf(chatMessage.getContentType())        == ChatContentType.AUDIO )

@@ -44,10 +44,9 @@ import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.hedgehog.widget.StyleableEditView;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.client.LifecycleListener;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
 import  cc.mashroom.squirrel.module.home.adapters.SystemSettingsLanguageAdapter;
-import  cc.mashroom.squirrel.parent.AbstractLifecycleListenerActivity;
+import  cc.mashroom.squirrel.parent.AbstractLifecycleEventListenerActivity;
 import  cc.mashroom.squirrel.util.LocaleUtils;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.util.StringUtils;
@@ -56,7 +55,7 @@ import  lombok.Getter;
 import  lombok.Setter;
 import  lombok.experimental.Accessors;
 
-public  class  LoginActivity  extends  AbstractLifecycleListenerActivity  implements  Button.OnClickListener,LifecycleListener,HeaderBar.OnItemClickListener,SmoothCheckBox.OnCheckedChangeListener,AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
+public  class  LoginActivity  extends AbstractLifecycleEventListenerActivity implements  Button.OnClickListener,HeaderBar.OnItemClickListener,SmoothCheckBox.OnCheckedChangeListener,AdapterView.OnItemClickListener,LocaleChangeEventDispatcher.LocaleChangeListener
 {
     protected  void  onActivityResult( int  requestCode , int  rstCode , Intent  data )
     {
@@ -143,8 +142,6 @@ public  class  LoginActivity  extends  AbstractLifecycleListenerActivity  implem
     {
         super.onDestroy(  );
 
-        application().getSquirrelClient().removeLifecycleListener(  this );
-
         LocaleChangeEventDispatcher.removeListener( this );
     }
 
@@ -190,7 +187,7 @@ public  class  LoginActivity  extends  AbstractLifecycleListenerActivity  implem
 
             progressDialog.show();
 
-            application().connect( ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString(),ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString(),NetworkUtils.getLocation(this),this );
+            application().connect( ObjectUtils.cast(super.findViewById(R.id.username),StyleableEditView.class).getText().toString(),ObjectUtils.cast(super.findViewById(R.id.password),StyleableEditView.class).getText().toString(),NetworkUtils.getLocation(this) );
         }
     }
 }

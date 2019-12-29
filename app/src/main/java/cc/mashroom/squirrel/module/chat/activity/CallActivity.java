@@ -31,6 +31,7 @@ import  cc.mashroom.hedgehog.widget.HeaderBar;
 import  cc.mashroom.hedgehog.widget.ViewSwitcher;
 import  cc.mashroom.squirrel.client.connect.call.Call;
 import  cc.mashroom.squirrel.client.connect.call.CallState;
+import  cc.mashroom.squirrel.client.connect.call.webrtc.ClientObserver;
 import  cc.mashroom.squirrel.client.connect.call.webrtc.PeerConnectionParameters;
 import  cc.mashroom.squirrel.client.storage.repository.chat.ChatMessageRepository;
 import  cc.mashroom.squirrel.client.storage.repository.chat.NewsProfileRepository;
@@ -42,7 +43,6 @@ import  cc.mashroom.squirrel.paip.message.TransportState;
 import  cc.mashroom.squirrel.paip.message.call.CallContentType;
 import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.connect.call.CallError;
-import  cc.mashroom.squirrel.client.connect.call.CallEventDispatcher;
 import  cc.mashroom.squirrel.client.connect.call.CallListener;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.hedgehog.widget.Stopwatch;
@@ -70,7 +70,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 {
 	protected  void  onCreate( Bundle  savedInstanceState )
 	{
-		CallEventDispatcher.addListener(  this );
+		super.application().getSquirrelClient().getCallEventDispatcher().addListener(  this );
 
 		super.onCreate( savedInstanceState );
 
@@ -91,7 +91,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 		statusBarlayoutParams.height   = ContextUtils.getStatusBarHeight( this );
 
-		super.findViewById(R.id.status_bar_hint).setLayoutParams( statusBarlayoutParams );
+		super.findViewById(R.id.status_bar_hint).setLayoutParams(     statusBarlayoutParams );
 
 		ObjectUtils.cast(super.findViewById(R.id.header_bar),HeaderBar.class).setTitle( ContactRepository.DAO.getContactDirect().get(this.contactId).getRemark() );
 
@@ -142,7 +142,7 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 
 		if( !  getIntent().getBooleanExtra("CALLED",true) )
 		{
-            application().getSquirrelClient().newCall( this.contactId , callContentType );
+            application().getSquirrelClient().newCall( this.contactId, this.callContentType );
 		}
 		else
 		{
@@ -156,14 +156,14 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		}
 	}
 
-	protected  void  onDestroy()
+	protected  void        onDestroy()
 	{
 		super.onDestroy();
 
-		CallEventDispatcher.removeListener(this);
+		super.application().getSquirrelClient().getCallEventDispatcher().removeListener(this);
 	}
 
-	public  void  onStart(Call  call )
+	public  void  onStart( ClientObserver  call )
 	{
 		if( this.callContentType == CallContentType.VIDEO )
 		{
@@ -173,21 +173,21 @@ public  class  CallActivity   extends  AbstractActivity  implements  CallListene
 		this.application().getMainLooperHandler().post( () -> { ObjectUtils.cast(super.findViewById(R.id.prompt_message) , TextView.class).setText(  R.string.call_calling );  ObjectUtils.cast(super.findViewById(R.id.chronometer),Stopwatch.class).start("HH:mm:ss");} );
 	}
 
-	public  void  onRoomCreated(     Call  call )
+	public  void  onRoomCreated(   ClientObserver    call )
 	{
 		{
-			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75-(int)  (((double)  DensityUtils.px(this,10)/super.getResources().getDisplayMetrics().widthPixels)*100),(int)  ((((double)  ContextUtils.getStatusBarHeight(this)+DensityUtils.px(this,50))/super.getResources().getDisplayMetrics().heightPixels)*100)+1,24,24),"opus",1,Application.ICE_SERVERS) ).request();
+			this.setCall(application().getSquirrelClient().getCall()).getCall().initialize( super.application(),new  PeerConnectionParameters(application(),callContentType == CallContentType.VIDEO,"VP9",1280,720,25,callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(0,0,100,100),callContentType != CallContentType.VIDEO ? null : VideoRendererGui.create(75-(int)  (((double)  DensityUtils.px(this,10)/super.getResources().getDisplayMetrics().widthPixels)*100),(int)  ((((double)  ContextUtils.getStatusBarHeight(this)+DensityUtils.px(this,50))/super.getResources().getDisplayMetrics().heightPixels)*100)+1,24,24),"opus",1,Application.ICE_SERVERS) );  this.call.request();
 		}
 	}
 
-	public  void  onError( Call  call,CallError  callError,Throwable  throwable )
+	public  void  onError( ClientObserver  call,CallError  callError,Throwable     throwable )
 	{
 		application().getMainLooperHandler().post( () -> Toasty.error(this,super.getString(errors.containsKey(callError) ? errors.get(callError) : R.string.network_or_internal_server_error),Toast.LENGTH_LONG,false).show() );
 
 		ContextUtils.finish(   this );
 	}
 
-	public  void  onClose(       Call  call,boolean  proactively,CloseCallReason  reason )
+	public  void  onClose( ClientObserver  call,boolean  proactively,CloseCallReason  reason )
 	{
 		DateTime  now   = DateTime.now( DateTimeZone.UTC );
 
