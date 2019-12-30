@@ -50,37 +50,51 @@ import  cc.mashroom.util.NoopX509TrustManager;
 import  cc.mashroom.util.StringUtils;
 import  java8.util.stream.Collectors;
 import  java8.util.stream.StreamSupport;
+import  lombok.Setter;
 import  okhttp3.OkHttpClient;
 
-public  class    NetworkPreinitializeActivity      extends     AbstractActivity  implements  Runnable,ServiceListRequestEventListener
+public  class    NetworkPreinitializeActivity  extends  AbstractActivity  implements  ServiceListRequestEventListener
 {
+	@Override
 	protected  void  onCreate(Bundle  savedInstanceState )
 	{
 		super.onCreate( savedInstanceState );
 
 		LocaleUtils.change(    this , null );
 
-		super.getWindow().addFlags(    WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS );
+		super.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS );
 
-		super.getWindow().setStatusBarColor( super.getResources().getColor(R.color.gainsboro) );
+		super.getWindow().setStatusBarColor( super.getResources().getColor( R.color.gainsboro ) );
 
 		super.setContentView( R.layout.activity_network_preinitialize );
 
 		super.application().getSquirrelClient().route(new  DefaultServiceListRequestStrategy(new  OkHttpClient.Builder().hostnameVerifier(new NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new NoopX509TrustManager()).connectTimeout(5,TimeUnit.SECONDS).writeTimeout(5,TimeUnit.SECONDS).readTimeout(10,TimeUnit.SECONDS).build(),Lists.newArrayList(Application.SERVICE_LIST_REQUEST_URL),StreamSupport.stream(Lists.newArrayList(super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("HOSTS","").split(","))).filter((host) -> StringUtils.isNotBlank(host)).map((host) -> new  Service().setHost(host)).collect(Collectors.toList())),this );
 
-		this.progressDialog = StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight( DensityUtils.px(this,150) );
-
-		super.application().getScheduler().schedule( this, 5 , TimeUnit.SECONDS );
+		setProgressDialog( StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) );
 	}
-
+	@Setter
 	private UIProgressDialog  progressDialog;
 	@Override
 	public  void  onRequestComplete( List<Service>  list )
 	{
 		if( this.progressDialog.isShowing() )
 		{
-			super.application().getMainLooperHandler().post(()-> this.progressDialog.cancel() );run();
+			super.application().getMainLooperHandler().post( () -> this.progressDialog.cancel() );
 		}
+
+		if( list == null  && list.isEmpty() )
+		{
+			super.application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> {this.progressDialog.show();}).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );  return;
+		}
+
+		SharedPreferences  sdprf = super.getSharedPreferences( "LATEST_LOGIN_FORM",MODE_PRIVATE );
+
+		if( sdprf.getLong("USER_ID",0L) > 0 )
+		{
+			super.application().connect( sdprf.getString("USERNAME",""),sdprf.getString("ENCRYPT_PASSWORD",""),NetworkUtils.getLocation(NetworkPreinitializeActivity.this) );
+		}
+
+		ActivityCompat.startActivity( this,new  Intent(NetworkPreinitializeActivity.this,sdprf.getLong("USER_ID",0L) > 0 ? SheetActivity.class : LoginActivity.class),ActivityOptionsCompat.makeCustomAnimation(NetworkPreinitializeActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
 	}
 	@Override
 	public  void  onBeforeRequest()
@@ -92,23 +106,6 @@ public  class    NetworkPreinitializeActivity      extends     AbstractActivity 
     {
         super.onDestroy();
 
-        super.application().getSquirrelClient().getServiceRouteManager().getServiceListRequestEventDispatcher().removeListener(this);
+        super.application().getSquirrelClient().getServiceRouteManager().getServiceListRequestEventDispatcher().removeListener( this );
     }
-
-    public  void     run()
-	{
-		if( super.application().getSquirrelClient().service()  != null )
-		{
-			super.application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> {this.progressDialog.show();}).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );  return;
-		}
-
-		SharedPreferences  sharedPrf = super.getSharedPreferences( "LATEST_LOGIN_FORM",MODE_PRIVATE );
-
-		if( sharedPrf.getLong(      "USER_ID" , 0L ) > 0 )
-		{
-			super.application().connect( sharedPrf.getString("USERNAME",""),sharedPrf.getString("ENCRYPT_PASSWORD",""),NetworkUtils.getLocation(NetworkPreinitializeActivity.this) );
-		}
-
-		ActivityCompat.startActivity( this,new  Intent(NetworkPreinitializeActivity.this,sharedPrf.getLong("USER_ID",0L) > 0 ? SheetActivity.class : LoginActivity.class),ActivityOptionsCompat.makeCustomAnimation(NetworkPreinitializeActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
-	}
 }
