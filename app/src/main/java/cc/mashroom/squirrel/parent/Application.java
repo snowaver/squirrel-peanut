@@ -102,7 +102,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		Toasty.Config.getInstance().allowQueue(true).setTextSize(14).setToastTypeface(Typeface.createFromAsset(super.getResources().getAssets(),"font/droid_sans_mono.ttf")).apply();
 
-		ObjectUtils.cast(super.getSystemService(Context.CONNECTIVITY_SERVICE),ConnectivityManager.class).requestNetwork( new  NetworkRequest.Builder().build(),new  ConnectivityStateListener( this ) );
+		ObjectUtils.cast(super.getSystemService(Context.CONNECTIVITY_SERVICE),ConnectivityManager.class).requestNetwork( new  NetworkRequest.Builder().build(),new ConnectivityAndActivityScheduler( this ) );
 	}
 	@Accessors(  chain = true )
 	@Getter
@@ -111,20 +111,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  void  onAuthenticateComplete( int  returnCode )
 	{
-		if( returnCode == 601||  returnCode == 602 )
-		{
-			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().clear().apply();
 
-			if( !AbstractActivity.STACK.isEmpty() && !authenticateNeedlessActivityClasses.contains(AbstractActivity.STACK.getLast().getClass() ) )
-			{
-				this.clearStackActivitiesAndStart( new  Intent(AbstractActivity.STACK.getLast(),LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",0),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
-			}
-		}
-		else
-		if( returnCode == 200 )
-		{
-			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().putLong("ID",squirrelClient.userMetadata().getId()).putString("USERNAME",squirrelClient.userMetadata().getUsername()).putString("NAME",squirrelClient.userMetadata().getName()).putString("NICKNAME",squirrelClient.userMetadata().getNickname()).putString("HTTPS_BASE_URL",baseUrl().toString()).apply();
-		}
 	}
 	@Override
 	public  void  onTerminate()
@@ -151,18 +138,6 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 		}
 	}
 
-	public  void  clearStackActivitiesAndStart( Intent  intent,Bundle  bundle )
-	{
-		LinkedList<Activity>  activities  = new  LinkedList<Activity>( AbstractActivity.STACK );
-
-		ActivityCompat.startActivity(  activities.isEmpty()? Application.this :     activities.getLast(), intent, bundle );
-
-		if( !   activities.isEmpty() )
-		{
-			for(  Activity  activity : activities  )  activity.finish();
-		}
-	}
-
 	public  void  onError(   Throwable   throwable )
 	{
 
@@ -170,13 +145,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 	public  void  onLogoutComplete( int  code,int  reason )
 	{
-		//  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login  and  skip  to  loginactivity.
-		if( code == 200 &&        ( reason == DisconnectAckPacket.REASON_REMOTE_SIGNIN || reason == DisconnectAckPacket.REASON_CLIENT_LOGOUT   ) )
-		{
-			super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).edit().clear().apply();
 
-			super.getMainLooperHandler().post( () -> clearStackActivitiesAndStart(new  Intent(this,LoginActivity.class).putExtra("USERNAME",super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("USERNAME","")).putExtra("RELOGIN_REASON",reason).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle()) );
-		}
 	}
 
 	public  void  onBeforeSend(     Packet  packet )

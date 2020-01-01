@@ -68,33 +68,33 @@ public  class    NetworkPreinitializeActivity  extends  AbstractActivity  implem
 
 		super.setContentView( R.layout.activity_network_preinitialize );
 
-		super.application().getSquirrelClient().route(new  DefaultServiceListRequestStrategy(new  OkHttpClient.Builder().hostnameVerifier(new NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new NoopX509TrustManager()).connectTimeout(5,TimeUnit.SECONDS).writeTimeout(5,TimeUnit.SECONDS).readTimeout(10,TimeUnit.SECONDS).build(),Lists.newArrayList(Application.SERVICE_LIST_REQUEST_URL),StreamSupport.stream(Lists.newArrayList(super.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE).getString("HOSTS","").split(","))).filter((host) -> StringUtils.isNotBlank(host)).map((host) -> new  Service().setHost(host)).collect(Collectors.toList())),this );
 
 		setProgressDialog( StyleUnifier.unify(new  UIProgressDialog.WeBoBuilder(this).setTextSize(18).setMessage(R.string.waiting).setCanceledOnTouchOutside(false).create(),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).setWidth(DensityUtils.px(this,220)).setHeight(DensityUtils.px(this,150)) );
 	}
 	@Setter
 	private UIProgressDialog  progressDialog;
 	@Override
-	public  void  onRequestComplete( List<Service>  list )
+	public  void  onRequestComplete( int  code,List<Service>  services )
 	{
-		if( this.progressDialog.isShowing() )
-		{
-			super.application().getMainLooperHandler().post( () -> this.progressDialog.cancel() );
-		}
+        SharedPreferences  sdprf = super.getSharedPreferences( "LATEST_LOGIN_FORM",MODE_PRIVATE );
 
-		if( list == null  && list.isEmpty() )
-		{
-			super.application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> {this.progressDialog.show();}).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );  return;
-		}
+        if( this.progressDialog.isShowing() )  super.application().getMainLooperHandler().post( () ->   this.progressDialog.cancel() );
 
-		SharedPreferences  sdprf = super.getSharedPreferences( "LATEST_LOGIN_FORM",MODE_PRIVATE );
-
-		if( sdprf.getLong("USER_ID",0L) > 0 )
-		{
-			super.application().connect( sdprf.getString("USERNAME",""),sdprf.getString("ENCRYPT_PASSWORD",""),NetworkUtils.getLocation(NetworkPreinitializeActivity.this) );
-		}
-
-		ActivityCompat.startActivity( this,new  Intent(NetworkPreinitializeActivity.this,sdprf.getLong("USER_ID",0L) > 0 ? SheetActivity.class : LoginActivity.class),ActivityOptionsCompat.makeCustomAnimation(NetworkPreinitializeActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
+        if( code == 200  )
+        {
+            ActivityCompat.startActivity( this,new  Intent(this,sdprf.getLong("USER_ID",0L) > 0 ? SheetActivity.class : LoginActivity.class),ActivityOptionsCompat.makeCustomAnimation(NetworkPreinitializeActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
+        }
+        else
+        {
+        if( sdprf.getLong("USER_ID",0L) > 0 )
+            {
+            ActivityCompat.startActivity( this,new  Intent(this,SheetActivity.class),ActivityOptionsCompat.makeCustomAnimation(NetworkPreinitializeActivity.this,R.anim.fade_in,R.anim.fade_out).toBundle() );  super.finish();
+            }
+            else
+            {
+            super.application().getMainLooperHandler().post( () -> StyleUnifier.unify(new  UIAlertDialog.DividerIOSBuilder(this).setBackgroundRadius(15).setTitle(R.string.warning).setTitleTextSize(18).setMessage(R.string.network_configuration_error).setMessageTextSize(18).setCancelable(false).setCanceledOnTouchOutside(false).setPositiveButtonTextColor(Color.RED).setNegativeButtonTextSize(18).setNegativeButton(R.string.retry,(dialog,which) -> {this.progressDialog.show();}).setPositiveButtonTextSize(18).setPositiveButton(R.string.exit,(dialog,which) -> android.os.Process.killProcess(android.os.Process.myPid())).create().setWidth((int)  (super.getResources().getDisplayMetrics().widthPixels*0.88)),ResourcesCompat.getFont(this,R.font.droid_sans_mono)).show() );
+            }
+        }
 	}
 	@Override
 	public  void  onBeforeRequest()
