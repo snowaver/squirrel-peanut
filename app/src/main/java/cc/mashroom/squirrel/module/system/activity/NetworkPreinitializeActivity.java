@@ -26,32 +26,20 @@ import  android.view.WindowManager;
 
 import  com.aries.ui.widget.alert.UIAlertDialog;
 import  com.aries.ui.widget.progress.UIProgressDialog;
-import  com.google.common.collect.Lists;
 
 import  java.util.List;
-import  java.util.concurrent.TimeUnit;
 
 import  androidx.core.content.res.ResourcesCompat;
 
 import  cc.mashroom.hedgehog.util.DensityUtils;
-import  cc.mashroom.hedgehog.util.NetworkUtils;
 import  cc.mashroom.hedgehog.util.StyleUnifier;
 import  cc.mashroom.router.Service;
 import  cc.mashroom.router.ServiceListRequestEventListener;
-import  cc.mashroom.router.impl.DefaultServiceListRequestStrategy;
 import  cc.mashroom.squirrel.R;
-import  cc.mashroom.squirrel.client.SquirrelClient;
 import  cc.mashroom.squirrel.parent.AbstractActivity;
 import  cc.mashroom.squirrel.module.home.activity.SheetActivity;
-import  cc.mashroom.squirrel.parent.Application;
 import  cc.mashroom.squirrel.util.LocaleUtils;
-import  cc.mashroom.util.NoopHostnameVerifier;
-import  cc.mashroom.util.NoopX509TrustManager;
-import  cc.mashroom.util.StringUtils;
-import  java8.util.stream.Collectors;
-import  java8.util.stream.StreamSupport;
 import  lombok.Setter;
-import  okhttp3.OkHttpClient;
 
 public  class    NetworkPreinitializeActivity  extends  AbstractActivity  implements  ServiceListRequestEventListener
 {
@@ -96,11 +84,6 @@ public  class    NetworkPreinitializeActivity  extends  AbstractActivity  implem
             }
         }
 	}
-	@Override
-	public  void  onBeforeRequest()
-	{
-		if( !super.isFinishing() && !super.isDestroyed() )  super.application().getMainLooperHandler().post( () -> this.progressDialog.show() );
-	}
     @Override
     protected  void     onDestroy()
     {
@@ -108,4 +91,9 @@ public  class    NetworkPreinitializeActivity  extends  AbstractActivity  implem
 
         super.application().getSquirrelClient().getServiceRouteManager().getServiceListRequestEventDispatcher().removeListener( this );
     }
+	@Override
+	public  void  onBeforeRequest()
+	{
+		if( !super.isFinishing() && !super.isDestroyed() )  super.application().getMainLooperHandler().post( () -> this.progressDialog.show() );
+	}
 }

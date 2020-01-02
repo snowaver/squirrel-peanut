@@ -79,15 +79,13 @@ import  lombok.SneakyThrows;
 import  lombok.experimental.Accessors;
 import  okhttp3.HttpUrl;
 
-public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  LifecycleEventListener,PacketEventListener,ServiceChangeEventListener
+public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  ServiceChangeEventListener
 {
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList(new  PeerConnection.IceServer("stun:47.105.210.154:3478"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302"),new  PeerConnection.IceServer("turn:47.105.210.154:3478","snowaver","snowaver") );
 
 	public  static  String  SERVICE_LIST_REQUEST_URL      = "https://192.168.1.114:8011/system/service?action=1&keyword=0";
-
-	private  Set<Class> authenticateNeedlessActivityClasses  = Sets.newHashSet(NetworkPreinitializeActivity.class,LoginActivity.class,RegisterActivity.class );
 	@Getter
-	private  ScheduledThreadPoolExecutor   scheduler  = new  ScheduledThreadPoolExecutor( 1,new  DefaultThreadFactory("DEFAULT-TASK-SCHEDULER") );
+	private  ScheduledThreadPoolExecutor   scheduler = new  ScheduledThreadPoolExecutor( 1,new  DefaultThreadFactory("DEFAULT-TASK-SCHEDULER") );
 
 	@SneakyThrows
 	public  void     onCreate()
@@ -107,12 +105,8 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 	@Accessors(  chain = true )
 	@Getter
 	@Setter
-	private  SquirrelClient  squirrelClient  = null;
+	private  SquirrelClient  squirrelClient = null;
 
-	public  void  onAuthenticateComplete( int  returnCode )
-	{
-
-	}
 	@Override
 	public  void  onTerminate()
 	{
@@ -122,67 +116,19 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		this.scheduler.shutdown(/**/);
 	}
-
-	public  void  connect( String  username,String  password,Location  geoLoc )
-	{
-		this.squirrelClient.connect( username,true ,password,geoLoc == null ? null : geoLoc.getLongitude(),     geoLoc == null ? null : geoLoc.getLatitude(),NetworkUtils.getMac() );
-	}
 	@Override
-	public  void  onChange( Service  oldService,   Service  newService )
+	public  void  onChange( Service  oldService,Service  newService )
 	{
 		if( oldService != newService )
 		{
-		Fresco.initialize( Application.this,OkHttpImagePipelineConfigFactory.newBuilder(this, this.squirrelClient.okhttpClient(5,5,10)).build() );
+		Fresco.initialize( Application.this,OkHttpImagePipelineConfigFactory.newBuilder(this,this.squirrelClient.okhttpClient(5,5,10)).build() );
 
-		ServiceRegistry.INSTANCE.initialize( this );
+		ServiceRegistry.INSTANCE.initialize(this );
 		}
-	}
-
-	public  void  onError(   Throwable   throwable )
-	{
-
-	}
-
-	public  void  onLogoutComplete( int  code,int  reason )
-	{
-
-	}
-
-	public  void  onBeforeSend(     Packet  packet )
-	{
-
-	}
-
-	public  void  onReceivedOfflineData( OoIData  offline )
-	{
-
 	}
 
 	public  HttpUrl.Builder  baseUrl()
 	{
 		return  new  HttpUrl.Builder().scheme(System.getProperty("squirrel.dt.server.schema","https")).host(this.squirrelClient.service().getHost()).port( Integer.parseInt(System.getProperty("squirrel.dt.server.port","8011")) );
-	}
-
-	public  void  onSent(   Packet  sentPacket,TransportState  transportState )
-	{
-
-	}
-
-	public  void  onConnectStateChanged(     ConnectState connectState )
-	{
-
-	}
-
-	public  void  onReceived(Packet receivedPacket )
-	{
-		if( receivedPacket instanceof   CallPacket )
-		{
-			ActivityCompat.startActivity( this,new  Intent(this,ObjectUtils.cast(receivedPacket,CallPacket.class).getContentType() == CallContentType.AUDIO ? AudioCallActivity.class : VideoCallActivity.class).putExtra("CONTACT_ID",ObjectUtils.cast(receivedPacket,CallPacket.class).getContactId()).putExtra("CALL_TYPE",ObjectUtils.cast(receivedPacket,CallPacket.class).getContentType().getValue()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("CALLED",true),ActivityOptionsCompat.makeCustomAnimation(this,R.anim.right_in,R.anim.left_out).toBundle() );
-		}
-		else
-		if( receivedPacket instanceof   ChatPacket )
-		{
-			PushServiceNotifier.INSTANCE.notify( new  NewsProfile(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId(),new  Timestamp(DateTime.now().getMillis()),PAIPPacketType.CHAT.getValue(),ObjectUtils.cast(receivedPacket,ChatPacket.class).getContactId(),ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType() == ChatContentType.WORDS ? new  String(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContent()) : super.getString(NewsProfileListAdapter.NEWS_PROFILE_PLACEHOLDERS.get(ObjectUtils.cast(receivedPacket,ChatPacket.class).getContentType().getPlaceholder())),0) );
-		}
 	}
 }
