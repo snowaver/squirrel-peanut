@@ -68,37 +68,45 @@ import  cc.mashroom.util.ObjectUtils;
 import  java8.util.stream.Collectors;
 import  java8.util.stream.StreamSupport;
 import  lombok.AllArgsConstructor;
+import  lombok.Getter;
+import  lombok.Setter;
+import  lombok.experimental.Accessors;
 import  okhttp3.OkHttpClient;
 
 import  static  android.content.Context.MODE_PRIVATE;
 
 @AllArgsConstructor
 
-public  class  ConnectivityAndActivityScheduler    extends  ConnectivityManager.NetworkCallback  implements  ServiceListRequestEventListener,LifecycleEventListener,PacketEventListener
+public  class  ConnectivityAndActivityScheduler      extends  ConnectivityManager.NetworkCallback  implements  ServiceListRequestEventListener,LifecycleEventListener,PacketEventListener
 {
+    @Accessors(        chain=true )
+    @Setter
+    @Getter
     protected  Application  application;
 
-    public  void  onAvailable(     Network  network )
+    public  void  onAvailable(   Network    network )
     {
-        super.onAvailable(  network   );
+        super.onAvailable(  network   );this.route();
     }
     @Override
     public  void  onBeforeRequest()
     {
 
     }
+
     public  void  route()
     {
         this.application.getSquirrelClient().route( new  DefaultServiceListRequestStrategy(new  OkHttpClient.Builder().hostnameVerifier(new  NoopHostnameVerifier()).sslSocketFactory(SquirrelClient.SSL_CONTEXT.getSocketFactory(),new NoopX509TrustManager()).connectTimeout(5, TimeUnit.SECONDS).writeTimeout(5,TimeUnit.SECONDS).readTimeout(10,TimeUnit.SECONDS).build(),Lists.newArrayList(Application.SERVICE_LIST_REQUEST_URL)),this );
     }
-    public  void  connect( String  username,String  password,Location  geoLoc )
+
+    public  void  connect( String  username,String  password,Location  location )
     {
-        this.application.getSquirrelClient().connect( username,true,password,geoLoc == null ? null : geoLoc.getLongitude(),geoLoc == null ? null : geoLoc.getLatitude(),NetworkUtils.getMac() );
+        this.application.getSquirrelClient().connect( username,true,password,location == null ? null : location.getLongitude(),location == null ? null : location.getLatitude(),NetworkUtils.getMac() );
     }
     @Override
     public  void  onRequestComplete( int  code,List<Service>   services )
     {
-        SharedPreferences  sdpf = this.application.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE );
+        SharedPreferences  sdpf = this.application.getSharedPreferences( "LATEST_LOGIN_FORM" ,MODE_PRIVATE );
 
         if( code == 200 && sdpf.getLong("USER_ID",0L)  > 0 )
         {
@@ -113,7 +121,7 @@ public  class  ConnectivityAndActivityScheduler    extends  ConnectivityManager.
     @Override
     public  void  onAuthenticateComplete( int  code )
     {
-        SharedPreferences  sdpf = this.application.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE );
+        SharedPreferences  sdpf = this.application.getSharedPreferences( "LATEST_LOGIN_FORM" ,MODE_PRIVATE );
 
         if( code == 200 )
         {
@@ -130,7 +138,7 @@ public  class  ConnectivityAndActivityScheduler    extends  ConnectivityManager.
 
                 ActivityCompat.startActivity( AbstractActivity.STACK.getLast(),new  Intent(AbstractActivity.STACK.getLast(),LoginActivity.class).putExtra("USERNAME",sdpf.getString("USERNAME","")).putExtra("RELOGIN_REASON",0),ActivityOptionsCompat.makeCustomAnimation(this.application,R.anim.right_in,R.anim.left_out).toBundle() );
 
-                StreamSupport.stream(stackActivities).forEach( (stackActivity) -> stackActivity.finish() );
+                StreamSupport.stream(stackActivities).forEach( (stackActivity)  ->  stackActivity.finish() );
             }
         }
     }
@@ -142,17 +150,17 @@ public  class  ConnectivityAndActivityScheduler    extends  ConnectivityManager.
     @Override
     public  void  onLogoutComplete(  int  code,int  reason )
     {
-        SharedPreferences  sdpf = this.application.getSharedPreferences("LATEST_LOGIN_FORM",MODE_PRIVATE );
+        SharedPreferences  sdpf = this.application.getSharedPreferences( "LATEST_LOGIN_FORM" ,MODE_PRIVATE );
         //  remove  credentials  if  logout  or  squeezed  off  the  line  by  remote  login,  finish  stack  activities  and   start  login  activity.
         if( code == 200 )
         {
-            if( reason == DisconnectAckPacket.REASON_REMOTE_SIGNIN || reason == DisconnectAckPacket.REASON_CLIENT_LOGOUT )
+            if( reason == DisconnectAckPacket.REASON_REMOTE_SIGNIN  || reason == DisconnectAckPacket.REASON_CLIENT_LOGOUT )
             {
                 List<Activity>  stackActivities = new  ArrayList<Activity>( AbstractActivity.STACK );
 
                 ActivityCompat.startActivity( AbstractActivity.STACK.getLast(),new  Intent(AbstractActivity.STACK.getLast(),LoginActivity.class).putExtra("USERNAME",sdpf.getString("USERNAME","")).putExtra("RELOGIN_REASON",reason),ActivityOptionsCompat.makeCustomAnimation(this.application,R.anim.right_in,R.anim.left_out).toBundle() );
 
-                StreamSupport.stream(stackActivities).forEach( (stackActivity) -> stackActivity.finish() );
+                StreamSupport.stream(stackActivities).forEach( (stackActivity)  ->  stackActivity.finish() );
             }
         }
     }

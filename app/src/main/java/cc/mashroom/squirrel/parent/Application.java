@@ -81,11 +81,15 @@ import  okhttp3.HttpUrl;
 
 public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  implements  ServiceChangeEventListener
 {
+	protected  PushServiceNotifier  pushServiceNotifier = new  PushServiceNotifier( this );
+
+    protected  ConnectivityAndActivityScheduler  connectivityAndActivityScheduler = new  ConnectivityAndActivityScheduler( this );
+
 	public  static  List<PeerConnection.IceServer>  ICE_SERVERS = Lists.newArrayList(new  PeerConnection.IceServer("stun:47.105.210.154:3478"),new  PeerConnection.IceServer("stun:stun.l.google.com:19302"),new  PeerConnection.IceServer("turn:47.105.210.154:3478","snowaver","snowaver") );
 
 	public  static  String  SERVICE_LIST_REQUEST_URL      = "https://192.168.1.114:8011/system/service?action=1&keyword=0";
 	@Getter
-	private  ScheduledThreadPoolExecutor   scheduler = new  ScheduledThreadPoolExecutor( 1,new  DefaultThreadFactory("DEFAULT-TASK-SCHEDULER") );
+	protected  ScheduledThreadPoolExecutor   scheduler = new  ScheduledThreadPoolExecutor( 1,new  DefaultThreadFactory("DEFAULT-TASK-SCHEDULER") );
 
 	@SneakyThrows
 	public  void     onCreate()
@@ -94,9 +98,7 @@ public  class  Application  extends  cc.mashroom.hedgehog.parent.Application  im
 
 		LocaleUtils.change(this,null);
 
-		setSquirrelClient(new  SquirrelClient( this,super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir())).getSquirrelClient().getLifecycleEventDispatcher().addListener( this );
-
-		PushServiceNotifier.INSTANCE.initialize(    this );
+		setSquirrelClient( new  SquirrelClient( this,super.setCacheDir(FileUtils.createDirectoryIfAbsent(super.getDir(".squirrel",Context.MODE_PRIVATE))).getCacheDir()) );
 
 		Toasty.Config.getInstance().allowQueue(true).setTextSize(14).setToastTypeface(Typeface.createFromAsset(super.getResources().getAssets(),"font/droid_sans_mono.ttf")).apply();
 

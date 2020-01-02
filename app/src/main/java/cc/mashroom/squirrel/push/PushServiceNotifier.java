@@ -28,44 +28,40 @@ import  cc.mashroom.squirrel.R;
 import  cc.mashroom.squirrel.client.storage.model.chat.NewsProfile;
 import  cc.mashroom.squirrel.client.storage.model.user.Contact;
 import  cc.mashroom.squirrel.client.storage.repository.user.ContactRepository;
-import cc.mashroom.squirrel.module.system.activity.NetworkPreinitializeActivity;
+import  cc.mashroom.squirrel.module.system.activity.NetworkPreinitializeActivity;
+import  cc.mashroom.squirrel.parent.Application;
 import  cc.mashroom.util.ObjectUtils;
 import  cc.mashroom.hedgehog.util.ContextUtils;
 import  lombok.AccessLevel;
-import  lombok.NoArgsConstructor;
+import  lombok.NonNull;
+import  lombok.RequiredArgsConstructor;
 
-@NoArgsConstructor( access=AccessLevel.PRIVATE )
+@RequiredArgsConstructor(access=AccessLevel.PUBLIC)
 
 public  class  PushServiceNotifier
 {
-	private  Context  context;
+	@NonNull
+	protected  Application  application;
 
-	private  SimpleDateFormat  format = new  SimpleDateFormat("yyyy-MM-dd HH:mm:ss" );
-
-	public  void  initialize( Context  context )
-	{
-		this.context= context;
-	}
-
-	public  final  static  PushServiceNotifier  INSTANCE = new  PushServiceNotifier();
+	protected  SimpleDateFormat  format = new  SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
 	public  NewsProfile  notify( NewsProfile  newsProfile )
 	{
-		if( ContextUtils.isApplicationRunningBackground(this.context) )
+		if( !ContextUtils.isApplicationRunningBackground(this.application) )
 		{
-			NotificationManager  notificationManager = ObjectUtils.cast( this.context.getSystemService(Context.NOTIFICATION_SERVICE) );
-
-			RemoteViews  notification = new  RemoteViews( this.context.getPackageName(),R.layout.notification_push );
-
-			Contact  contact   = ContactRepository.DAO.getContactDirect().get( newsProfile.getContactId() );
-
-			notification.setTextViewText( R.id.content,contact.getRemark()+this.context.getString(R.string.colon)+newsProfile.getContent() );
-
-			notification.setTextViewText( R.id.time,format.format(newsProfile.getCreateTime()).toString() );
-
-			notificationManager.notify( 0,new  NotificationCompat.Builder(context,"default").setSmallIcon(R.drawable.app).setTicker(context.getString(R.string.notification_received_a_new_message)).setPriority(NotificationCompat.PRIORITY_DEFAULT).setContent(notification).setContentIntent(PendingIntent.getActivity(context,0,new  Intent(context, NetworkPreinitializeActivity.class),PendingIntent.FLAG_UPDATE_CURRENT)).build() );
+		return  newsProfile;
 		}
 
-		return    newsProfile;
+		NotificationManager  notificationManager = ObjectUtils.cast( this.application.getSystemService(Context.NOTIFICATION_SERVICE) );
+
+		RemoteViews  notification = new  RemoteViews( this.application.getPackageName(),R.layout.notification_push );
+
+		Contact  contact   = ContactRepository.DAO.getContactDirect().get( newsProfile.getContactId() );
+
+		notification.setTextViewText( R.id.content,contact.getRemark()+this.application.getString(R.string.colon)+newsProfile.getContent() );
+
+		notification.setTextViewText( R.id.time,format.format(newsProfile.getCreateTime()).toString() );
+
+		notificationManager.notify( 0,new  NotificationCompat.Builder( this.application,"default").setSmallIcon(R.drawable.app).setTicker(this.application.getString(R.string.notification_received_a_new_message)).setPriority(NotificationCompat.PRIORITY_DEFAULT).setContent(notification).setContentIntent(PendingIntent.getActivity(this.application,0,new  Intent(this.application,NetworkPreinitializeActivity.class),PendingIntent.FLAG_UPDATE_CURRENT)).build() );  return  newsProfile;
 	}
 }
